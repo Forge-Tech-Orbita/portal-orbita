@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Órbita — Protótipo Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="lab-label"> · <span>PORTAL ÓRBITA . </span></div>
+
+    <div class="device">
+        <div class="screen-area" id="screenArea">
+            <div class="notch"></div>
+            <div class="statusbar">
+                <span class="time" id="clock">21:42</span>
+                <div class="icons">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 12h2M6 8h2M10 5h2M14 3h2v18h-2M18 8h2" />
+                    </svg>
+                    <svg width="16" height="12" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="2" width="19" height="12" rx="2" />
+                        <path d="M22 6v4" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="screens">
+
+                <!-- ============ LOGIN ============ -->
+                <section class="screen active" id="screen-login">
+                    <div class="login-logo">
+                        <svg class="orbit-mark" viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="30" fill="#FBF8EF" stroke="#DECBA0" stroke-width="1" />
+                            <circle cx="32" cy="32" r="25" fill="none" stroke="#2B2A22" stroke-width="1.2"
+                                stroke-dasharray="2.5 3" />
+                            <circle cx="32" cy="32" r="5.5" fill="#2B2A22" />
+                            <ellipse cx="32" cy="32" rx="21" ry="9" stroke="#2B2A22" stroke-width="1.3" opacity=".85" />
+                            <ellipse cx="32" cy="32" rx="21" ry="9" stroke="#A6543B" stroke-width="1.3"
+                                transform="rotate(60 32 32)" opacity=".85" />
+                            <ellipse cx="32" cy="32" rx="21" ry="9" stroke="#C98A2E" stroke-width="1.3"
+                                transform="rotate(120 32 32)" opacity=".85" />
+                        </svg>
+                        <h1>ÓRBITA</h1>
+                        <p>ENSINO EM OUTRA ÓRBITA</p>
+                    </div>
+
+                    <form id="loginForm" onsubmit="return doLogin(event)">
+                        <div class="field">
+                            <label>Matrícula</label>
+                            <input type="text" placeholder="2023104567" value="2023104567" required>
+                        </div>
+                        <div class="field">
+                            <label>Senha de acesso</label>
+                            <input type="password" placeholder="••••••••" value="••••••••" required>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%" type="submit" id="loginBtn">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.4">
+                                <path d="M5 12h14M13 6l6 6-6 6" />
+                            </svg>
+                            ENTRAR NO PORTAL
+                        </button>
+                    </form>
+                    <div class="bio-row" onclick="doLogin(event)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M12 11a3 3 0 0 1 3 3v2M9 20.5V17a3 3 0 0 1 6 0M12 4a8 8 0 0 0-8 8c0 1.9.6 3.6 1.6 5M20 12a8 8 0 0 0-3-6.2M12 8a4 4 0 0 1 4 4v1" />
+                        </svg>
+                        Acessar com biometria
+                    </div>
+                    <div class="login-foot">INSTITUTO ÓRBITA · SISTEMA ACADÊMICO v3.2<br>CONEXÃO CRIPTOGRAFADA · REDE
+                        INTEGRADA</div>
+                </section>
+
+                <!-- ============ HOME ============ -->
+                <section class="screen" id="screen-home">
+                    <div class="home-header">
+                        <div>
+                            <div class="greet-eyebrow" id="greetTime">Boa noite</div>
+                            <h1>Marina Duarte</h1>
+                        </div>
+                        <div class="bell" onclick="go('screen-notices')">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+                            </svg>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+
+                    <div class="id-card-wrap">
+                        <div class="id-card" id="idCard">
+                            <div class="id-card-top">
+                                <span class="org">◈ INSTITUTO ÓRBITA</span>
+                                <div class="chip"></div>
+                            </div>
+                            <div class="id-card-body">
+                                <div class="id-avatar">MD</div>
+                                <div class="id-info">
+                                    <div class="name">Marina Duarte Costa</div>
+                                    <div class="course">Engenharia de Software · 6º período</div>
+                                </div>
+                            </div>
+                            <div class="id-meta">
+                                <div><span class="label">Matrícula</span><span class="value">2023104567</span></div>
+                                <div><span class="label">Validade</span><span class="value">12/2027</span></div>
+                                <div class="barcode" id="barcode"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat">
+                            <div class="num">8.7</div>
+                            <div class="lbl">CRA geral</div>
+                        </div>
+                        <div class="stat">
+                            <div class="num">94%</div>
+                            <div class="lbl">Frequência</div>
+                        </div>
+                        <div class="stat">
+                            <div class="num">142</div>
+                            <div class="lbl">Créditos</div>
+                        </div>
+                    </div>
+
+                    <div class="card next-class">
+                        <div class="bar"></div>
+                        <div class="info">
+                            <div class="subj">Inteligência Artificial</div>
+                            <div class="meta">Sala 304 · Bloco C · Prof. R. Nakamura</div>
+                        </div>
+                        <div class="countdown">em 47 min<small>19:00</small></div>
+                    </div>
+
+                    <div class="qa-grid">
+                        <div class="qa" onclick="go('screen-financial')">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <path d="M2 10h20" />
+                            </svg>
+                            <div class="t">Financeiro</div>
+                        </div>
+                        <div class="qa" onclick="go('screen-library')">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z" />
+                                <path d="M4 19.5V17" />
+                            </svg>
+                            <div class="t">Biblioteca</div>
+                        </div>
+                        <div class="qa" onclick="go('screen-notices')">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+                            </svg>
+                            <div class="t">Avisos</div>
+                        </div>
+                        <div class="qa" onclick="go('screen-support')">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.9.4-1.5 1-1.5 2.2M12 17h.01" />
+                            </svg>
+                            <div class="t">Suporte</div>
+                        </div>
+                    </div>
+
+                    <div class="section-head">
+                        <h3>Mural recente</h3><a onclick="go('screen-notices')">ver tudo</a>
+                    </div>
+                    <div class="card">
+                        <div class="notice-mini">
+                            <span class="tag tag-acad">Acadêmico</span>
+                            <div class="ntxt"><b>Matrícula do próximo período</b> abre dia 15/09 pelo portal.</div>
+                        </div>
+                        <div class="notice-mini">
+                            <span class="tag tag-event">Eventos</span>
+                            <div class="ntxt"><b>Semana de Tecnologia</b> com palestras e feira de projetos.</div>
+                        </div>
+                        <div class="notice-mini">
+                            <span class="tag tag-fin">Financeiro</span>
+                            <div class="ntxt"><b>Boleto de setembro</b> disponível para emissão.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ SCHEDULE ============ -->
+                <section class="screen" id="screen-schedule">
+                    <div class="eyebrow" style="margin-top:16px;">HORÁRIO SEMANAL</div>
+                    <h2 style="font-size:19px; font-family:var(--font-body); margin-bottom:16px;">Suas aulas</h2>
+                    <div class="day-chips" id="dayChips"></div>
+                    <div id="classList"></div>
+                </section>
+
+                <!-- ============ GRADES ============ -->
+                <section class="screen" id="screen-grades">
+                    <div class="eyebrow" style="margin-top:16px;">DESEMPENHO ACADÊMICO</div>
+                    <h2 style="font-size:19px; font-family:var(--font-body); margin-bottom:18px;">Notas &amp; frequência
+                    </h2>
+
+                    <div class="gpa-ring-wrap">
+                        <div class="gpa-ring">
+                            <svg width="96" height="96" viewBox="0 0 96 96">
+                                <circle cx="48" cy="48" r="42" stroke="var(--panel-3)" stroke-width="8" fill="none" />
+                                <circle cx="48" cy="48" r="42" stroke="url(#gradGpa)" stroke-width="8" fill="none"
+                                    stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="45" />
+                                <defs>
+                                    <linearGradient id="gradGpa" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#00e5ff" />
+                                        <stop offset="100%" stop-color="#8b6bff" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="center"><span class="n">8.7</span><span class="l">CRA</span></div>
+                        </div>
+                        <div class="gpa-legend">
+                            <div class="row"><span>Aprovadas</span><b>18</b></div>
+                            <div class="row"><span>Cursando</span><b>5</b></div>
+                            <div class="row"><span>Pendentes</span><b>0</b></div>
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="chip active" onclick="filterGrades('todas', event)">Todas</div>
+                        <div class="chip" onclick="filterGrades('cursando', event)">Cursando</div>
+                        <div class="chip" onclick="filterGrades('concluidas', event)">Concluídas</div>
+                    </div>
+                    <div id="gradesList"></div>
+                </section>
+
+                <!-- ============ COURSES ============ -->
+                <section class="screen" id="screen-courses">
+                    <div class="eyebrow" style="margin-top:16px;">SEMESTRE 2026.2</div>
+                    <h2 style="font-size:19px; font-family:var(--font-body); margin-bottom:18px;">Minhas disciplinas
+                    </h2>
+                    <div id="coursesList"></div>
+                </section>
+
+                <!-- ============ MORE ============ -->
+                <section class="screen" id="screen-more">
+                    <div class="eyebrow" style="margin-top:16px;">NAVEGAÇÃO</div>
+                    <h2 style="font-size:19px; font-family:var(--font-body); margin-bottom:18px;">Mais opções</h2>
+                    <div class="more-grid">
+                        <div class="more-tile" onclick="go('screen-financial')">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <path d="M2 10h20" />
+                            </svg>
+                            <div class="t">Financeiro</div>
+                            <div class="d">Boletos e pagamentos</div>
+                        </div>
+                        <div class="more-tile" onclick="go('screen-library')">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z" />
+                            </svg>
+                            <div class="t">Biblioteca</div>
+                            <div class="d">Empréstimos e acervo</div>
+                        </div>
+                        <div class="more-tile" onclick="go('screen-notices')">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                            </svg>
+                            <div class="t">Mural</div>
+                            <div class="d">Avisos e comunicados</div>
+                        </div>
+                        <div class="more-tile" onclick="go('screen-profile')">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
+                            </svg>
+                            <div class="t">Perfil</div>
+                            <div class="d">Dados e configurações</div>
+                        </div>
+                        <div class="more-tile" onclick="go('screen-support')">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.9.4-1.5 1-1.5 2.2M12 17h.01" />
+                            </svg>
+                            <div class="t">Suporte</div>
+                            <div class="d">Central de ajuda</div>
+                        </div>
+                        <div class="more-tile rose" onclick="go('screen-login')">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                            </svg>
+                            <div class="t">Sair</div>
+                            <div class="d">Encerrar sessão</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ FINANCIAL ============ -->
+                <section class="screen" id="screen-financial">
+                    <div class="topbar">
+                        <div class="backbtn" onclick="goBack()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.4">
+                                <path d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </div>
+                        <h2>Financeiro</h2>
+                    </div>
+
+                    <div class="status-banner open">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffb84d" stroke-width="2">
+                            <path
+                                d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+                        </svg>
+                        <div>
+                            <div class="st">Fatura em aberto</div>
+                            <div class="sd">Vencimento em 10/09/2026</div>
+                        </div>
+                    </div>
+
+                    <div class="card invoice-card">
+                        <div class="eyebrow">MENSALIDADE · SETEMBRO</div>
+                        <div class="invoice-row"><span class="l">Valor</span><span class="v">R$ 1.240,00</span></div>
+                        <div class="invoice-row"><span class="l">Vencimento</span><span class="v">10/09/2026</span>
+                        </div>
+                        <div class="invoice-row"><span class="l">Desconto pontualidade</span><span class="v"
+                                style="color:var(--mint)">− R$ 62,00</span></div>
+                        <div class="barcode-strip" id="barcodeStrip"></div>
+                        <button class="btn btn-primary" style="width:100%">Gerar 2ª via</button>
+                    </div>
+
+                    <div class="section-head">
+                        <h3>Histórico de pagamentos</h3>
+                    </div>
+                    <div class="card">
+                        <div class="hist-item"><span class="l">Agosto/2026</span><span class="r paid">Pago · R$
+                                1.178,00</span></div>
+                        <div class="hist-item"><span class="l">Julho/2026</span><span class="r paid">Pago · R$
+                                1.178,00</span></div>
+                        <div class="hist-item"><span class="l">Junho/2026</span><span class="r paid">Pago · R$
+                                1.178,00</span></div>
+                        <div class="hist-item"><span class="l">Maio/2026</span><span class="r paid">Pago · R$
+                                1.178,00</span></div>
+                    </div>
+                </section>
+
+                <!-- ============ LIBRARY ============ -->
+                <section class="screen" id="screen-library">
+                    <div class="topbar">
+                        <div class="backbtn" onclick="goBack()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.4">
+                                <path d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </div>
+                        <h2>Biblioteca</h2>
+                    </div>
+
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                        <input type="text" placeholder="Buscar título, autor ou ISBN...">
+                    </div>
+                    <div class="cat-row">
+                        <div class="cat-pill">Todos</div>
+                        <div class="cat-pill">Exatas</div>
+                        <div class="cat-pill">Computação</div>
+                        <div class="cat-pill">Humanas</div>
+                        <div class="cat-pill">Periódicos</div>
+                    </div>
+
+                    <div class="section-head">
+                        <h3>Meus empréstimos</h3>
+                    </div>
+                    <div class="book-item">
+                        <div class="book-cover"></div>
+                        <div class="book-info">
+                            <div class="t">Estruturas de Dados e Algoritmos</div>
+                            <div class="a">T. Cormen</div>
+                        </div>
+                        <div class="book-due due-warn">2 dias</div>
+                    </div>
+                    <div class="book-item">
+                        <div class="book-cover"></div>
+                        <div class="book-info">
+                            <div class="t">Arquitetura Limpa</div>
+                            <div class="a">R. C. Martin</div>
+                        </div>
+                        <div class="book-due due-ok">12 dias</div>
+                    </div>
+                    <div class="book-item">
+                        <div class="book-cover"></div>
+                        <div class="book-info">
+                            <div class="t">Redes Neurais e Deep Learning</div>
+                            <div class="a">I. Goodfellow</div>
+                        </div>
+                        <div class="book-due due-ok">18 dias</div>
+                    </div>
+                </section>
+
+                <!-- ============ NOTICES ============ -->
+                <section class="screen" id="screen-notices">
+                    <div class="topbar">
+                        <div class="backbtn" onclick="goBack()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.4">
+                                <path d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </div>
+                        <h2>Mural de avisos</h2>
+                    </div>
+
+                    <div class="notice-full">
+                        <div class="notice-dot"></div>
+                        <div class="body">
+                            <div class="head"><span class="ttl">Matrícula do próximo período</span><span
+                                    class="tag tag-acad">Acadêmico</span></div>
+                            <div class="txt">As inscrições para o período 2026.2 abrem no portal a partir das 8h.</div>
+                            <div class="date">Hoje · 08:12</div>
+                        </div>
+                    </div>
+                    <div class="notice-full">
+                        <div class="notice-dot" style="background:var(--violet); box-shadow:0 0 6px var(--violet)">
+                        </div>
+                        <div class="body">
+                            <div class="head"><span class="ttl">Semana de Tecnologia Órbita</span><span
+                                    class="tag tag-event">Eventos</span></div>
+                            <div class="txt">Palestras, workshops e feira de projetos dos alunos no Bloco C.</div>
+                            <div class="date">Ontem · 17:40</div>
+                        </div>
+                    </div>
+                    <div class="notice-full">
+                        <div class="notice-dot" style="background:var(--amber); box-shadow:0 0 6px var(--amber)"></div>
+                        <div class="body">
+                            <div class="head"><span class="ttl">Boleto de setembro disponível</span><span
+                                    class="tag tag-fin">Financeiro</span></div>
+                            <div class="txt">A fatura já pode ser emitida na área Financeiro do portal.</div>
+                            <div class="date">2 dias atrás</div>
+                        </div>
+                    </div>
+                    <div class="notice-full">
+                        <div class="notice-dot"></div>
+                        <div class="body">
+                            <div class="head"><span class="ttl">Manutenção no laboratório 2</span><span
+                                    class="tag tag-acad">Acadêmico</span></div>
+                            <div class="txt">Aulas remanejadas para o laboratório 5 durante esta semana.</div>
+                            <div class="date">4 dias atrás</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ SUPPORT ============ -->
+                <section class="screen" id="screen-support">
+                    <div class="topbar">
+                        <div class="backbtn" onclick="goBack()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.4">
+                                <path d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </div>
+                        <h2>Central de suporte</h2>
+                    </div>
+                    <div class="card" style="margin-bottom:14px;">
+                        <div class="eyebrow">FALE COM A SECRETARIA</div>
+                        <p style="font-size:12.5px; color:var(--text-dim); line-height:1.6; margin:0 0 14px;">Abra um
+                            chamado para dúvidas sobre matrícula, documentos, aproveitamento de disciplinas ou
+                            requerimentos.</p>
+                        <button class="btn btn-primary" style="width:100%">Abrir novo chamado</button>
+                    </div>
+                    <div class="section-head">
+                        <h3>Perguntas frequentes</h3>
+                    </div>
+                    <div class="card">
+                        <div class="notice-mini">
+                            <div class="ntxt"><b>Como emito a 2ª via do boleto?</b><br>Acesse Financeiro → Gerar 2ª via.
+                            </div>
+                        </div>
+                        <div class="notice-mini">
+                            <div class="ntxt"><b>Como solicito o histórico escolar?</b><br>Abra um chamado na Central de
+                                Suporte.</div>
+                        </div>
+                        <div class="notice-mini">
+                            <div class="ntxt"><b>Onde vejo minha frequência?</b><br>Acesse Notas → detalhes da
+                                disciplina.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ PROFILE ============ -->
+                <section class="screen" id="screen-profile">
+                    <div class="eyebrow" style="margin-top:16px;">CONTA</div>
+                    <h2 style="font-size:19px; font-family:var(--font-body); margin-bottom:16px;">Meu perfil</h2>
+
+                    <div class="id-card-wrap">
+                        <div class="id-card">
+                            <div class="id-card-top"><span class="org">◈ INSTITUTO ÓRBITA</span>
+                                <div class="chip"></div>
+                            </div>
+                            <div class="id-card-body">
+                                <div class="id-avatar">MD</div>
+                                <div class="id-info">
+                                    <div class="name">Marina Duarte Costa</div>
+                                    <div class="course">Engenharia de Software</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prof-list">
+                        <div class="prof-row">
+                            <div class="l"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <rect x="4" y="4" width="16" height="16" rx="3" />
+                                </svg>CPF</div>
+                            <div class="v">•••.•••.•••-45</div>
+                        </div>
+                        <div class="prof-row">
+                            <div class="l"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <path d="M4 4h16v16H4z" />
+                                </svg>E-mail institucional</div>
+                            <div class="v">marina.costa@orbita.edu</div>
+                        </div>
+                        <div class="prof-row">
+                            <div class="l"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <path
+                                        d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.7a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2Z" />
+                                </svg>Telefone</div>
+                            <div class="v">(11) 9•••-4521</div>
+                        </div>
+                        <div class="prof-row">
+                            <div class="l"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                                </svg>Notificações push</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')">
+                                <div class="dot2"></div>
+                            </div>
+                        </div>
+                        <div class="prof-row">
+                            <div class="l"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" />
+                                </svg>Modo escuro</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')">
+                                <div class="dot2"></div>
+                            </div>
+                        </div>
+                        <div class="prof-row">
+                            <div class="l"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <circle cx="12" cy="8" r="4" />
+                                    <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
+                                </svg>Biometria facial</div>
+                            <div class="toggle" onclick="this.classList.toggle('on')">
+                                <div class="dot2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn logout-btn" onclick="go('screen-login')">Encerrar sessão</button>
+                </section>
+
+            </div>
+
+            <!-- ============ BOTTOM NAV ============ -->
+            <div class="bottomnav" id="bottomnav">
+                <div class="navbtn active" data-target="screen-home" onclick="go('screen-home', true)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 11.5 12 4l9 7.5" />
+                        <path d="M5 10v10h14V10" />
+                    </svg>
+                    <span>Início</span>
+                </div>
+                <div class="navbtn" data-target="screen-schedule" onclick="go('screen-schedule', true)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M3 10h18M8 3v4M16 3v4" />
+                    </svg>
+                    <span>Horário</span>
+                </div>
+                <div class="navbtn" data-target="screen-grades" onclick="go('screen-grades', true)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 20V10M12 20V4M20 20v-7" />
+                    </svg>
+                    <span>Notas</span>
+                </div>
+                <div class="navbtn" data-target="screen-courses" onclick="go('screen-courses', true)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z" />
+                    </svg>
+                    <span>Cursos</span>
+                </div>
+                <div class="navbtn" data-target="screen-more" onclick="go('screen-more', true)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="5" cy="12" r="1.6" />
+                        <circle cx="12" cy="12" r="1.6" />
+                        <circle cx="19" cy="12" r="1.6" />
+                    </svg>
+                    <span>Mais</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

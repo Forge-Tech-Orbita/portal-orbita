@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P03 concluídas; partes P04–P14 pendentes.
+> Status: P01–P04 concluídas; partes P05–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -421,7 +421,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P01 | Fundação/navegação | concluída | Sol | Análise sem problemas; 12 testes aprovados em 27/10/2026 |
 | P02 | Login | concluída | Sol | Análise sem problemas; 19 testes aprovados em 29/10/2026 |
 | P03 | Compartilhados | concluída | Sol | Análise sem problemas; 33 testes aprovados em 29/10/2026 |
-| P04 | Home | pendente | — | — |
+| P04 | Home | concluída | Sol | Análise sem problemas; 44 testes aprovados em 29/10/2026 |
 | P05 | Horário | pendente | — | — |
 | P06 | Notas | pendente | — | — |
 | P07 | Disciplinas | pendente | — | — |
@@ -470,6 +470,18 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - Não houve build, teste manual em dispositivo ou reprodução visual completa. Integração na Home, no Mural e no Perfil permanece nas partes P04, P11 e P13.
 - Não havia alterações pendentes antes da P03, portanto não foi criado commit vazio para a solicitação inicial.
 - Próxima parte: P04, somente após confirmação do usuário.
+
+### Resultado da P04 — 29/10/2026
+
+- Home provisória substituída por dashboard rolável, com saudação por horário, nome curto e carteirinha usando a fixture compartilhada.
+- Criados `AcademicStatTile`, `NextClassCard` e `QuickActionTile` locais, recebendo dados/callbacks por construtor e usando apenas Flutter.
+- Exibidos CRA 8.7, frequência 94% e 142 créditos; próxima aula, local, professor, 19:00 e “em 47 min” preservados como conteúdo explicitamente demonstrativo, sem timer.
+- Financeiro, Biblioteca, Avisos, Suporte, sino e “ver tudo” conectados às rotas existentes. Os três avisos resumidos reutilizam as mesmas instâncias da fixture compartilhada.
+- Acrescentados 11 testes: regra de saudação nos limites 0/11/12/17/18/23h, conteúdo, seis acessos com retorno à Home preservando rolagem e três tamanhos de viewport.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; cinco arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 44 testes aprovados. Home e atalhos testados em 360 × 800, 390 × 844 e 360 × 640, com rolagem até o último aviso e sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Não houve build, teste manual em dispositivo ou refinamento visual completo.
+- Não havia alterações pendentes no início; o commit da P03 já existia. Próxima parte: P05, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

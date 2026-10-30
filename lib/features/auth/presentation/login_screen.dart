@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
+import '../../../core/mock/student_mock.dart';
 import '../../../core/theme/orbita_theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _registration = TextEditingController(text: '2023104567');
+  final _registration = TextEditingController(text: demoStudent.registration);
   final _password = TextEditingController(text: '••••••••');
   bool _loading = false;
 

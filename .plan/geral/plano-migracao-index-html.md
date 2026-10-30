@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P02 concluídas; partes P03–P14 pendentes.
+> Status: P01–P03 concluídas; partes P04–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -420,7 +420,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | --- | --- | --- | --- | --- |
 | P01 | Fundação/navegação | concluída | Sol | Análise sem problemas; 12 testes aprovados em 27/10/2026 |
 | P02 | Login | concluída | Sol | Análise sem problemas; 19 testes aprovados em 29/10/2026 |
-| P03 | Compartilhados | pendente | — | — |
+| P03 | Compartilhados | concluída | Sol | Análise sem problemas; 33 testes aprovados em 29/10/2026 |
 | P04 | Home | pendente | — | — |
 | P05 | Horário | pendente | — | — |
 | P06 | Notas | pendente | — | — |
@@ -456,6 +456,20 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `git diff --check` e revisão dos diffs realizados antes do commit. Nenhum build ou teste manual em dispositivo nesta parte.
 - Alterações avulsas anteriores registradas separadamente no commit `78bd00d`, conforme solicitado, sem misturar com a implementação da P02.
 - Próxima parte: P03, somente após confirmação do usuário.
+
+### Resultado da P03 — 29/10/2026
+
+- Criados modelos imutáveis `Student`, `Notice` e categoria tipada, com fixtures únicas em `core/mock/`.
+- Transcritos estudante, dados cadastrais mascarados, quatro avisos completos e três resumos distintos da Home. Datas permanecem textuais e demonstrativas.
+- Criados `StudentIdCard` e `NoticeTile` normais/compactos em `core/widgets/`, recebendo dados por construtor e reutilizando o tema existente.
+- Carteirinha compacta omite período, matrícula, validade e barras; versão normal exibe esses dados. Barras são determinísticas, decorativas e excluídas da leitura por tecnologias assistivas.
+- Login passou a reutilizar a matrícula da fixture compartilhada, sem alteração de comportamento.
+- Acrescentados 14 testes: duas verificações de fixtures e 12 testes de widgets, incluindo variantes, resumo/corpo, repetibilidade das barras e textos longos em 360 px.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; oito arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 33 testes aprovados; diffs revisados e verificação de espaços executada antes do commit.
+- Não houve build, teste manual em dispositivo ou reprodução visual completa. Integração na Home, no Mural e no Perfil permanece nas partes P04, P11 e P13.
+- Não havia alterações pendentes antes da P03, portanto não foi criado commit vazio para a solicitação inicial.
+- Próxima parte: P04, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

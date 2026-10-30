@@ -18,7 +18,9 @@ import 'package:portal_orbita/features/support/presentation/support_screen.dart'
 
 Future<void> enterPortal(WidgetTester tester) async {
   await tester.pumpWidget(const MainApp());
-  await tester.tap(find.text('Entrar no portal demonstrativo'));
+  await tester.tap(find.text('ENTRAR NO PORTAL'));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 900));
   await tester.pumpAndSettle();
 }
 
@@ -134,7 +136,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);
 
-    await tester.tap(find.text('Entrar no portal demonstrativo'));
+    await tester.tap(find.text('ENTRAR NO PORTAL'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
     await tester.pumpAndSettle();
 
     expect(find.byType(HomeScreen), findsOneWidget);

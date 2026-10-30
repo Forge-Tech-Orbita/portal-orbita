@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01 concluída; partes P02–P14 pendentes.
+> Status: P01–P02 concluídas; partes P03–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -419,7 +419,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | Parte | Entrega | Estado | Responsável | Validação / observação |
 | --- | --- | --- | --- | --- |
 | P01 | Fundação/navegação | concluída | Sol | Análise sem problemas; 12 testes aprovados em 27/10/2026 |
-| P02 | Login | pendente | — | — |
+| P02 | Login | concluída | Sol | Análise sem problemas; 19 testes aprovados em 29/10/2026 |
 | P03 | Compartilhados | pendente | — | — |
 | P04 | Home | pendente | — | — |
 | P05 | Horário | pendente | — | — |
@@ -443,6 +443,19 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `git diff --check` e revisão dos diffs realizados antes do commit; alterações preexistentes fora do escopo não incluídas.
 - Não houve teste manual em dispositivo, build Android/iOS/Web ou validação de fidelidade visual. As telas ainda são placeholders; formulário e simulação de espera pertencem à P02.
 - Próxima parte: P02, somente após confirmação do usuário.
+
+### Resultado da P02 — 29/10/2026
+
+- Substituído o Login provisório por símbolo orbital desenhado, títulos institucionais, formulário e rodapé demonstrativo.
+- Matrícula e senha pré-preenchidas conforme legado; validação apenas de obrigatoriedade, senha oculta e envio pelo botão ou ação concluir do teclado.
+- Espera local de 900 ms, campos/botões desabilitados e proteção contra envio duplicado. Controllers descartados e `mounted` verificado após a espera.
+- Biometria usa o mesmo fluxo local, explicitamente identificada como simulada. O rodapé informa ausência de autenticação real em vez de prometer conexão criptografada inexistente.
+- Testes de navegação atualizados para o botão definitivo e atraso controlado; sete novos testes cobrem formulário, espera, duplicidade, biometria, teclado e descarte durante a espera.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; três arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 19 testes aprovados; formulário testado em 360 × 640 com teclado simulado de 300 px, sem overflow.
+- `git diff --check` e revisão dos diffs realizados antes do commit. Nenhum build ou teste manual em dispositivo nesta parte.
+- Alterações avulsas anteriores registradas separadamente no commit `78bd00d`, conforme solicitado, sem misturar com a implementação da P02.
+- Próxima parte: P03, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

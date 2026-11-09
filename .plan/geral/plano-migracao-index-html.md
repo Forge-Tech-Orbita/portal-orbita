@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P04 concluídas; partes P05–P14 pendentes.
+> Status: P01–P05 concluídas; partes P06–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -422,7 +422,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P02 | Login | concluída | Sol | Análise sem problemas; 19 testes aprovados em 29/10/2026 |
 | P03 | Compartilhados | concluída | Sol | Análise sem problemas; 33 testes aprovados em 29/10/2026 |
 | P04 | Home | concluída | Sol | Análise sem problemas; 44 testes aprovados em 29/10/2026 |
-| P05 | Horário | pendente | — | — |
+| P05 | Horário | concluída | Sol | Análise sem problemas; 57 testes aprovados em 09/11/2026 |
 | P06 | Notas | pendente | — | — |
 | P07 | Disciplinas | pendente | — | — |
 | P08 | Mais | pendente | — | — |
@@ -482,6 +482,19 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 44 testes aprovados. Home e atalhos testados em 360 × 800, 390 × 844 e 360 × 640, com rolagem até o último aviso e sem overflow.
 - Diffs revisados e verificação de espaços executada antes do commit. Não houve build, teste manual em dispositivo ou refinamento visual completo.
 - Não havia alterações pendentes no início; o commit da P03 já existia. Próxima parte: P05, somente após confirmação do usuário.
+
+### Resultado da P05 — 09/11/2026
+
+- Criados `ScheduleDay` e `ScheduledClass` tipados e fixtures das oito ocorrências semanais, reutilizando as cinco aulas imutáveis quando repetidas.
+- Preservados disciplinas, horários, salas, professores e cores do JavaScript original, com sábado vazio e fallback explícito de domingo para sábado.
+- Tela de Horário provisória substituída por cabeçalhos, seis chips horizontais e cards roláveis de aulas ou estado “Sem aulas em Sábado”.
+- Dia inicial obtido da data local; seleção mantida em estado local e preservada pelo `IndexedStack` existente, sem alterar a casca ou a navegação.
+- Acrescentados 13 testes: duas verificações de datas/fixtures e 11 testes de widgets, cobrindo seis dias, troca/reseleção, preservação entre abas e três viewports.
+- Os testes selecionam dias explicitamente e verificam datas fixas para o mapeamento semanal, sem depender da data da máquina.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; quatro arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 57 testes aprovados. Chips, últimas aulas e estado vazio acessíveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build, teste manual em dispositivo ou calendário acadêmico real; os horários permanecem demonstrativos.
+- Próxima parte: P06, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

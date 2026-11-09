@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P05 concluídas; partes P06–P14 pendentes.
+> Status: P01–P06 concluídas; partes P07–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -423,7 +423,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P03 | Compartilhados | concluída | Sol | Análise sem problemas; 33 testes aprovados em 29/10/2026 |
 | P04 | Home | concluída | Sol | Análise sem problemas; 44 testes aprovados em 29/10/2026 |
 | P05 | Horário | concluída | Sol | Análise sem problemas; 57 testes aprovados em 09/11/2026 |
-| P06 | Notas | pendente | — | — |
+| P06 | Notas | concluída | Sol | Análise sem problemas; 72 testes aprovados em 09/11/2026 |
 | P07 | Disciplinas | pendente | — | — |
 | P08 | Mais | pendente | — | — |
 | P09 | Financeiro | pendente | — | — |
@@ -495,6 +495,20 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 57 testes aprovados. Chips, últimas aulas e estado vazio acessíveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build, teste manual em dispositivo ou calendário acadêmico real; os horários permanecem demonstrativos.
 - Próxima parte: P06, somente após confirmação do usuário.
+
+### Resultado da P06 — 09/11/2026
+
+- Criados `Grade`, status explícito e fixtures das cinco disciplinas, com AV2 anulável e média calculada somente quando existem as duas avaliações.
+- Notas apresentadas com uma casa decimal; AV2 zero continua válida, e AV2 ausente aparece como “—” e “Não informada” na leitura acessível, sem ser anunciada como zero.
+- Tela provisória substituída por resumo fixo (CRA 8.7 e legenda 18/5/0), anel determinístico, filtros e cards expansíveis com AV1, AV2, frequência e situação.
+- Filtros Todas/Cursando/Concluídas retornam 5/1/4 cards. Filtro e expansão persistem entre abas; mudar o filtro fecha detalhes antigos.
+- Banco de Dados II preserva média exibida 6.8 e situação Aprovado do legado; não foi criada regra acadêmica para deduzir aprovação a partir da média.
+- Acrescentados 15 testes: três verificações de fixtures/médias e 12 testes de widgets, incluindo filtros, expansão/recolhimento, resumo fixo, acessibilidade, persistência e três viewports.
+- A primeira execução detectou incompatibilidade de valores semânticos textuais nas barras do SDK atual. A leitura foi corrigida na linha da avaliação, sem mascarar a falha ou confundir nota ausente com zero; teste específico e suíte completa reexecutados com sucesso.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; cinco arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 72 testes aprovados. Última disciplina expansível e filtros acessíveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; CRA, contagens e dados acadêmicos permanecem demonstrativos.
+- Próxima parte: P07, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

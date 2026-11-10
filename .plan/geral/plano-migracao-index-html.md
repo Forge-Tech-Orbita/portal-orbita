@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P10 concluídas; partes P11–P14 pendentes.
+> Status: P01–P11 concluídas; partes P12–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -428,7 +428,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P08 | Mais | concluída | Sol | Análise sem problemas; 83 testes aprovados em 09/11/2026 |
 | P09 | Financeiro | concluída | Sol | Análise sem problemas; 91 testes aprovados em 09/11/2026 |
 | P10 | Biblioteca | concluída | Sol | Análise sem problemas; 100 testes aprovados em 09/11/2026 |
-| P11 | Avisos | pendente | — | — |
+| P11 | Avisos | concluída | Sol | Análise sem problemas; 106 testes aprovados em 09/11/2026 |
 | P12 | Suporte | pendente | — | — |
 | P13 | Perfil | pendente | — | — |
 | P14 | Auditoria | pendente | — | — |
@@ -561,6 +561,18 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - Campo e empréstimos verificados em 360 × 640 com teclado simulado de 300 px; texto ampliado em 2× também verificado separadamente nesse tamanho.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há busca real, integração ao acervo ou renovação.
 - Próxima parte: P11, somente após confirmação do usuário.
+
+### Resultado da P11 — 09/11/2026
+
+- Mural provisório substituído por quatro `NoticeTile` completos, reutilizando diretamente a fixture compartilhada, sem novos modelos ou cópia de dados.
+- Preservados ordem, títulos, categorias, corpos e datas textuais Hoje · 08:12, Ontem · 17:40, 2 dias atrás e 4 dias atrás. Comunicados/datas identificados como demonstração, sem recálculo por relógio.
+- Scaffold/AppBar e retorno nativo mantidos. Não foram criados detalhes, estado de leitura/não leitura ou atualização remota.
+- Acrescentados seis testes de widgets: conteúdo completo, identidade/IDs compartilhados com os três resumos da Home, três viewports e texto ampliado em 2×.
+- Testes existentes do atalho Avisos, sino, “ver tudo” e opção Mural de Mais continuam aprovados, retornando à origem correta; teste novo também verifica retorno à Home após comparar os avisos.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; dois arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 106 testes aprovados. Quatro comunicados e última data alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; avisos e datas continuam mockados.
+- Próxima parte: P12, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

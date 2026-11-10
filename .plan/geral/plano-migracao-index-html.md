@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P13 concluídas; parte P14 pendente.
+> Status: P01–P14 concluídas (migração estrutural concluída).
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -431,7 +431,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P11 | Avisos | concluída | Sol | Análise sem problemas; 106 testes aprovados em 09/11/2026 |
 | P12 | Suporte | concluída | Sol | Análise sem problemas; 112 testes aprovados em 09/11/2026 |
 | P13 | Perfil | concluída | Sol | Análise sem problemas; 119 testes aprovados em 09/11/2026 |
-| P14 | Auditoria | pendente | — | — |
+| P14 | Auditoria | concluída | Sol | Análise sem problemas; 123 testes aprovados e build Web ok em 09/11/2026 |
 
 ### Resultado da P01 — 27/10/2026
 
@@ -598,6 +598,16 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 119 testes aprovados. Carteirinha, dados, switches e logout alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; preferências permanecem apenas visuais e sem persistência.
 - Próxima parte: P14, somente após confirmação do usuário.
+
+### Resultado da P14 — 09/11/2026
+
+- Confirmadas as 11 telas migradas (Login, cinco abas principais e cinco rotas secundárias), sem textos ou telas de placeholder remanescentes.
+- Criado `test/migration_audit_test.dart` cobrindo o fluxo representativo ponta a ponta (Login → Home → Horário → Notas → Cursos → Mais → secundárias → retorno preservando estado das abas → Perfil → logout limpando a pilha) e verificações de layout com teclado e rolagem em 360 × 800, 390 × 844 e 360 × 640.
+- A primeira execução do teste de auditoria buscou “Cursando” na linha de situação expandida de Cálculo Numérico; a asserção foi ajustada para o rótulo explícito da fixture (`Frequência: 82% · Situação: Em andamento`), e a suíte completa foi reexecutada com aprovação.
+- `README.md` atualizado com instruções de execução, testes, build Web, mapa das 11 telas migradas, recursos simulados/limitações do protótipo e próximas etapas planejadas (`style.css`, `script.js` e evolução com integrações reais).
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; `test/migration_audit_test.dart` formatado.
+- `flutter analyze` sem problemas; `flutter test` com 123 testes aprovados; `flutter build web` executado com sucesso (`build/web`).
+- Diffs revisados e verificação de espaços executada antes do commit. Etapa de migração estrutural concluída.
 
 ## 8. Verificações obrigatórias de cada parte
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/student.dart';
 import '../theme/orbita_theme.dart';
+import 'decorative_barcode.dart';
 
 class StudentIdCard extends StatelessWidget {
   const StudentIdCard({super.key, required this.student, this.compact = false});
@@ -87,37 +88,7 @@ class StudentIdCard extends StatelessWidget {
                       Text(student.validUntil),
                     ],
                   ),
-                  ExcludeSemantics(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 2,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        // shortcut: barras apenas decorativas, substituir se houver identificação escaneável real.
-                        for (final height in const [
-                          8.0,
-                          18.0,
-                          12.0,
-                          20.0,
-                          10.0,
-                          16.0,
-                          9.0,
-                          19.0,
-                          14.0,
-                          8.0,
-                          17.0,
-                          11.0,
-                          20.0,
-                          13.0,
-                        ])
-                          SizedBox(
-                            width: 2,
-                            height: height,
-                            child: const ColoredBox(color: OrbitaTheme.text),
-                          ),
-                      ],
-                    ),
-                  ),
+                  const DecorativeBarcode(),
                 ],
               ),
             ],

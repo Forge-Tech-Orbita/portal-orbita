@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P08 concluídas; partes P09–P14 pendentes.
+> Status: P01–P09 concluídas; partes P10–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -426,7 +426,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P06 | Notas | concluída | Sol | Análise sem problemas; 72 testes aprovados em 09/11/2026 |
 | P07 | Disciplinas | concluída | Sol | Análise sem problemas; 78 testes aprovados em 09/11/2026 |
 | P08 | Mais | concluída | Sol | Análise sem problemas; 83 testes aprovados em 09/11/2026 |
-| P09 | Financeiro | pendente | — | — |
+| P09 | Financeiro | concluída | Sol | Análise sem problemas; 91 testes aprovados em 09/11/2026 |
 | P10 | Biblioteca | pendente | — | — |
 | P11 | Avisos | pendente | — | — |
 | P12 | Suporte | pendente | — | — |
@@ -533,6 +533,20 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 83 testes aprovados. Grade verificada em 360 × 800, 390 × 844 e 360 × 640; ampliação de texto verificada em 360 × 640.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; destinos secundários continuam com o conteúdo provisório previsto para as próximas partes.
 - Próxima parte: P09, somente após confirmação do usuário.
+
+### Resultado da P09 — 09/11/2026
+
+- Criados modelos imutáveis e fixtures da fatura de setembro e quatro pagamentos, preservando vencimento 10/09/2026, valor R$ 1.240,00, desconto − R$ 62,00 e histórico Agosto/Julho/Junho/Maio de R$ 1.178,00 cada.
+- Valores monetários mantidos como textos demonstrativos já formatados, sem cálculos; literais Dart usam strings brutas para preservar `R$` sem interpolação.
+- Tela provisória substituída por aviso de demonstração, banner de fatura em aberto, detalhes, barras decorativas, botão e histórico rolável. AppBar/retorno nativo mantidos.
+- “Gerar 2ª via” mostra apenas “Recurso demonstrativo, sem integração”; não gera arquivo, chamada HTTP, linha digitável ou alteração de pagamento.
+- Extraído `DecorativeBarcode` das barras existentes da carteirinha: padrão determinístico compartilhado, com 14 barras na carteirinha e 46 no Financeiro, excluídas da leitura assistiva. Código financeiro identificado como sem valor bancário.
+- Acrescentados oito testes: fixture monetária completa e sete testes de widgets, cobrindo conteúdo/histórico, feedback sem mutação, barras repetíveis, três viewports e texto ampliado em 2×.
+- Testes existentes da carteirinha continuam aprovados, assim como os retornos do Financeiro à Home e à aba Mais.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; seis arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 91 testes aprovados. Fatura e último pagamento alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há integração financeira ou emissão real de boleto.
+- Próxima parte: P10, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

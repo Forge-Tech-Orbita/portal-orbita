@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P09 concluídas; partes P10–P14 pendentes.
+> Status: P01–P10 concluídas; partes P11–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -427,7 +427,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P07 | Disciplinas | concluída | Sol | Análise sem problemas; 78 testes aprovados em 09/11/2026 |
 | P08 | Mais | concluída | Sol | Análise sem problemas; 83 testes aprovados em 09/11/2026 |
 | P09 | Financeiro | concluída | Sol | Análise sem problemas; 91 testes aprovados em 09/11/2026 |
-| P10 | Biblioteca | pendente | — | — |
+| P10 | Biblioteca | concluída | Sol | Análise sem problemas; 100 testes aprovados em 09/11/2026 |
 | P11 | Avisos | pendente | — | — |
 | P12 | Suporte | pendente | — | — |
 | P13 | Perfil | pendente | — | — |
@@ -547,6 +547,20 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 91 testes aprovados. Fatura e último pagamento alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado verificado em 360 × 640.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há integração financeira ou emissão real de boleto.
 - Próxima parte: P10, somente após confirmação do usuário.
+
+### Resultado da P10 — 09/11/2026
+
+- Criados modelo imutável `Loan` e fixtures dos três empréstimos, preservando títulos, autores e prazos de 2, 12 e 18 dias.
+- Tela provisória substituída por campo editável com hint original, aviso “Busca e categorias demonstrativas”, cinco categorias passivas em chips horizontais e cards roláveis de empréstimos.
+- Digitação e ação de busca não filtram a lista nem simulam resultados; não foram acrescentados ISBN, categorias aos livros, acervo fictício, datas ou renovação.
+- Alerta de prazo próximo preservado explicitamente na fixture do empréstimo de dois dias, com destaque visual e descrição acessível. Não foi inventada regra de calendário ou cálculo de vencimento.
+- Acrescentados nove testes: fixture completa e oito testes de widgets, cobrindo conteúdo, alerta visual/semântico, ausência de filtragem, teclado, três viewports e texto ampliado em 2×.
+- Testes existentes de retorno da Biblioteca à Home e à aba Mais continuam aprovados; AppBar/retorno nativo preservados.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; quatro arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 100 testes aprovados. Categorias e último empréstimo alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Campo e empréstimos verificados em 360 × 640 com teclado simulado de 300 px; texto ampliado em 2× também verificado separadamente nesse tamanho.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há busca real, integração ao acervo ou renovação.
+- Próxima parte: P11, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

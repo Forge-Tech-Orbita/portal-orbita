@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P06 concluídas; partes P07–P14 pendentes.
+> Status: P01–P07 concluídas; partes P08–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -424,7 +424,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P04 | Home | concluída | Sol | Análise sem problemas; 44 testes aprovados em 29/10/2026 |
 | P05 | Horário | concluída | Sol | Análise sem problemas; 57 testes aprovados em 09/11/2026 |
 | P06 | Notas | concluída | Sol | Análise sem problemas; 72 testes aprovados em 09/11/2026 |
-| P07 | Disciplinas | pendente | — | — |
+| P07 | Disciplinas | concluída | Sol | Análise sem problemas; 78 testes aprovados em 09/11/2026 |
 | P08 | Mais | pendente | — | — |
 | P09 | Financeiro | pendente | — | — |
 | P10 | Biblioteca | pendente | — | — |
@@ -509,6 +509,18 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 72 testes aprovados. Última disciplina expansível e filtros acessíveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; CRA, contagens e dados acadêmicos permanecem demonstrativos.
 - Próxima parte: P07, somente após confirmação do usuário.
+
+### Resultado da P07 — 09/11/2026
+
+- Criados modelo imutável `Course` e fixtures das cinco disciplinas na ordem do array original, preservando professores, créditos, percentuais e salas.
+- Tela provisória substituída por semestre 2026.2, título “Minhas disciplinas” e cinco cards roláveis, sem catálogo, edição ou tela de detalhes.
+- Barras usam `progress / 100`, com rótulo acessível por disciplina e percentual nativo; Arquitetura de Software representa 78% (0.78).
+- Acrescentados seis testes: fixture completa, conteúdo/progresso dos cinco cards, preservação de rolagem entre abas e três viewports mínimos.
+- A primeira execução apontou uma busca semântica exata inadequada ao nó combinado do card. O teste passou a conferir o conteúdo do nó real, mantendo a verificação dos rótulos acessíveis; os seis testes específicos e a suíte completa foram reexecutados com sucesso.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; quatro arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 78 testes aprovados. Os cinco cards e a última sala são alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; semestre e progressos continuam demonstrativos.
+- Próxima parte: P08, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

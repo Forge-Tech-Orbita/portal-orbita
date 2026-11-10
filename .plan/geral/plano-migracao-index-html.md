@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P12 concluídas; partes P13–P14 pendentes.
+> Status: P01–P13 concluídas; parte P14 pendente.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -430,7 +430,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P10 | Biblioteca | concluída | Sol | Análise sem problemas; 100 testes aprovados em 09/11/2026 |
 | P11 | Avisos | concluída | Sol | Análise sem problemas; 106 testes aprovados em 09/11/2026 |
 | P12 | Suporte | concluída | Sol | Análise sem problemas; 112 testes aprovados em 09/11/2026 |
-| P13 | Perfil | pendente | — | — |
+| P13 | Perfil | concluída | Sol | Análise sem problemas; 119 testes aprovados em 09/11/2026 |
 | P14 | Auditoria | pendente | — | — |
 
 ### Resultado da P01 — 27/10/2026
@@ -585,6 +585,19 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 112 testes aprovados. Secretaria, botão e três FAQs alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há abertura real de chamados ou integração com secretaria.
 - Próxima parte: P13, somente após confirmação do usuário.
+
+### Resultado da P13 — 09/11/2026
+
+- Perfil provisório substituído por cabeçalho “CONTA”, `StudentIdCard` compacto com `demoStudent` compartilhado, dados cadastrais mascarados (CPF, E-mail institucional e Telefone), três `SwitchListTile` e botão “Encerrar sessão”.
+- Estados iniciais dos switches preservados do HTML: Notificações push ligado, Modo escuro ligado e Biometria facial desligado.
+- Preferências identificadas como demonstrativas e mantidas apenas na instância da tela; alternar os switches não altera o tema claro, não solicita permissões nem persiste estado ao fechar/reabrir.
+- “Encerrar sessão” usa `pushNamedAndRemoveUntil(AppRoutes.login, (_) => false)`, limpando toda a pilha inclusive quando o Perfil é aberto sobre outra rota secundária.
+- Acrescentados sete testes de widgets: carteirinha compacta compartilhada e dados mascarados, alternância independente dos três switches sem alterar o tema e reinício ao reabrir, limpeza de pilha sobre outra rota, três viewports mínimos e texto ampliado em 2×.
+- Testes existentes de acesso e retorno do Perfil pela aba Mais continuam aprovados.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; dois arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 119 testes aprovados. Carteirinha, dados, switches e logout alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; preferências permanecem apenas visuais e sem persistência.
+- Próxima parte: P14, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

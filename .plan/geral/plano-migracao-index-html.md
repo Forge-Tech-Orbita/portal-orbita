@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P11 concluídas; partes P12–P14 pendentes.
+> Status: P01–P12 concluídas; partes P13–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -429,7 +429,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P09 | Financeiro | concluída | Sol | Análise sem problemas; 91 testes aprovados em 09/11/2026 |
 | P10 | Biblioteca | concluída | Sol | Análise sem problemas; 100 testes aprovados em 09/11/2026 |
 | P11 | Avisos | concluída | Sol | Análise sem problemas; 106 testes aprovados em 09/11/2026 |
-| P12 | Suporte | pendente | — | — |
+| P12 | Suporte | concluída | Sol | Análise sem problemas; 112 testes aprovados em 09/11/2026 |
 | P13 | Perfil | pendente | — | — |
 | P14 | Auditoria | pendente | — | — |
 
@@ -573,6 +573,18 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 106 testes aprovados. Quatro comunicados e última data alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; avisos e datas continuam mockados.
 - Próxima parte: P12, somente após confirmação do usuário.
+
+### Resultado da P12 — 09/11/2026
+
+- Central de suporte provisória substituída pelo card “FALE COM A SECRETARIA”, descrição, botão “Abrir novo chamado” e três perguntas frequentes na ordem do HTML.
+- Atendimento identificado como demonstrativo; “Abrir novo chamado” exibe apenas “Recurso demonstrativo, sem integração”, sem formulário, envio, protocolo ou navegação pelas respostas.
+- Scaffold/AppBar e retorno nativo mantidos, sem introduzir pacotes, camada de dados extra ou rotas adicionais.
+- Acrescentados seis testes de widgets: conteúdo e ordem das três FAQs, feedback demonstrativo preservando retorno à Home, três viewports mínimos e texto ampliado em 2×.
+- Testes existentes de acesso e retorno do Suporte pela Home e pela aba Mais continuam aprovados.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; dois arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 112 testes aprovados. Secretaria, botão e três FAQs alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há abertura real de chamados ou integração com secretaria.
+- Próxima parte: P13, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

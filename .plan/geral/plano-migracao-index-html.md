@@ -1,0 +1,657 @@
+# Portal Órbita — plano refinado de migração estrutural para Flutter
+
+> Plano geral de referência para execução por Sol medium.
+> Documento: `.plan/geral/plano-migracao-index-html.md`.
+> Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
+> Status: P01–P14 concluídas (migração estrutural concluída).
+> Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
+
+## 1. Objetivo e limites
+
+Converter as 11 telas do protótipo HTML em uma aplicação Flutter com navegação nativa, widgets reutilizáveis, conteúdo demonstrativo e interações locais mínimas necessárias para validar a estrutura.
+
+Não usar WebView, não copiar a moldura de celular, notch, relógio ou bateria simulados. Usar `Scaffold`, `SafeArea`, rolagem e controles Flutter.
+
+Este plano continua sendo a etapa estrutural derivada do HTML. Consultar o CSS e o JavaScript desde o início para não perder conteúdo e comportamento, mas NÃO antecipar toda a migração desses arquivos.
+
+### Incluído nesta etapa
+
+- As 11 telas e seus elementos de conteúdo.
+- Cinco abas principais e cinco rotas secundárias, além do Login.
+- Login demonstrativo, logout, retorno, seleção de dias, filtros e expansão de notas.
+- Dados mockados mínimos e tipados para renderizar as telas.
+- Paleta básica do legado e componentes legíveis/adaptáveis.
+- Testes de widgets e testes unitários onde houver cálculo ou seleção.
+
+### Fora desta etapa
+
+- Backend, API, banco de dados, autenticação real e armazenamento de credenciais.
+- Biometria real, notificações push, emissão/pagamento de boletos e criação de chamados.
+- Busca real no acervo, dados de ISBN inexistentes ou renovação de empréstimos.
+- Persistência de preferências, modo escuro funcional e estado global de conta.
+- Reprodução visual exata: fontes externas, texturas, sombras finas, gradientes, efeito tilt e animações decorativas.
+- Cálculo real de CRA, calendário acadêmico ou contagem regressiva da próxima aula.
+- Novos pacotes, arquitetura de repositórios/serviços ou bibliotecas de estado/rotas sem aprovação específica.
+
+## 2. Regra principal: execução por partes e um commit por parte
+
+**Executar somente UMA parte por solicitação. Não executar o plano inteiro automaticamente.**
+
+Cada parte é uma entrega pequena que deve compilar e passar nas verificações, mesmo quando outras telas ainda forem placeholders. A sequência padrão é P01 até P14. Não assumir que uma parte anterior foi feita apenas porque está marcada: conferir seus arquivos e testes.
+
+Para cada parte:
+
+1. Ler este plano, o status compartilhado, os arquivos de origem indicados e a implementação atual relacionada.
+2. Verificar `git status --short` e identificar trabalho preexistente. Não alterar, reverter nem incluir trabalho de terceiros no commit.
+3. Confirmar dependências e reservar a parte no plano geral, indicando responsável e estado `em andamento`.
+4. Registrar o roteiro individual em `.plan/local/<integrante>/Pxx.md`, somente em modo de implementação e quando autorizado pelas instruções da sessão. O plano local não substitui o status compartilhado.
+5. Implementar apenas o escopo da parte, incluindo os testes especificados.
+6. Executar as verificações da seção 8 e revisar `git diff` e `git diff --cached`.
+7. Atualizar o status geral e registrar verificações realmente executadas. Não marcar como concluído se houver falha ou bloqueio.
+8. Fazer **um commit exclusivo dessa parte**, com os arquivos da implementação, seus testes e a atualização correspondente do plano geral. Adicionar arquivos por caminhos explícitos; não usar `git add .` ou `git add -A`.
+9. Informar ao usuário: parte concluída, arquivos principais, verificações, limitações e hash do commit. Então PARAR e aguardar a próxima solicitação.
+
+Se instruções da sessão proibirem commits ou alterações, não contornar a restrição: informar o bloqueio. Não criar commit com testes falhando, salvo autorização expressa do usuário. Falha de ferramenta/SDK também deve ser comunicada, sem alegar validação inexistente.
+
+### Padrão de commits
+
+O histórico existente usa Conventional Commits. Manter:
+
+```text
+<tipo>(<escopo>): <resumo curto em português>
+```
+
+Tipos desta migração: `feat` para funcionalidades/telas, `test` para consolidação de testes e `docs` para publicação exclusiva de planejamento. Sem ponto final, sem misturar partes e sem amend/rebase de commits de outros integrantes. As mensagens propostas em cada parte já seguem esse formato.
+
+O hash do commit pode ser informado no relatório final ou registrado numa atualização futura; não alterar o plano depois do commit apenas para adicionar o próprio hash e gerar um segundo commit.
+
+### Situação observada ao elaborar este plano
+
+- Flutter inicial: `lib/main.dart` contém apenas `MainApp` com `Hello World!`.
+- `pubspec.yaml`: somente Flutter como dependência de produção; `flutter_test` e `flutter_lints` em desenvolvimento.
+- Não foi encontrado `AGENTS.md` na árvore consultada. Verificar novamente na execução.
+- Havia alteração preexistente em `.gitignore` e `.plan/` estava não rastreado. Reavaliar o status antes de cada entrega; esta observação não autoriza incluir essas alterações indiscriminadamente.
+- `.gitignore` contém `.plan/local`: não forçar a inclusão de planos individuais no Git.
+
+## 3. Decisões técnicas fechadas para esta etapa
+
+### 3.1 Navegação
+
+- `MainApp` permanece o widget raiz público, definido em `lib/app.dart`; `main.dart` apenas importa o app e chama `runApp(const MainApp())`.
+- Usar `MaterialApp` com `initialRoute: AppRoutes.login` e `onGenerateRoute`. Não usar `home` simultaneamente.
+- Constantes em `lib/core/constants/app_routes.dart`:
+  - `login = '/'`
+  - `main = '/main'`
+  - `financial = '/financial'`
+  - `library = '/library'`
+  - `notices = '/notices'`
+  - `support = '/support'`
+  - `profile = '/profile'`
+- `onGenerateRoute` associa exclusivamente essas rotas às telas correspondentes, usando `MaterialPageRoute` e preservando `RouteSettings`. Rota desconhecida deve mostrar uma página simples de rota não encontrada, sem ser interpretada como sessão autenticada.
+- `MainNavigationScreen`, um `StatefulWidget`, mantém `selectedIndex` com `setState` e mostra as cinco abas em `IndexedStack`, nesta ordem: Início, Horário, Notas, Cursos, Mais.
+- `OrbitaBottomNav` recebe `currentIndex` e `ValueChanged<int> onTap`; usar `BottomNavigationBar` com tipo fixo para exibir as cinco opções.
+- Abas não geram rotas ou entradas extras na pilha. O `IndexedStack` preserva o estado local ao trocar de aba.
+- Telas secundárias abrem com `Navigator.pushNamed` sobre a casca principal. Cada uma tem seu próprio `Scaffold` e `AppBar` com retorno; a barra inferior não aparece nelas.
+- Login bem-sucedido: `pushNamedAndRemoveUntil(AppRoutes.main, (_) => false)`.
+- Logout: `pushNamedAndRemoveUntil(AppRoutes.login, (_) => false)`. Voltar não deve recuperar telas da sessão anterior.
+- Não criar lista manual de histórico como a do JavaScript. Não implementar proteção de rotas ou deep links nesta etapa.
+
+### 3.2 Estado e dados
+
+- Usar estado local com `StatefulWidget`/`setState`, sem Provider, Riverpod, BLoC ou singleton mutável.
+- Listas demonstrativas devem usar pequenas classes Dart imutáveis com campos tipados; não usar mapas dinâmicos nem espalhar acesso por strings nas telas.
+- Dados compartilhados de estudante e avisos ficam em `core/models/` e `core/mock/`; dados exclusivos de uma funcionalidade ficam em `features/<feature>/data/`.
+- Criar classes e fixtures somente quando a parte correspondente precisar delas. Não montar uma camada de domínio abstrata antecipadamente.
+- Não duplicar dados compartilhados: Home e Perfil usam o mesmo estudante; Home e Mural usam a mesma lista de avisos.
+- Datas, valores, contagens e nomes são demonstrativos, não devem ser atualizados para a data atual por iniciativa do executor.
+- Não criar rede, arquivos de persistência, permissões de dispositivo ou serviços externos.
+
+### 3.3 Apresentação mínima
+
+- `lib/core/theme/orbita_theme.dart` fornece um `ThemeData` claro com: fundo `#F6F1E3`, superfície `#FBF8EF`, borda `#DECBA0`, texto `#2B2A22`, destaque `#2F6F68`, terracota `#A6543B`, verde `#5B7F3A`, âmbar `#C98A2E` e alerta `#AF3B2E`.
+- Não instalar fontes/pacotes nem baixar assets. Fontes padrão do Flutter são temporárias até o plano visual.
+- Ícones podem ser equivalentes Material; o símbolo orbital usa desenho simples com `CustomPainter`, sem pacote SVG.
+- Usar `AppBar` padrão nas rotas secundárias: não criar um `OrbitaTopBar` redundante nesta etapa.
+- Não usar altura fixa de dispositivo. Evitar larguras rígidas em textos; usar `Expanded`, `Flexible` e `Wrap` onde necessário.
+- Conteúdo deve funcionar em 360 × 800 e 390 × 844; testar também 360 × 640 com teclado no Login. Em larguras maiores, admitir composição simples e legível, sem criar layout desktop fora do escopo.
+- Usar controles interativos acessíveis (`IconButton`, botões, chips, `SwitchListTile`), labels e tooltips onde aplicável.
+
+## 4. Fontes da verdade e divergências conhecidas
+
+| Informação | Fonte / decisão |
+| --- | --- |
+| Estrutura e textos das 11 telas | `index.html`, seções identificadas por `screen-*` |
+| Paleta inicial | variáveis de `style.css`, bloco `:root` |
+| Dias/aulas, notas e disciplinas | arrays `schedule`, `grades`, `courses` de `script.js` |
+| Estudante | Marina Duarte Costa, matrícula 2023104567, Engenharia de Software, 6º período, validade 12/2027 |
+| Métricas | CRA 8.7, frequência 94%, créditos 142: fixtures, não resultados calculados |
+| Resumo de notas | 18 aprovadas, 5 cursando, 0 pendentes: fixtures independentes da pequena lista de exemplo |
+| Próxima aula | Inteligência Artificial, sala 304/bloco C, Prof. R. Nakamura, 19:00, “em 47 min”: conteúdo fixo |
+| Login | atraso simulado de 900 ms; não valida credenciais em backend |
+| Biometria | atalho para a mesma simulação de login, com indicação explícita de demonstração |
+| Biblioteca | busca e categorias não têm lógica no legado; não inventar acervo ou ISBN |
+| Financeiro/Suporte | botões não têm implementação no legado; feedback “Recurso demonstrativo, sem integração” via `SnackBar` |
+| Preferências | switches apenas mudam o próprio estado em memória; não ativam tema, push ou biometria real |
+| Código de barras | decoração sem valor bancário; desenho determinístico, sem `Random` em `build` |
+
+Regras adicionais para evitar interpretações incorretas:
+
+- O HTML contém cinco abas, cinco telas secundárias e Login: 11 telas no total. A casca `MainNavigationScreen` é infraestrutura, não uma décima segunda funcionalidade.
+- “Cursos” é o rótulo da aba; a tela apresenta “Minhas disciplinas”. Não criar catálogo de cursos.
+- O Perfil não possui botão voltar no HTML, mas será uma rota secundária com `AppBar` e retorno no Flutter, conforme a intenção do plano original.
+- O JavaScript trata domingo como sábado no seletor de dias. Nesta etapa, preservar esse fallback e documentá-lo no teste; não criar uma coluna de domingo ou calendário novo.
+- A média só existe quando AV2 não é nula: `(av1 + av2) / 2`, exibida com uma casa decimal. AV2 ausente aparece como “—”; não tratá-la como zero.
+- O legado marca Banco de Dados II como concluída/aprovada apesar da média 6.75, exibida como 6.8. Preservar status e regra visual existentes; não implementar regulamento acadêmico nem corrigir os mocks silenciosamente.
+- A lista de avisos da Home usa resumo diferente do texto completo em alguns itens. O modelo pode ter `summary` e `body`; transcrever cada um da sua fonte sem inventar conteúdo.
+- O CRA e a legenda não devem ser recalculados usando apenas as cinco notas demonstrativas. Progresso do anel pode representar 8.7/10; não alegar cálculo acadêmico real.
+- Não inventar linha digitável bancária, CPF completo, telefone completo, credenciais válidas, histórico adicional ou novos recursos.
+
+## 5. Organização esperada
+
+Criar arquivos conforme necessários, não todos antecipadamente exceto os placeholders de navegação da P01.
+
+```text
+lib/
+  main.dart
+  app.dart
+  core/
+    constants/app_routes.dart
+    theme/orbita_theme.dart
+    models/                       # Student e Notice, introduzidos na P03
+    mock/                         # fixtures compartilhadas, introduzidas na P03
+    widgets/
+      orbita_bottom_nav.dart
+      student_id_card.dart         # compartilhado entre Home e Perfil
+      notice_tile.dart             # compartilhado entre Home e Mural
+  features/
+    navigation/presentation/main_navigation_screen.dart
+    auth/presentation/login_screen.dart
+    home/presentation/home_screen.dart
+    home/presentation/widgets/     # NextClassCard, AcademicStatTile, QuickActionTile
+    schedule/data/                # modelo e fixtures de aulas
+    schedule/presentation/schedule_screen.dart
+    grades/data/                  # modelo e fixtures de notas
+    grades/presentation/grades_screen.dart
+    grades/presentation/widgets/gpa_ring_progress.dart
+    courses/data/                 # modelo e fixtures de disciplinas
+    courses/presentation/courses_screen.dart
+    more/presentation/more_screen.dart
+    financial/data/               # apenas dados/modelos necessários à tela
+    financial/presentation/financial_screen.dart
+    library/data/                 # empréstimos demonstrativos
+    library/presentation/library_screen.dart
+    notices/presentation/notices_screen.dart
+    support/presentation/support_screen.dart
+    profile/presentation/profile_screen.dart
+test/
+  ...                             # organização correspondente ao código testado
+```
+
+Contratos mínimos compartilhados:
+
+- Todas as telas: construtor público `const NomeDaScreen({super.key})`, lendo fixtures locais, sem argumentos de rota obrigatórios.
+- `StudentIdCard`: recebe `Student student` e `bool compact = false`. A versão compacta omite matrícula/validade/código decorativo como no Perfil original.
+- `NoticeTile`: recebe `Notice notice` e `bool compact = false`. Home usa resumo; Mural usa corpo, categoria e data.
+- Widgets menores recebem somente os dados/callbacks necessários, sem navegar ou buscar dados implicitamente quando isso não for sua responsabilidade.
+- Manter os nomes das telas descritos nas partes abaixo. Não renomear arquivos ou contratos de outra parte sem justificar e coordenar.
+
+## 6. Partes executáveis
+
+Cada parte inclui implementação, testes, atualização de status e **seu único commit**. Os testes abaixo são mínimos, não uma substituição das verificações gerais.
+
+### P01 — Fundação e navegação completa com placeholders
+
+**Dependência:** nenhuma.
+**Ler:** `main.dart`, `pubspec.yaml`, HTML de `bottomnav`, `go`, `goBack` e `doLogin` no JavaScript.
+
+- Criar `app.dart`, constantes de rota, tema básico, `MainNavigationScreen` e `OrbitaBottomNav` conforme a seção 3.
+- Criar os 11 arquivos de tela com construtores definitivos e conteúdo temporário identificado como placeholder.
+- Login temporário tem botão para entrar; Mais temporário oferece cinco atalhos secundários e logout para testar a pilha. Estes controles serão substituídos em P02/P08.
+- Rotas secundárias já possuem `Scaffold`/`AppBar` próprios, sem barra inferior.
+- Não implementar os detalhes das telas posteriores.
+
+**Aceite/testes:** app inicia no Login; entrar abre Início; as cinco abas alternam sem empilhar; cada atalho de Mais abre a rota correta e volta à aba de origem; logout limpa a pilha; rota desconhecida tem fallback explícito. `flutter analyze` e `flutter test` passam.
+
+**Commit:** `feat(navigation): criar estrutura e rotas do portal`
+
+### P02 — Login demonstrativo
+
+**Dependência:** P01.
+**Ler:** HTML `screen-login`, JavaScript `doLogin`.
+
+- Substituir o placeholder por logotipo orbital simples, título, subtítulo, formulário e rodapé institucional.
+- Matrícula e senha começam com valores demonstrativos equivalentes aos do legado. Senha usa `obscureText`; nunca registrar seu conteúdo em logs.
+- Validar somente campos obrigatórios; não inventar tamanho de matrícula ou política de senha.
+- Simular espera de 900 ms; mostrar “AUTENTICANDO...”, bloquear disparos duplicados e navegar conforme P01.
+- Atalho de biometria segue a mesma simulação, com texto/tooltip que informe que não há biometria real.
+- Usar formulário rolável e liberar controllers; após operações assíncronas, verificar `mounted` antes de acessar contexto/estado.
+
+**Aceite/testes:** vazio exibe erro e não navega; valores demonstrativos permitem entrar; loading impede novo envio; biometria simulada entra; teclado não causa overflow no viewport mínimo. Testes controlam o avanço dos 900 ms sem espera real.
+
+**Commit:** `feat(auth): portar login demonstrativo para flutter`
+
+### P03 — Dados e widgets compartilhados
+
+**Dependência:** P01.
+**Ler:** carteirinhas de Home/Perfil; mural recente e `screen-notices`; dados cadastrais do HTML.
+
+- Criar modelos imutáveis `Student` e `Notice` e respectivas fixtures compartilhadas.
+- Transcrever os quatro avisos e os três resumos de Home; manter identificação/categoria consistentes.
+- Implementar `StudentIdCard` normal/compacto e `NoticeTile` normal/compacto conforme contratos da seção 5.
+- A carteirinha normal exibe instituição, iniciais, nome, curso/período, matrícula e validade. Código de barras é apenas decorativo e determinístico.
+- Compartilhar os widgets em `core/widgets/`; não fazer Perfil importar widgets internos de Home.
+
+**Aceite/testes:** versões normal/compacta exibem seus campos corretos; estudante é o mesmo nos dois usos; resumo e corpo de um aviso podem ser diferentes; textos longos não geram overflow em largura de 360 px.
+
+**Commit:** `feat(shared): criar carteirinha e avisos reutilizaveis`
+
+### P04 — Início / dashboard
+
+**Dependências:** P02 e P03.
+**Ler:** HTML `screen-home`; JavaScript `updateClock`, somente para a regra da saudação.
+
+- Implementar `HomeScreen` rolável e widgets locais `AcademicStatTile`, `NextClassCard` e `QuickActionTile`.
+- Saudação por horário: antes de 12h “Bom dia”, antes de 18h “Boa tarde”, demais “Boa noite”. Calcular na construção da tela; relógio/timer contínuo fica fora desta etapa.
+- Exibir nome curto, sino, carteirinha, métricas 8.7/94%/142, próxima aula fixa e quatro atalhos.
+- Sino, “ver tudo” e Avisos abrem `AppRoutes.notices`; demais atalhos abrem Financeiro, Biblioteca e Suporte.
+- Usar os três avisos resumidos compartilhados.
+
+**Aceite/testes:** todos os blocos existem; atalhos/sino/ver tudo abrem destinos corretos; voltar restaura Home; próxima aula continua explicitamente mockada, sem countdown real.
+
+**Commit:** `feat(home): portar painel inicial do aluno`
+
+### P05 — Horário semanal
+
+**Dependências:** P01 e P04, seguindo a sequência padrão.
+**Ler:** HTML `screen-schedule`; JavaScript `schedule`, `dayNames`, `dayKeys`, `selectDay` e `renderClasses`.
+
+- Criar modelo tipado e fixtures com todas as aulas do array, sem alterar professores, salas ou horários.
+- Chips horizontais SEG, TER, QUA, QUI, SEX e SÁB; selecionar inicialmente pelo dia atual, preservando fallback de domingo para sábado.
+- Seleção atualiza a lista; sábado exibe estado “Sem aulas em Sábado”.
+- Manter o dia selecionado ao trocar de aba via `IndexedStack`.
+
+**Aceite/testes:** segunda tem duas aulas; terça uma; sábado vazio; domingo mapeia para sábado; seleção persiste ao sair/voltar à aba. Testes definem o dia/seleção explicitamente, sem depender da data da máquina.
+
+**Commit:** `feat(schedule): portar horario semanal e selecao de dias`
+
+### P06 — Notas e frequência
+
+**Dependência:** P05 na sequência padrão.
+**Ler:** HTML `screen-grades`; JavaScript `grades`, `renderGrades` e `filterGrades`.
+
+- Criar modelo de nota com AV2 anulável e status explícito; copiar as cinco entradas do legado.
+- Exibir CRA fixo 8.7, anel simples e legenda fixa 18/5/0.
+- Filtros Todas, Cursando e Concluídas; cards expansíveis com AV1, AV2, frequência e situação.
+- Calcular média apenas com as duas avaliações; uma casa decimal. Se média >= 7 usar destaque positivo; abaixo de 7 usar alerta. AV2 nula usa “Cursando” e traço no detalhe.
+- Mostrar situação conforme fixture, sem deduzir aprovação da média. Ao trocar filtro, cards podem voltar fechados como no legado.
+
+**Aceite/testes:** filtros retornam 5/1/4 itens; expansão mostra avaliações/frequência; 8.5 e 9.0 geram média exibida 8.8; AV2 nula não vira zero; Banco de Dados II mantém situação demonstrativa original. Testar cálculo separadamente.
+
+**Commit:** `feat(grades): portar notas filtros e detalhes de avaliacao`
+
+### P07 — Disciplinas
+
+**Dependência:** P06 na sequência padrão.
+**Ler:** HTML `screen-courses`; JavaScript array `courses`.
+
+- Criar modelo e fixtures das cinco disciplinas.
+- Exibir semestre 2026.2, nome, professor, créditos, progresso e sala de cada entrada.
+- Progresso visual usa `prog / 100`; não criar detalhe de disciplina, edição ou catálogo.
+
+**Aceite/testes:** cinco cards; valores correspondem ao array; barra de Arquitetura representa 78%; conteúdo pode ser alcançado por rolagem sem overflow.
+
+**Commit:** `feat(courses): portar lista de disciplinas do semestre`
+
+### P08 — Mais opções
+
+**Dependência:** P07 na sequência padrão.
+**Ler:** HTML `screen-more`.
+
+- Substituir atalhos provisórios pela grade Financeiro, Biblioteca, Mural, Perfil, Suporte e Sair.
+- Manter rótulos e descrições do legado; não adicionar configurações extras.
+- Usar as rotas existentes. Sair limpa a pilha conforme P01.
+
+**Aceite/testes:** seis opções presentes; os cinco destinos abrem sem barra inferior; voltar retorna à aba Mais; após Sair, voltar não restaura sessão.
+
+**Commit:** `feat(more): portar menu de opcoes e encerramento de sessao`
+
+### P09 — Financeiro
+
+**Dependência:** P08 na sequência padrão.
+**Ler:** HTML `screen-financial`.
+
+- Exibir alerta de fatura em aberto, mensalidade de setembro, vencimento 10/09/2026, valor R$ 1.240,00 e desconto R$ 62,00.
+- Exibir histórico de maio a agosto/2026, cada um pago por R$ 1.178,00, mantendo a ordem do HTML.
+- Usar código decorativo determinístico, sem linha digitável válida nem geração de arquivo.
+- “Gerar 2ª via” mostra feedback demonstrativo, sem download, HTTP ou alteração de pagamento.
+
+**Aceite/testes:** valores/datas corretos; quatro pagamentos; botão informa ausência de integração; voltar retorna à origem da navegação.
+
+**Commit:** `feat(financial): portar fatura e historico demonstrativos`
+
+### P10 — Biblioteca
+
+**Dependência:** P09 na sequência padrão.
+**Ler:** HTML `screen-library`.
+
+- Exibir campo com hint “Buscar título, autor ou ISBN...” e categorias Todos, Exatas, Computação, Humanas, Periódicos.
+- Campo e categorias são apresentação nesta etapa: indicar “Busca e categorias demonstrativas” e não prometer filtragem real. Não acrescentar ISBN ou categorias aos livros por inferência.
+- Exibir os três empréstimos: Estruturas de Dados e Algoritmos / T. Cormen / 2 dias; Arquitetura Limpa / R. C. Martin / 12 dias; Redes Neurais e Deep Learning / I. Goodfellow / 18 dias.
+- Prazo de 2 dias usa destaque de alerta. Não inventar datas de retirada/devolução nem renovação.
+
+**Aceite/testes:** três empréstimos e prazos corretos; indicação de demonstração visível; nenhum filtro ou resultado real é alegado; campo não causa overflow com teclado.
+
+**Commit:** `feat(library): portar emprestimos e estrutura da biblioteca`
+
+### P11 — Mural de avisos
+
+**Dependências:** P03 e P10 na sequência padrão.
+**Ler:** HTML `screen-notices` e fixtures compartilhadas já existentes.
+
+- Renderizar quatro avisos com `NoticeTile` completo: título, categoria, corpo e data textual demonstrativa.
+- Manter Hoje · 08:12, Ontem · 17:40, 2 dias atrás e 4 dias atrás como textos mockados, não datas recalculadas.
+- Não criar leitura/não leitura, detalhes de aviso ou atualização remota.
+
+**Aceite/testes:** quatro avisos na ordem do HTML; resumos da Home correspondem aos mesmos IDs; navegação funciona tanto pela Home quanto por Mais, retornando à origem correta.
+
+**Commit:** `feat(notices): portar mural com comunicados compartilhados`
+
+### P12 — Central de suporte
+
+**Dependência:** P11 na sequência padrão.
+**Ler:** HTML `screen-support`.
+
+- Exibir card de secretaria com descrição, botão “Abrir novo chamado” e três FAQs originais.
+- Botão mostra feedback demonstrativo, sem formulário, envio ou registro de protocolo.
+- FAQ pode ser texto simples; não inventar fluxo de atendimento ou navegação pelo texto das respostas.
+
+**Aceite/testes:** três perguntas e respostas presentes; botão informa ausência de integração; conteúdo rolável e retorno preservado.
+
+**Commit:** `feat(support): portar central de ajuda e perguntas frequentes`
+
+### P13 — Perfil e preferências locais
+
+**Dependências:** P03 e P12 na sequência padrão.
+**Ler:** HTML `screen-profile`.
+
+- Usar `StudentIdCard` compacto com a fixture compartilhada; exibir CPF/telefone mascarados e e-mail institucional exatamente como no legado.
+- Switches: Notificações push inicialmente ligado, Modo escuro inicialmente ligado e Biometria facial inicialmente desligado, conforme HTML.
+- Preservar esses estados visuais sem ativar recursos reais; mostrar indicação explícita de que são preferências demonstrativas. O tema do app continua claro.
+- Estado vive somente na instância da tela e pode reiniciar ao fechar/reabrir; não implementar persistência.
+- Botão “Encerrar sessão” limpa a pilha, inclusive se Perfil foi aberto sobre outra rota.
+
+**Aceite/testes:** dados mascarados corretos; switches alternam independentemente; não alteram tema nem pedem permissões; logout leva ao Login sem retorno à sessão.
+
+**Commit:** `feat(profile): portar perfil e preferencias demonstrativas`
+
+### P14 — Auditoria e testes da migração estrutural
+
+**Dependências:** P01–P13 concluídas.
+**Ler:** todas as caixas de aceite deste plano e as 11 seções HTML.
+
+- Acrescentar teste de fluxo representativo: Login → Home → Horário/Notas/Disciplinas/Mais → secundária → retorno → Perfil → logout.
+- Confirmar as 11 telas implementadas e remover somente placeholders introduzidos por esta migração.
+- Testar preservação de estado das abas e pilha de retorno/encerramento de sessão.
+- Acrescentar verificações de layout nos viewports mínimos; verificar Login com teclado e listas com rolagem. Não tratar ausência de exceções como prova de fidelidade visual total.
+- Atualizar README com execução, testes e lista clara de recursos simulados e etapas ainda pendentes.
+- Executar build Web de fumaça, se o ambiente suportar. Android/iOS dependem de SDKs disponíveis; não instalar ferramentas ou alterar configurações nativas sem aprovação.
+- Se aparecer defeito pequeno da migração, corrigir e testar nesta parte. Se exigir funcionalidade nova, arquitetura ou retrabalho amplo, registrar bloqueio e discutir antes de expandir o escopo.
+
+**Aceite:** todos os testes passam, análise sem novos problemas, nenhuma tela de placeholder, limitações documentadas e build Web verificado ou bloqueio técnico explicitamente informado. Pendência de validação impede marcar a etapa como totalmente validada.
+
+**Commit:** `test(migration): validar fluxos e documentar limites do prototipo`
+
+## 7. Organização entre integrantes
+
+- A ordem P01–P14 é o caminho padrão para um executor individual. Uma solicitação pode selecionar uma parte posterior somente se as dependências técnicas já existirem.
+- Dependências “na sequência padrão” organizam a execução, mas não significam dependência de código entre funcionalidades independentes.
+- Trabalho simultâneo exige combinar explicitamente responsáveis e dependências; não autoriza disparar subagentes automaticamente.
+- P01 e P03 definem os contratos compartilhados antes de dividir telas.
+- Após P01/P03, telas independentes podem ser distribuídas, desde que Login esteja disponível para validar o fluxo e cada integrante trabalhe em arquivos próprios.
+- Reservar arquivos compartilhados (`app.dart`, rotas, fixtures, tema e plano geral) e coordenar atualizações. Não editar contrato compartilhado silenciosamente.
+- Não duplicar widgets ou mocks para evitar combinar mudanças. Se o contrato estiver insuficiente, discutir a alteração.
+- Cada parte mantém seu commit próprio também no trabalho em equipe. Não juntar entregas diferentes num único commit.
+
+### Quadro de acompanhamento inicial
+
+Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
+
+| Parte | Entrega | Estado | Responsável | Validação / observação |
+| --- | --- | --- | --- | --- |
+| P01 | Fundação/navegação | concluída | Sol | Análise sem problemas; 12 testes aprovados em 27/10/2026 |
+| P02 | Login | concluída | Sol | Análise sem problemas; 19 testes aprovados em 29/10/2026 |
+| P03 | Compartilhados | concluída | Sol | Análise sem problemas; 33 testes aprovados em 29/10/2026 |
+| P04 | Home | concluída | Sol | Análise sem problemas; 44 testes aprovados em 29/10/2026 |
+| P05 | Horário | concluída | Sol | Análise sem problemas; 57 testes aprovados em 09/11/2026 |
+| P06 | Notas | concluída | Sol | Análise sem problemas; 72 testes aprovados em 09/11/2026 |
+| P07 | Disciplinas | concluída | Sol | Análise sem problemas; 78 testes aprovados em 09/11/2026 |
+| P08 | Mais | concluída | Sol | Análise sem problemas; 83 testes aprovados em 09/11/2026 |
+| P09 | Financeiro | concluída | Sol | Análise sem problemas; 91 testes aprovados em 09/11/2026 |
+| P10 | Biblioteca | concluída | Sol | Análise sem problemas; 100 testes aprovados em 09/11/2026 |
+| P11 | Avisos | concluída | Sol | Análise sem problemas; 106 testes aprovados em 09/11/2026 |
+| P12 | Suporte | concluída | Sol | Análise sem problemas; 112 testes aprovados em 09/11/2026 |
+| P13 | Perfil | concluída | Sol | Análise sem problemas; 119 testes aprovados em 09/11/2026 |
+| P14 | Auditoria | concluída | Sol | Análise sem problemas; 123 testes aprovados e build Web ok em 09/11/2026 |
+
+### Resultado da P01 — 27/10/2026
+
+- Criados app, rotas, tema claro, barra inferior fixa, casca com `IndexedStack` e as 11 telas provisórias.
+- Login demonstrativo e Sair limpam a pilha; as cinco secundárias abrem sem barra inferior e retornam à aba Mais; rotas desconhecidas exibem fallback.
+- Ambiente conferido: Flutter 3.47.7 e Dart 3.13.5; `flutter pub get` concluído, sem novos pacotes ou alteração do lockfile.
+- `dart format` executado nos 18 arquivos Dart da entrega; `flutter analyze` sem problemas e `flutter test` com 12 testes aprovados.
+- Testes de layout da estrutura executados em 360 × 800, 390 × 844 e 360 × 640, sem exceções de overflow.
+- `git diff --check` e revisão dos diffs realizados antes do commit; alterações preexistentes fora do escopo não incluídas.
+- Não houve teste manual em dispositivo, build Android/iOS/Web ou validação de fidelidade visual. As telas ainda são placeholders; formulário e simulação de espera pertencem à P02.
+- Próxima parte: P02, somente após confirmação do usuário.
+
+### Resultado da P02 — 29/10/2026
+
+- Substituído o Login provisório por símbolo orbital desenhado, títulos institucionais, formulário e rodapé demonstrativo.
+- Matrícula e senha pré-preenchidas conforme legado; validação apenas de obrigatoriedade, senha oculta e envio pelo botão ou ação concluir do teclado.
+- Espera local de 900 ms, campos/botões desabilitados e proteção contra envio duplicado. Controllers descartados e `mounted` verificado após a espera.
+- Biometria usa o mesmo fluxo local, explicitamente identificada como simulada. O rodapé informa ausência de autenticação real em vez de prometer conexão criptografada inexistente.
+- Testes de navegação atualizados para o botão definitivo e atraso controlado; sete novos testes cobrem formulário, espera, duplicidade, biometria, teclado e descarte durante a espera.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; três arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 19 testes aprovados; formulário testado em 360 × 640 com teclado simulado de 300 px, sem overflow.
+- `git diff --check` e revisão dos diffs realizados antes do commit. Nenhum build ou teste manual em dispositivo nesta parte.
+- Alterações avulsas anteriores registradas separadamente no commit `78bd00d`, conforme solicitado, sem misturar com a implementação da P02.
+- Próxima parte: P03, somente após confirmação do usuário.
+
+### Resultado da P03 — 29/10/2026
+
+- Criados modelos imutáveis `Student`, `Notice` e categoria tipada, com fixtures únicas em `core/mock/`.
+- Transcritos estudante, dados cadastrais mascarados, quatro avisos completos e três resumos distintos da Home. Datas permanecem textuais e demonstrativas.
+- Criados `StudentIdCard` e `NoticeTile` normais/compactos em `core/widgets/`, recebendo dados por construtor e reutilizando o tema existente.
+- Carteirinha compacta omite período, matrícula, validade e barras; versão normal exibe esses dados. Barras são determinísticas, decorativas e excluídas da leitura por tecnologias assistivas.
+- Login passou a reutilizar a matrícula da fixture compartilhada, sem alteração de comportamento.
+- Acrescentados 14 testes: duas verificações de fixtures e 12 testes de widgets, incluindo variantes, resumo/corpo, repetibilidade das barras e textos longos em 360 px.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; oito arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 33 testes aprovados; diffs revisados e verificação de espaços executada antes do commit.
+- Não houve build, teste manual em dispositivo ou reprodução visual completa. Integração na Home, no Mural e no Perfil permanece nas partes P04, P11 e P13.
+- Não havia alterações pendentes antes da P03, portanto não foi criado commit vazio para a solicitação inicial.
+- Próxima parte: P04, somente após confirmação do usuário.
+
+### Resultado da P04 — 29/10/2026
+
+- Home provisória substituída por dashboard rolável, com saudação por horário, nome curto e carteirinha usando a fixture compartilhada.
+- Criados `AcademicStatTile`, `NextClassCard` e `QuickActionTile` locais, recebendo dados/callbacks por construtor e usando apenas Flutter.
+- Exibidos CRA 8.7, frequência 94% e 142 créditos; próxima aula, local, professor, 19:00 e “em 47 min” preservados como conteúdo explicitamente demonstrativo, sem timer.
+- Financeiro, Biblioteca, Avisos, Suporte, sino e “ver tudo” conectados às rotas existentes. Os três avisos resumidos reutilizam as mesmas instâncias da fixture compartilhada.
+- Acrescentados 11 testes: regra de saudação nos limites 0/11/12/17/18/23h, conteúdo, seis acessos com retorno à Home preservando rolagem e três tamanhos de viewport.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; cinco arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 44 testes aprovados. Home e atalhos testados em 360 × 800, 390 × 844 e 360 × 640, com rolagem até o último aviso e sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Não houve build, teste manual em dispositivo ou refinamento visual completo.
+- Não havia alterações pendentes no início; o commit da P03 já existia. Próxima parte: P05, somente após confirmação do usuário.
+
+### Resultado da P05 — 09/11/2026
+
+- Criados `ScheduleDay` e `ScheduledClass` tipados e fixtures das oito ocorrências semanais, reutilizando as cinco aulas imutáveis quando repetidas.
+- Preservados disciplinas, horários, salas, professores e cores do JavaScript original, com sábado vazio e fallback explícito de domingo para sábado.
+- Tela de Horário provisória substituída por cabeçalhos, seis chips horizontais e cards roláveis de aulas ou estado “Sem aulas em Sábado”.
+- Dia inicial obtido da data local; seleção mantida em estado local e preservada pelo `IndexedStack` existente, sem alterar a casca ou a navegação.
+- Acrescentados 13 testes: duas verificações de datas/fixtures e 11 testes de widgets, cobrindo seis dias, troca/reseleção, preservação entre abas e três viewports.
+- Os testes selecionam dias explicitamente e verificam datas fixas para o mapeamento semanal, sem depender da data da máquina.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; quatro arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 57 testes aprovados. Chips, últimas aulas e estado vazio acessíveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build, teste manual em dispositivo ou calendário acadêmico real; os horários permanecem demonstrativos.
+- Próxima parte: P06, somente após confirmação do usuário.
+
+### Resultado da P06 — 09/11/2026
+
+- Criados `Grade`, status explícito e fixtures das cinco disciplinas, com AV2 anulável e média calculada somente quando existem as duas avaliações.
+- Notas apresentadas com uma casa decimal; AV2 zero continua válida, e AV2 ausente aparece como “—” e “Não informada” na leitura acessível, sem ser anunciada como zero.
+- Tela provisória substituída por resumo fixo (CRA 8.7 e legenda 18/5/0), anel determinístico, filtros e cards expansíveis com AV1, AV2, frequência e situação.
+- Filtros Todas/Cursando/Concluídas retornam 5/1/4 cards. Filtro e expansão persistem entre abas; mudar o filtro fecha detalhes antigos.
+- Banco de Dados II preserva média exibida 6.8 e situação Aprovado do legado; não foi criada regra acadêmica para deduzir aprovação a partir da média.
+- Acrescentados 15 testes: três verificações de fixtures/médias e 12 testes de widgets, incluindo filtros, expansão/recolhimento, resumo fixo, acessibilidade, persistência e três viewports.
+- A primeira execução detectou incompatibilidade de valores semânticos textuais nas barras do SDK atual. A leitura foi corrigida na linha da avaliação, sem mascarar a falha ou confundir nota ausente com zero; teste específico e suíte completa reexecutados com sucesso.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; cinco arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 72 testes aprovados. Última disciplina expansível e filtros acessíveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; CRA, contagens e dados acadêmicos permanecem demonstrativos.
+- Próxima parte: P07, somente após confirmação do usuário.
+
+### Resultado da P07 — 09/11/2026
+
+- Criados modelo imutável `Course` e fixtures das cinco disciplinas na ordem do array original, preservando professores, créditos, percentuais e salas.
+- Tela provisória substituída por semestre 2026.2, título “Minhas disciplinas” e cinco cards roláveis, sem catálogo, edição ou tela de detalhes.
+- Barras usam `progress / 100`, com rótulo acessível por disciplina e percentual nativo; Arquitetura de Software representa 78% (0.78).
+- Acrescentados seis testes: fixture completa, conteúdo/progresso dos cinco cards, preservação de rolagem entre abas e três viewports mínimos.
+- A primeira execução apontou uma busca semântica exata inadequada ao nó combinado do card. O teste passou a conferir o conteúdo do nó real, mantendo a verificação dos rótulos acessíveis; os seis testes específicos e a suíte completa foram reexecutados com sucesso.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; quatro arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 78 testes aprovados. Os cinco cards e a última sala são alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; semestre e progressos continuam demonstrativos.
+- Próxima parte: P08, somente após confirmação do usuário.
+
+### Resultado da P08 — 09/11/2026
+
+- Menu provisório substituído por cabeçalho “NAVEGAÇÃO”/“Mais opções” e grade de duas colunas com Financeiro, Biblioteca, Mural, Perfil, Suporte e Sair.
+- Rótulos, descrições e ordem preservados do HTML; botões nativos com altura natural dos textos, ícones e destaque de alerta para a saída.
+- Mantidas as rotas existentes para os cinco destinos e limpeza da pilha ao sair. Nenhuma tela secundária, configuração extra ou camada de dados foi antecipada.
+- Testes existentes de destinos, retorno à aba Mais e logout reutilizados, com rolagem explícita antes dos toques. Novo login continua reiniciando na Home sem recuperar sessão anterior.
+- Acrescentados cinco testes de widgets: conteúdo das seis opções, três viewports verificando duas colunas/botões alcançáveis e texto ampliado em 2× sem overflow ou altura fixa.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; três arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 83 testes aprovados. Grade verificada em 360 × 800, 390 × 844 e 360 × 640; ampliação de texto verificada em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; destinos secundários continuam com o conteúdo provisório previsto para as próximas partes.
+- Próxima parte: P09, somente após confirmação do usuário.
+
+### Resultado da P09 — 09/11/2026
+
+- Criados modelos imutáveis e fixtures da fatura de setembro e quatro pagamentos, preservando vencimento 10/09/2026, valor R$ 1.240,00, desconto − R$ 62,00 e histórico Agosto/Julho/Junho/Maio de R$ 1.178,00 cada.
+- Valores monetários mantidos como textos demonstrativos já formatados, sem cálculos; literais Dart usam strings brutas para preservar `R$` sem interpolação.
+- Tela provisória substituída por aviso de demonstração, banner de fatura em aberto, detalhes, barras decorativas, botão e histórico rolável. AppBar/retorno nativo mantidos.
+- “Gerar 2ª via” mostra apenas “Recurso demonstrativo, sem integração”; não gera arquivo, chamada HTTP, linha digitável ou alteração de pagamento.
+- Extraído `DecorativeBarcode` das barras existentes da carteirinha: padrão determinístico compartilhado, com 14 barras na carteirinha e 46 no Financeiro, excluídas da leitura assistiva. Código financeiro identificado como sem valor bancário.
+- Acrescentados oito testes: fixture monetária completa e sete testes de widgets, cobrindo conteúdo/histórico, feedback sem mutação, barras repetíveis, três viewports e texto ampliado em 2×.
+- Testes existentes da carteirinha continuam aprovados, assim como os retornos do Financeiro à Home e à aba Mais.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; seis arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 91 testes aprovados. Fatura e último pagamento alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há integração financeira ou emissão real de boleto.
+- Próxima parte: P10, somente após confirmação do usuário.
+
+### Resultado da P10 — 09/11/2026
+
+- Criados modelo imutável `Loan` e fixtures dos três empréstimos, preservando títulos, autores e prazos de 2, 12 e 18 dias.
+- Tela provisória substituída por campo editável com hint original, aviso “Busca e categorias demonstrativas”, cinco categorias passivas em chips horizontais e cards roláveis de empréstimos.
+- Digitação e ação de busca não filtram a lista nem simulam resultados; não foram acrescentados ISBN, categorias aos livros, acervo fictício, datas ou renovação.
+- Alerta de prazo próximo preservado explicitamente na fixture do empréstimo de dois dias, com destaque visual e descrição acessível. Não foi inventada regra de calendário ou cálculo de vencimento.
+- Acrescentados nove testes: fixture completa e oito testes de widgets, cobrindo conteúdo, alerta visual/semântico, ausência de filtragem, teclado, três viewports e texto ampliado em 2×.
+- Testes existentes de retorno da Biblioteca à Home e à aba Mais continuam aprovados; AppBar/retorno nativo preservados.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; quatro arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 100 testes aprovados. Categorias e último empréstimo alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
+- Campo e empréstimos verificados em 360 × 640 com teclado simulado de 300 px; texto ampliado em 2× também verificado separadamente nesse tamanho.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há busca real, integração ao acervo ou renovação.
+- Próxima parte: P11, somente após confirmação do usuário.
+
+### Resultado da P11 — 09/11/2026
+
+- Mural provisório substituído por quatro `NoticeTile` completos, reutilizando diretamente a fixture compartilhada, sem novos modelos ou cópia de dados.
+- Preservados ordem, títulos, categorias, corpos e datas textuais Hoje · 08:12, Ontem · 17:40, 2 dias atrás e 4 dias atrás. Comunicados/datas identificados como demonstração, sem recálculo por relógio.
+- Scaffold/AppBar e retorno nativo mantidos. Não foram criados detalhes, estado de leitura/não leitura ou atualização remota.
+- Acrescentados seis testes de widgets: conteúdo completo, identidade/IDs compartilhados com os três resumos da Home, três viewports e texto ampliado em 2×.
+- Testes existentes do atalho Avisos, sino, “ver tudo” e opção Mural de Mais continuam aprovados, retornando à origem correta; teste novo também verifica retorno à Home após comparar os avisos.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; dois arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 106 testes aprovados. Quatro comunicados e última data alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; avisos e datas continuam mockados.
+- Próxima parte: P12, somente após confirmação do usuário.
+
+### Resultado da P12 — 09/11/2026
+
+- Central de suporte provisória substituída pelo card “FALE COM A SECRETARIA”, descrição, botão “Abrir novo chamado” e três perguntas frequentes na ordem do HTML.
+- Atendimento identificado como demonstrativo; “Abrir novo chamado” exibe apenas “Recurso demonstrativo, sem integração”, sem formulário, envio, protocolo ou navegação pelas respostas.
+- Scaffold/AppBar e retorno nativo mantidos, sem introduzir pacotes, camada de dados extra ou rotas adicionais.
+- Acrescentados seis testes de widgets: conteúdo e ordem das três FAQs, feedback demonstrativo preservando retorno à Home, três viewports mínimos e texto ampliado em 2×.
+- Testes existentes de acesso e retorno do Suporte pela Home e pela aba Mais continuam aprovados.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; dois arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 112 testes aprovados. Secretaria, botão e três FAQs alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; não há abertura real de chamados ou integração com secretaria.
+- Próxima parte: P13, somente após confirmação do usuário.
+
+### Resultado da P13 — 09/11/2026
+
+- Perfil provisório substituído por cabeçalho “CONTA”, `StudentIdCard` compacto com `demoStudent` compartilhado, dados cadastrais mascarados (CPF, E-mail institucional e Telefone), três `SwitchListTile` e botão “Encerrar sessão”.
+- Estados iniciais dos switches preservados do HTML: Notificações push ligado, Modo escuro ligado e Biometria facial desligado.
+- Preferências identificadas como demonstrativas e mantidas apenas na instância da tela; alternar os switches não altera o tema claro, não solicita permissões nem persiste estado ao fechar/reabrir.
+- “Encerrar sessão” usa `pushNamedAndRemoveUntil(AppRoutes.login, (_) => false)`, limpando toda a pilha inclusive quando o Perfil é aberto sobre outra rota secundária.
+- Acrescentados sete testes de widgets: carteirinha compacta compartilhada e dados mascarados, alternância independente dos três switches sem alterar o tema e reinício ao reabrir, limpeza de pilha sobre outra rota, três viewports mínimos e texto ampliado em 2×.
+- Testes existentes de acesso e retorno do Perfil pela aba Mais continuam aprovados.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; dois arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 119 testes aprovados. Carteirinha, dados, switches e logout alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow; texto ampliado em 2× verificado em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; preferências permanecem apenas visuais e sem persistência.
+- Próxima parte: P14, somente após confirmação do usuário.
+
+### Resultado da P14 — 09/11/2026
+
+- Confirmadas as 11 telas migradas (Login, cinco abas principais e cinco rotas secundárias), sem textos ou telas de placeholder remanescentes.
+- Criado `test/migration_audit_test.dart` cobrindo o fluxo representativo ponta a ponta (Login → Home → Horário → Notas → Cursos → Mais → secundárias → retorno preservando estado das abas → Perfil → logout limpando a pilha) e verificações de layout com teclado e rolagem em 360 × 800, 390 × 844 e 360 × 640.
+- A primeira execução do teste de auditoria buscou “Cursando” na linha de situação expandida de Cálculo Numérico; a asserção foi ajustada para o rótulo explícito da fixture (`Frequência: 82% · Situação: Em andamento`), e a suíte completa foi reexecutada com aprovação.
+- `README.md` atualizado com instruções de execução, testes, build Web, mapa das 11 telas migradas, recursos simulados/limitações do protótipo e próximas etapas planejadas (`style.css`, `script.js` e evolução com integrações reais).
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; `test/migration_audit_test.dart` formatado.
+- `flutter analyze` sem problemas; `flutter test` com 123 testes aprovados; `flutter build web` executado com sucesso (`build/web`).
+- Diffs revisados e verificação de espaços executada antes do commit. Etapa de migração estrutural concluída.
+
+## 8. Verificações obrigatórias de cada parte
+
+Executar no diretório do projeto, sem alterar ou formatar o legado:
+
+```text
+flutter --version
+flutter pub get
+dart format <arquivos Dart criados ou alterados na parte>
+flutter analyze
+flutter test
+git diff --check
+git diff
+git diff --cached
+```
+
+- Conferir a versão do Flutter/Dart pelo SDK instalado e pelo `pubspec.yaml`; não inventar versão, atualizar SDK ou alterar restrição para contornar erro sem aprovação.
+- `flutter pub get` não autoriza novos pacotes. Investigar mudanças inesperadas no lockfile antes de incluí-las.
+- `dart format` recebe caminhos explícitos da parte; não reformatar trabalho alheio.
+- Testes de widgets usam `flutter_test`, `pumpWidget`, `pump`/`pumpAndSettle` e interações reais com os controles. Não usar apenas comparação de snapshots nem testar somente construtores.
+- Para telas longas, rolar antes de procurar/tocar componentes fora da área visível.
+- Não usar `pumpAndSettle` com animação infinita; preferir indicador estático do anel de CRA e avanço controlado de tempo durante loading.
+- Testes de viewport devem ajustar/restaurar as configurações de tamanho da view com as APIs compatíveis com o SDK instalado.
+- No P14, acrescentar `flutter build web`. Registrar falha de ambiente separadamente de falha de código.
+- Se não for possível executar um comando, informar o comando e o erro. Não registrar “passou” por inspeção visual ou por suposição.
+- Antes de commitar, conferir que somente os caminhos da parte estão staged. Não incluir `.gitignore`, legado, arquivos de IDE ou alterações nativas preexistentes sem relação explícita com a entrega.
+
+## 9. Protocolo contra suposições e expansão de escopo
+
+1. O plano orienta; os arquivos reais comprovam. Ler o trecho fonte antes de transcrever dados ou implementar comportamento.
+2. Caminho ausente/contrato diferente deve ser investigado, não substituído por API inventada.
+3. Não escrever “autenticação”, “pagamento”, “push ativado” ou “chamado criado” como se fossem reais. Usar linguagem de demonstração na interface e documentação onde esses recursos aparecem.
+4. Não adicionar pacote, arquivo de asset inexistente, serviço remoto, permissão ou credencial para preencher lacuna.
+5. Não corrigir divergências de mocks sem decisão do usuário. Registrar a inconsistência e preservar o comportamento delimitado neste plano.
+6. Não criar todo o tema CSS ou toda a lógica JavaScript como efeito colateral de uma tela.
+7. Se a parte ficar grande demais, propor sua divisão antes de começar. Uma subdivisão aprovada recebe identificador e commit próprios; não executar várias partes disfarçadas de uma só.
+8. Nunca declarar entrega, teste ou commit que não ocorreu. Ao final de cada parte, parar.
+
+## 10. Etapas futuras, sem execução implícita
+
+Após a conclusão estrutural, elaborar planos próprios para:
+
+1. **Fidelidade visual de `style.css`:** tipografia, assets, texturas, bordas, sombras, gradientes, responsividade refinada e animações decorativas.
+2. **Comportamento completo de `script.js`:** revisar os estados locais já portados, relógio/saudação atualizada, efeitos e demais detalhes ainda pendentes, sem reescrever código funcional desnecessariamente.
+3. **Evolução além do protótipo:** somente com requisitos novos aprovados, definir autenticação/backend, integrações, regras acadêmicas reais, biblioteca pesquisável, persistência e recursos nativos.
+
+Nenhuma dessas etapas está autorizada pela seleção de uma parte deste plano estrutural.

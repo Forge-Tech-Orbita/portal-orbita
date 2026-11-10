@@ -87,3 +87,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Pasta para implementação de planos simples
+.plan/local

@@ -48,3 +48,4 @@ flutter build web
 1. **Fidelidade visual (`style.css`):** tipografia externa, texturas, sombras finas, gradientes, responsividade refinada e animações decorativas.
 2. **Comportamento complementar (`script.js`):** relógio/saudação contínua e refinamentos adicionais de interação.
 3. **Evolução além do protótipo:** integração com APIs, autenticação real, regras acadêmicas dinâmicas, busca de acervo e persistência de preferências.
+

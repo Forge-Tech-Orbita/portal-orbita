@@ -1,0 +1,1499 @@
+/* ============================================================
+   PORTAL ÓRBITA — FOLHA DE ESTILOS (style.css)
+   Tema: Retrô-clean · cores claras · sombras leves
+   ------------------------------------------------------------
+   Índice:
+   1. Variáveis globais (cores, fontes, sombras)
+   2. Reset e base
+   3. Moldura do dispositivo (device frame)
+   4. Componentes globais (cards, botões, inputs, chips)
+   5. Tela: Login
+   6. Tela: Início (Home) + cartão de identificação
+   7. Tela: Horário
+   8. Tela: Notas
+   9. Tela: Disciplinas
+   10. Tela: Mais (menu grid)
+   11. Tela: Financeiro
+   12. Tela: Biblioteca
+   13. Tela: Mural de avisos
+   14. Tela: Perfil
+   15. Navegação inferior (bottom nav)
+   ============================================================ */
+
+/* ---------- 1. VARIÁVEIS GLOBAIS ---------- */
+:root {
+    --void: #F6F1E3;
+    --panel: #FBF8EF;
+    --panel-2: #F1E8D2;
+    --panel-3: #E8DCBC;
+    --line: #DECBA0;
+    --cyan: #2F6F68;
+    --violet: #A6543B;
+    --mint: #5B7F3A;
+    --amber: #C98A2E;
+    --rose: #AF3B2E;
+    --text: #2B2A22;
+    --text-dim: #6E6650;
+    --text-faint: #A79A78;
+    --shadow-sm: 0 1px 2px rgba(43, 42, 34, 0.07), 0 3px 8px rgba(43, 42, 34, 0.05);
+    --shadow-md: 0 6px 16px rgba(43, 42, 34, 0.09), 0 2px 4px rgba(43, 42, 34, 0.06);
+    --shadow-lift: 0 16px 30px -12px rgba(43, 42, 34, 0.24);
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'Work Sans', sans-serif;
+    --font-mono: 'Courier Prime', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- 2. RESET E BASE ---------- */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    font-family: var(--font-body);
+    background:
+        radial-gradient(circle at 15% 8%, rgba(201, 138, 46, 0.10), transparent 50%),
+        radial-gradient(circle at 88% 92%, rgba(47, 111, 104, 0.08), transparent 50%),
+        #EDE4CE;
+    color: var(--text);
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 12px;
+    overflow-x: hidden;
+}
+
+.lab-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.lab-label span {
+    color: var(--violet);
+    font-weight: 600;
+}
+
+/* ---------- 3. MOLDURA DO DISPOSITIVO ---------- */
+.device {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    max-width: 94vw;
+    max-height: 88vh;
+    background: linear-gradient(160deg, #3E3527, #2C2519);
+    border-radius: 46px;
+    padding: 14px;
+    box-shadow:
+        var(--shadow-lift),
+        0 2px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.device::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 38px;
+    border: 1.5px solid rgba(201, 138, 46, 0.35);
+    pointer-events: none;
+}
+
+.screen-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--void);
+    border-radius: 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-image: radial-gradient(rgba(43, 42, 34, 0.055) 1px, transparent 1px);
+    background-size: 15px 15px;
+}
+
+.notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 26px;
+    background: #2C2519;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    z-index: 50;
+}
+
+.statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 26px 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    letter-spacing: .03em;
+}
+
+.statusbar .time {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.statusbar .icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+/* ---------- SCROLLABLE CONTENT ---------- */
+.screens {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 6px 20px 100px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity .28s ease, transform .28s ease;
+    scrollbar-width: none;
+}
+
+.screen::-webkit-scrollbar {
+    display: none;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--font-display);
+    margin: 0;
+    letter-spacing: .02em;
+    font-weight: 400;
+}
+
+.eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.eyebrow::before {
+    content: "";
+    width: 14px;
+    height: 2px;
+    background: var(--cyan);
+    border-radius: 2px;
+}
+
+/* ---------- 4. COMPONENTES GLOBAIS (cards, botões, inputs) ---------- */
+
+/* Barra superior com botão voltar */
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 2px 18px;
+}
+
+.backbtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--violet);
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.topbar h2 {
+    font-size: 19px;
+    color: var(--text);
+    font-weight: 700;
+    font-family: var(--font-body);
+}
+
+/* ---------- GLASS CARD (agora cartão de papel) ---------- */
+.card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    position: relative;
+    box-shadow: var(--shadow-md);
+}
+
+.card::after {
+    content: none;
+}
+
+/* ---------- BUTTONS / INPUTS ---------- */
+.btn {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: .02em;
+}
+
+.btn-primary {
+    background: var(--text);
+    color: var(--panel);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-ghost {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.field label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+}
+
+.field input {
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.field input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(47, 111, 104, 0.12);
+}
+
+/* ---------- 5. TELA: LOGIN ---------- */
+#screen-login {
+    padding-top: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 34px;
+}
+
+.orbit-mark {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 14px;
+    filter: drop-shadow(0 4px 6px rgba(43, 42, 34, 0.15));
+}
+
+.login-logo h1 {
+    font-size: 34px;
+    letter-spacing: .1em;
+    color: var(--text);
+    font-family: var(--font-display);
+}
+
+.login-logo p {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    letter-spacing: .14em;
+    margin-top: 2px;
+}
+
+.bio-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+}
+
+.bio-row svg {
+    color: var(--violet);
+}
+
+.login-foot {
+    margin-top: auto;
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 10.5px;
+    font-family: var(--font-mono);
+    padding-top: 20px;
+    letter-spacing: .04em;
+    line-height: 1.7;
+}
+
+/* ---------- 6. TELA: INÍCIO (HOME) + CARTÃO DE IDENTIFICAÇÃO ---------- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 2px 20px;
+}
+
+.home-header .greet-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.home-header h1 {
+    font-size: 26px;
+    margin-top: 2px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: var(--text);
+}
+
+.bell {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: var(--violet);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.bell .dot {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rose);
+    border: 1.5px solid var(--panel);
+}
+
+/* ID CARD - elemento assinatura: cartão-ficha retrô */
+.id-card-wrap {
+    perspective: 900px;
+    margin-bottom: 20px;
+}
+
+.id-card {
+    position: relative;
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    background: repeating-linear-gradient(135deg, var(--panel) 0px, var(--panel) 18px, #F8F3E5 18px, #F8F3E5 36px);
+    border: 1.5px solid var(--line);
+    box-shadow: var(--shadow-md);
+    transform-style: preserve-3d;
+    transition: transform .15s ease-out, box-shadow .2s;
+    overflow: hidden;
+}
+
+.id-card::before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    bottom: 10px;
+    width: 0;
+    border-left: 2px dashed var(--text-faint);
+    opacity: .55;
+}
+
+.id-card::after {
+    content: "ATIVO";
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: .12em;
+    font-weight: 700;
+    color: var(--rose);
+    border: 1.5px dashed var(--rose);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transform: rotate(-11deg);
+    opacity: .8;
+}
+
+.id-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-left: 16px;
+}
+
+.id-card-top .org {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: .1em;
+    color: var(--text);
+}
+
+.id-card-top .chip {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--panel-2);
+    border: 1.5px dashed var(--cyan);
+}
+
+.id-card-body {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+    padding-left: 16px;
+}
+
+.id-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 19px;
+    color: var(--panel);
+    box-shadow: var(--shadow-sm);
+}
+
+.id-info .name {
+    font-size: 15px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    color: var(--text);
+}
+
+.id-info .course {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+
+.id-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    padding-left: 16px;
+}
+
+.id-meta div span {
+    display: block;
+}
+
+.id-meta .label {
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.id-meta .value {
+    font-size: 12px;
+    color: var(--text);
+    margin-top: 2px;
+    letter-spacing: .03em;
+    font-weight: 600;
+}
+
+.id-meta .barcode {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 20px;
+}
+
+.id-meta .barcode i {
+    display: block;
+    width: 2px;
+    background: var(--text);
+    opacity: .65;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat .num {
+    font-family: var(--font-mono);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--cyan);
+}
+
+.stat .lbl {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    letter-spacing: .03em;
+}
+
+.next-class {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.next-class .bar {
+    width: 4px;
+    align-self: stretch;
+    border-radius: 4px;
+    background: var(--violet);
+}
+
+.next-class .info {
+    flex: 1;
+}
+
+.next-class .subj {
+    font-weight: 700;
+    font-size: 14.5px;
+}
+
+.next-class .meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    font-family: var(--font-mono);
+}
+
+.next-class .countdown {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--mint);
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.next-class .countdown small {
+    display: block;
+    color: var(--text-faint);
+    font-size: 9px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+    font-weight: 400;
+}
+
+.qa-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.qa {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: box-shadow .2s, transform .2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.qa:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.qa svg {
+    color: var(--cyan);
+    margin-bottom: 6px;
+}
+
+.qa .t {
+    font-size: 10px;
+    color: var(--text-dim);
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.section-head h3 {
+    font-size: 15px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--text);
+}
+
+.section-head a {
+    font-size: 11px;
+    color: var(--violet);
+    font-family: var(--font-mono);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.notice-mini {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--line);
+}
+
+.notice-mini:last-child {
+    border-bottom: none;
+}
+
+.tag {
+    font-size: 8.5px;
+    font-family: var(--font-mono);
+    padding: 3px 7px;
+    border-radius: 6px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.tag-acad {
+    background: rgba(47, 111, 104, 0.14);
+    color: var(--cyan);
+}
+
+.tag-event {
+    background: rgba(166, 84, 59, 0.14);
+    color: var(--violet);
+}
+
+.tag-fin {
+    background: rgba(201, 138, 46, 0.16);
+    color: var(--amber);
+}
+
+.notice-mini .ntxt {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    flex: 1;
+}
+
+.notice-mini .ntxt b {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.notice-mini .ndate {
+    font-size: 10px;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    white-space: nowrap;
+}
+
+/* ---------- 7. TELA: HORÁRIO ---------- */
+.day-chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    margin-bottom: 6px;
+}
+
+.chip {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+}
+
+.chip.active {
+    background: var(--text);
+    color: var(--panel);
+    border-color: var(--text);
+}
+
+.class-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.class-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 44px;
+    padding-top: 14px;
+    text-align: right;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.class-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.class-line .node {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 12px;
+    border: 2px solid var(--panel);
+    box-shadow: var(--shadow-sm);
+}
+
+.class-line .stem {
+    flex: 1;
+    width: 1px;
+    background: var(--line);
+    margin: 4px 0;
+}
+
+.class-card {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 2px;
+    box-shadow: var(--shadow-sm);
+}
+
+.class-card .subj {
+    font-weight: 700;
+    font-size: 13.5px;
+}
+
+.class-card .meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.empty-day {
+    text-align: center;
+    padding: 60px 10px;
+    color: var(--text-faint);
+}
+
+.empty-day svg {
+    margin-bottom: 10px;
+    color: var(--text-faint);
+}
+
+.empty-day p {
+    font-size: 12.5px;
+    margin: 0;
+    font-family: var(--font-mono);
+}
+
+/* ---------- 8. TELA: NOTAS ---------- */
+.gpa-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.gpa-ring {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+}
+
+.gpa-ring svg {
+    transform: rotate(-90deg);
+}
+
+.gpa-ring .center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gpa-ring .center .n {
+    font-family: var(--font-mono);
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.gpa-ring .center .l {
+    font-size: 8.5px;
+    color: var(--text-faint);
+    letter-spacing: .1em;
+}
+
+.gpa-legend {
+    flex: 1;
+}
+
+.gpa-legend .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    color: var(--text-dim);
+}
+
+.gpa-legend .row b {
+    color: var(--text);
+    font-family: var(--font-mono);
+}
+
+.filter-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.grade-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.grade-card .gh {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+}
+
+.grade-card .gh .subj {
+    font-weight: 700;
+    font-size: 13.5px;
+}
+
+.grade-card .gh .code {
+    font-size: 10.5px;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+}
+
+.avg-pill {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+.avg-high {
+    background: rgba(91, 127, 58, 0.16);
+    color: var(--mint);
+}
+
+.avg-mid {
+    background: rgba(201, 138, 46, 0.16);
+    color: var(--amber);
+}
+
+.avg-cursando {
+    background: rgba(166, 84, 59, 0.16);
+    color: var(--violet);
+}
+
+.grade-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease;
+}
+
+.grade-card.open .grade-detail {
+    max-height: 160px;
+}
+
+.grade-detail-in {
+    padding: 0 16px 16px;
+}
+
+.gd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+}
+
+.gd-bar-bg {
+    flex: 1;
+    height: 5px;
+    background: var(--panel-3);
+    border-radius: 4px;
+    margin: 0 10px;
+    overflow: hidden;
+}
+
+.gd-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--cyan);
+}
+
+.freq-note {
+    font-size: 10.5px;
+    color: var(--text-faint);
+    padding-top: 6px;
+    border-top: 1px dashed var(--line);
+    font-family: var(--font-mono);
+}
+
+/* ---------- 9. TELA: DISCIPLINAS ---------- */
+.course-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+.course-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.course-top .subj {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.course-top .prof {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 3px;
+}
+
+.credits-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan);
+    background: rgba(47, 111, 104, 0.1);
+    padding: 4px 8px;
+    border-radius: 7px;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.prog-bg {
+    height: 6px;
+    background: var(--panel-3);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.prog-fill {
+    height: 100%;
+    background: var(--violet);
+    border-radius: 5px;
+}
+
+.course-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+}
+
+/* ---------- 10. TELA: MAIS (MENU GRID) ---------- */
+.more-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.more-tile {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 14px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.more-tile svg {
+    color: var(--cyan);
+    margin-bottom: 12px;
+}
+
+.more-tile .t {
+    font-weight: 700;
+    font-size: 13.5px;
+}
+
+.more-tile .d {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    margin-top: 3px;
+}
+
+.more-tile.rose svg {
+    color: var(--rose);
+}
+
+/* ---------- 11. TELA: FINANCEIRO ---------- */
+.status-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+}
+
+.status-banner.open {
+    background: rgba(201, 138, 46, 0.12);
+    border: 1px solid rgba(201, 138, 46, 0.35);
+}
+
+.status-banner .st {
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--amber);
+}
+
+.status-banner .sd {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+
+.invoice-card {
+    margin-bottom: 20px;
+}
+
+.invoice-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+}
+
+.invoice-row .l {
+    color: var(--text-dim);
+}
+
+.invoice-row .v {
+    font-family: var(--font-mono);
+    font-weight: 700;
+}
+
+.barcode-strip {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 34px;
+    margin: 14px 0;
+    justify-content: center;
+}
+
+.barcode-strip i {
+    display: block;
+    width: 2px;
+    background: var(--text);
+}
+
+.hist-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 12px;
+}
+
+.hist-item:last-child {
+    border-bottom: none;
+}
+
+.hist-item .l {
+    color: var(--text-dim);
+}
+
+.hist-item .r {
+    font-family: var(--font-mono);
+    font-weight: 600;
+}
+
+.hist-item .r.paid {
+    color: var(--mint);
+}
+
+/* ---------- 12. TELA: BIBLIOTECA ---------- */
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    width: 100%;
+}
+
+.search-box svg {
+    color: var(--text-dim);
+    flex-shrink: 0;
+}
+
+.cat-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+}
+
+.cat-pill {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    padding: 8px 13px;
+    border-radius: 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.book-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: center;
+}
+
+.book-cover {
+    width: 42px;
+    height: 56px;
+    border-radius: 4px;
+    background: var(--violet);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.book-info {
+    flex: 1;
+}
+
+.book-info .t {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.book-info .a {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+
+.book-due {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    padding: 4px 8px;
+    border-radius: 7px;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.due-ok {
+    background: rgba(91, 127, 58, 0.14);
+    color: var(--mint);
+}
+
+.due-warn {
+    background: rgba(175, 59, 46, 0.14);
+    color: var(--rose);
+}
+
+/* ---------- 13. TELA: MURAL DE AVISOS ---------- */
+.notice-full {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--line);
+}
+
+.notice-full:last-child {
+    border-bottom: none;
+}
+
+.notice-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.notice-full .body {
+    flex: 1;
+}
+
+.notice-full .head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.notice-full .ttl {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.notice-full .txt {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+}
+
+.notice-full .date {
+    font-size: 10px;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    margin-top: 6px;
+}
+
+/* ---------- 14. TELA: PERFIL ---------- */
+.prof-list {
+    margin-top: 20px;
+}
+
+.prof-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 2px;
+    border-bottom: 1px dashed var(--line);
+}
+
+.prof-row .l {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text);
+}
+
+.prof-row .l svg {
+    color: var(--cyan);
+}
+
+.prof-row .v {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+}
+
+.toggle {
+    width: 40px;
+    height: 22px;
+    border-radius: 20px;
+    background: var(--panel-3);
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--line);
+}
+
+.toggle.on {
+    background: var(--text);
+    border-color: var(--text);
+}
+
+.toggle .dot2 {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--panel);
+    transition: left .2s;
+}
+
+.toggle.on .dot2 {
+    left: 20px;
+}
+
+.logout-btn {
+    width: 100%;
+    margin-top: 24px;
+    color: var(--rose);
+    background: rgba(175, 59, 46, 0.08);
+    border: 1px solid rgba(175, 59, 46, 0.3);
+}
+
+/* ---------- 15. NAVEGAÇÃO INFERIOR (BOTTOM NAV) ---------- */
+.bottomnav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 76px;
+    background: rgba(251, 248, 239, 0.92);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: 12px;
+    z-index: 40;
+    box-shadow: 0 -4px 12px rgba(43, 42, 34, 0.05);
+}
+
+.navbtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-faint);
+    cursor: pointer;
+    width: 56px;
+}
+
+.navbtn span {
+    font-size: 9.5px;
+    font-family: var(--font-mono);
+    letter-spacing: .02em;
+    font-weight: 600;
+}
+
+.navbtn.active {
+    color: var(--violet);
+}
+
+::selection {
+    background: rgba(201, 138, 46, 0.35);
+}

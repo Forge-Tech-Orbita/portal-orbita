@@ -3,7 +3,7 @@
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.
-> Status: P01–P07 concluídas; partes P08–P14 pendentes.
+> Status: P01–P08 concluídas; partes P09–P14 pendentes.
 > Esta versão substitui o planejamento estrutural original e deve ser executada uma parte por vez.
 
 ## 1. Objetivo e limites
@@ -425,7 +425,7 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 | P05 | Horário | concluída | Sol | Análise sem problemas; 57 testes aprovados em 09/11/2026 |
 | P06 | Notas | concluída | Sol | Análise sem problemas; 72 testes aprovados em 09/11/2026 |
 | P07 | Disciplinas | concluída | Sol | Análise sem problemas; 78 testes aprovados em 09/11/2026 |
-| P08 | Mais | pendente | — | — |
+| P08 | Mais | concluída | Sol | Análise sem problemas; 83 testes aprovados em 09/11/2026 |
 | P09 | Financeiro | pendente | — | — |
 | P10 | Biblioteca | pendente | — | — |
 | P11 | Avisos | pendente | — | — |
@@ -521,6 +521,18 @@ Estados permitidos: `pendente`, `em andamento`, `bloqueada`, `concluída`.
 - `flutter analyze` sem problemas; `flutter test` com 78 testes aprovados. Os cinco cards e a última sala são alcançáveis em 360 × 800, 390 × 844 e 360 × 640, sem overflow.
 - Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; semestre e progressos continuam demonstrativos.
 - Próxima parte: P08, somente após confirmação do usuário.
+
+### Resultado da P08 — 09/11/2026
+
+- Menu provisório substituído por cabeçalho “NAVEGAÇÃO”/“Mais opções” e grade de duas colunas com Financeiro, Biblioteca, Mural, Perfil, Suporte e Sair.
+- Rótulos, descrições e ordem preservados do HTML; botões nativos com altura natural dos textos, ícones e destaque de alerta para a saída.
+- Mantidas as rotas existentes para os cinco destinos e limpeza da pilha ao sair. Nenhuma tela secundária, configuração extra ou camada de dados foi antecipada.
+- Testes existentes de destinos, retorno à aba Mais e logout reutilizados, com rolagem explícita antes dos toques. Novo login continua reiniciando na Home sem recuperar sessão anterior.
+- Acrescentados cinco testes de widgets: conteúdo das seis opções, três viewports verificando duas colunas/botões alcançáveis e texto ampliado em 2× sem overflow ou altura fixa.
+- Flutter 3.47.7 / Dart 3.13.5 conferidos; `flutter pub get` sem novos pacotes ou mudanças no lockfile; três arquivos Dart formatados.
+- `flutter analyze` sem problemas; `flutter test` com 83 testes aprovados. Grade verificada em 360 × 800, 390 × 844 e 360 × 640; ampliação de texto verificada em 360 × 640.
+- Diffs revisados e verificação de espaços executada antes do commit. Sem build ou teste manual em dispositivo; destinos secundários continuam com o conteúdo provisório previsto para as próximas partes.
+- Próxima parte: P09, somente após confirmação do usuário.
 
 ## 8. Verificações obrigatórias de cada parte
 

@@ -89,6 +89,8 @@ void main() {
       await enterPortal(tester);
       await tester.tap(find.text('Mais'));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(label));
+      await tester.pumpAndSettle();
       await tester.tap(find.text(label));
       await tester.pumpAndSettle();
 
@@ -122,6 +124,8 @@ void main() {
   ) async {
     await enterPortal(tester);
     await tester.tap(find.text('Mais'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Sair'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Sair'));
     await tester.pumpAndSettle();
@@ -180,6 +184,8 @@ void main() {
 
       await enterPortal(tester);
       await tester.tap(find.text('Mais'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Sair'));
       await tester.pumpAndSettle();
       expect(find.text('Sair').hitTestable(), findsOneWidget);
       expect(tester.takeException(), isNull);

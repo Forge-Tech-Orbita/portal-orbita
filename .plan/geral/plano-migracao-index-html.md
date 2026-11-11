@@ -1,5 +1,7 @@
 # Portal Órbita — plano refinado de migração estrutural para Flutter
 
+> **Referência histórica concluída:** o legado citado abaixo já foi removido. Para tarefas novas, siga `AGENTS.md`, `.ai/rules/index.md` e `.plan/TEMPLATE.md`. Instruções históricas de commit por parte não autorizam commit automático; pergunte “Aprova o commit?” e aguarde aprovação explícita. As etapas e resultados abaixo foram preservados como histórico.
+
 > Plano geral de referência para execução por Sol medium.
 > Documento: `.plan/geral/plano-migracao-index-html.md`.
 > Fontes: `portal-orbita-antigo/index.html`, `style.css` e `script.js`.

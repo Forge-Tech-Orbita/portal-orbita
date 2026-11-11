@@ -1,0 +1,97 @@
+# Documentação e regras de execução para agentes — issue 3
+
+## Contexto
+Audite o Portal Órbita Flutter e documente os padrões existentes, a colaboração Git e os procedimentos de agentes. A referência é `fc3caaa6a01f81bf0c95f4ae8a85c7a5ea3f42e9`, igual a `origin/development` e ao HEAD inicial desta sessão. A API pública confirmou o mesmo commit em `development`; a branch local `development` estava desatualizada e não foi alterada.
+
+O usuário já escolheu `feature/3-cria-documentacao-e-regras-execucao-projeto`. Preserve-a. A entrega é uma sessão e um PR futuro para `development`; não faça operações remotas automaticamente.
+
+## Decisões pendentes
+| ID | Decisão | Bloqueia | Status / Resposta |
+| --- | --- | --- | --- |
+| D1 | Preservar o infinitivo predominante ou adotar terceira pessoa em branches/commits? | S01: convenções Git | Respondida: preservar o predominante, com verbos no infinitivo |
+
+## Regras para todas as sessões
+- Use `.plan/TEMPLATE.md`, `AGENTS.md` e `.ai/rules/index.md`. Execute apenas o escopo abaixo.
+- Preserve a aplicação, a suíte existente e os manifests. Não instale dependências nem transforme recomendações em implementação.
+- Separe fatos observados, políticas solicitadas e itens não verificados.
+- Não faça staging, commit, push ou PR automaticamente; peça aprovação do commit e autorização separada para operações remotas.
+
+## Sessões planejadas
+
+### S01: Auditar e documentar o contexto dos agentes
+- **Objetivo:** entregar instruções utilizáveis por agentes sem inventar arquitetura, testes ou integrações.
+- **Escopo / arquivos:** `AGENTS.md`, `CLAUDE.md`, `.ai/`, adaptadores por ferramenta, `.agents/skills/`, `.claude/`, `.gitattributes` restrito aos hooks, `.plan/TEMPLATE.md`, este acompanhamento e ajustes documentais mínimos no README/plano histórico.
+- **Fora do escopo:** código em `lib/` e `test/`, pacotes, configuração nativa, CI, correção de warnings de build, instalação de SDKs, autenticação no GitHub e execução manual mobile.
+- **Decisões necessárias:** D1 respondida.
+- **Passos:**
+  1. Investigue código Flutter, configurações, testes, Git e ambiente.
+  2. Confirme formatos dos adaptadores em documentação oficial; não alegue execução nos clientes ausentes.
+  3. Gere entrada canônica com adaptadores, regras modulares, template, skills e gate não destrutivo com auto-checagem isolada.
+  4. Verifique os arquivos, registre limitações e proponha o commit sem executá-lo.
+- **Validação técnica:** baseline de análise/formatação/suíte/build Web; sintaxe e auto-checagem do hook; consistência documental, caminhos e espaços do diff.
+- **Validação manual:** sem mudança visual no app. Teste de carregamento nos quatro clientes confirmados e disparo real do hook dependem das instalações dos integrantes.
+- **Critério de conclusão:** arquivos coerentes e verificações documentais aprovadas, com limitações dos clientes e mobile claramente registradas.
+
+#### Execução da S01 — issue 3 — 10/11/2026
+- **Implementado:** entradas, regras, template, registro de auditoria, adaptadores, três skills locais e hook de formato/análise com auto-checagem. README aponta para a documentação atual; o plano histórico recebeu aviso sem reescrita das etapas concluídas.
+- **Verificado:** `flutter analyze --no-pub` sem problemas; `dart format --output=none --set-exit-if-changed lib test` sem alterações nos 52 arquivos; `flutter test --no-pub --reporter expanded` com 123 testes aprovados; `flutter build web --no-pub` concluído. Sintaxe/auto-checagem isolada do hook, execução direta sem alterações Dart, atributos LF, JSON/frontmatter restrito, links/caminhos, sincronização das entradas e espaços do diff conferidos. Aplicação/lockfile intactos e nenhum staging no projeto; veja `.ai/auditoria.md`.
+- **Baseline / bloqueios:** build Web avisa sobre fontes MaterialIcons/CupertinoIcons; Android SDK e Visual Studio ausentes; iOS requer macOS/Xcode. API pública confirma branch padrão/proteção genérica, mas o endpoint detalhado respondeu 401. Clientes de IA não disponíveis no PATH.
+- **Pendências:** validar carregamento e disparo real do hook nos clientes usados pela equipe; revisão e aprovação do commit. Não houve conferência visual mobile, commit ou push.
+- **Commit proposto:** `docs(agents): documentar regras e fluxo de execucao do projeto`
+
+#### Revisão da S01 — 11/11/2026
+- **Solicitado:** confirmar reutilização de `AGENTS.md` entre agentes e tornar o README uma apresentação do projeto, sem instruções internas desnecessárias.
+- **Alterado:** README com apresentação, funcionalidades, status demonstrativo, pré-requisitos, execução, verificações e links de desenvolvimento. Removidas referências ao legado, detalhes de classes/rotas, etapas de migração e políticas operacionais do texto de boas-vindas; essas orientações continuam na documentação técnica.
+- **Confirmado documentalmente:** Claude suporta importação `@AGENTS.md`; Antigravity lê `AGENTS.md` nativamente; suporte do Copilot varia por superfície. O levantamento inicial incluiu outras ferramentas, posteriormente retiradas do escopo pela equipe. Registro atual em `.ai/compatibilidade.md`.
+- **Limite:** nenhuma entrada/adaptador foi reduzida nesta revisão; a importação é uma recomendação, não alteração aplicada. Não houve mudança de aplicação, execução nos clientes ou novo teste Flutter.
+- **Verificado:** links locais, cercas Markdown e espaços dos três documentos revisados aprovados; `git diff --check` sem erros (com avisos LF/CRLF já registrados). Entradas continuam idênticas, aplicação/lockfile intactos e nenhum staging. Aprovação de commit e operações remotas continuam pendentes.
+
+#### Simplificação do Claude — 11/11/2026
+- **Autorizado e aplicado:** substituir as 101 linhas duplicadas de `CLAUDE.md` somente por `@AGENTS.md`. Instruções gerais permanecem em `AGENTS.md`; regras temáticas, em `.ai/rules/`.
+- **Consistência:** ajustar a skill de convenções, o critério de qualidade, a compatibilidade e a auditoria para preservar a importação em vez de exigir cópias idênticas. Os registros anteriores de igualdade descrevem as verificações da versão anterior, não o estado atual.
+- **Verificado:** importação exata e alvo existente, links locais, cercas Markdown e espaços dos seis arquivos desta revisão aprovados com Python. `git diff --check` falhou por linha vazia extra preexistente no fim de `README.md` (linha 40); preservada por estar fora desta alteração. Testes Flutter não repetidos por se tratar apenas de documentação.
+- **Limites:** demais adaptadores, README, hooks e aplicação preservados nesta revisão. Validação no cliente Claude continua pendente; não executar commit/push automaticamente.
+
+#### Organização compartilhada e portabilidade — 11/11/2026
+- **Solicitado e aplicado:** planos maiores da equipe em `.plan/geral/`, usando o template, com responsáveis e acompanhamento compartilhado. `.plan/local/` serve ao detalhamento individual das tarefas designadas, referencia o plano geral e continua ignorado pelo Git. Orientação alinhada em `AGENTS.md`, regras gerais, template e entrada Copilot.
+- **Portabilidade:** remover os caminhos absolutos de instalação da auditoria e da compatibilidade; documentar comandos relativos ao repositório em Bash, com pré-requisitos por plataforma. Não alterar hooks nem SDKs. A configuração do hook já usa a variável do projeto, não um caminho fixo da máquina.
+- **Versionamento nesta etapa:** antes de fechar as ferramentas utilizadas, foram conferidos 19 novos arquivos `.md`, uma regra de editor e quatro arquivos de automação/configuração. Auditoria e plano desta entrega são registros de contexto, não requisitos de execução do app. A redução posterior está registrada abaixo.
+- **Conferido:** `.plan/local/` e o script gerado de ambiente iOS estão ignorados e não rastreados. O script gerado contém caminhos locais, mas não integra esta entrega e não foi editado.
+- **Validação:** contagem dos Markdown, links locais, cercas e espaços dos documentos revisados aprovados; importação do Claude preservada, sem caminhos absolutos de instalação nos novos documentos e nenhum staging. `git diff --check` passou nesta revisão, com os avisos LF/CRLF já conhecidos. Não repetir testes Flutter para esta mudança exclusivamente documental; validação macOS/Linux e nos clientes continua pendente.
+
+#### Ferramentas confirmadas pela equipe — 11/11/2026
+- **Escopo final:** GitHub Copilot, Antigravity, ChatGPT/Codex e Claude. Remover os dois adaptadores não utilizados e suas orientações/fontes da documentação ativa; atualizar a auditoria sem manter referências a arquivos removidos.
+- **Codex:** confirmar em documentação oficial a leitura nativa de `AGENTS.md`; reutilizar esse arquivo, sem criar configuração ou cópia adicional. ChatGPT sem acesso aos arquivos precisa recebê-los explicitamente.
+- **Entrega atual:** 22 arquivos novos, sendo 18 Markdown e quatro arquivos de automação/configuração; aplicação, hooks e regras de planejamento preservados. Carregamento real nos clientes continua pendente.
+- **Verificado:** ausência de referências às ferramentas retiradas nos documentos/configurações, links locais, cercas Markdown, espaços, importação do Claude e contagem dos arquivos aprovados. `git diff --check` passou com os avisos LF/CRLF conhecidos. Aplicação e staging intactos; testes Flutter não repetidos nesta revisão documental.
+
+#### Skill Ponytail local — 11/11/2026
+- **Solicitado e aplicado:** adicionar `.agents/skills/ponytail/SKILL.md` como adaptação local do modo full, alinhada às regras existentes. Incluir referências e critérios de uso em `AGENTS.md` e no catálogo de compatibilidade.
+- **Limites:** não instalar pacote/global, duplicar skills por cliente ou alterar `skills-lock.json`. A leitura manual do arquivo canônico atende clientes que não o descobrem automaticamente; isso não garante invocação automática.
+- **Entrega atual:** 23 arquivos novos, sendo 19 Markdown e quatro de automação/configuração. Aplicação, hooks e planos locais preservados; carregamento nos clientes continua pendente.
+- **Verificado:** skill local reconhecida e carregada neste harness; metadados, referências, links, cercas Markdown e espaços aprovados. `git diff --check` passou com avisos LF/CRLF conhecidos. Aplicação, lockfiles e staging intactos; testes Flutter não repetidos. `CLAUDE.md` já estava como `Leia @AGENTS.md` no início desta revisão e foi preservado, sem restaurar a versão anterior.
+
+#### Revisão final e persistência — 11/11/2026
+- **Revisado:** conjunto completo de 25 arquivos pendentes, incluindo consumidores das regras, adaptadores, quatro skills locais, configuração e scripts do hook. Nenhuma alteração da aplicação ou de planos locais.
+- **Corrigido:** catálogo incompleto de skills no Copilot; exigência documental de conteúdo literal em `CLAUDE.md`, agora alinhada à importação válida `Leia @AGENTS.md` já existente e preservada.
+- **Política adicionada:** continuar reproduzindo, investigando, corrigindo e validando enquanto o pedido não atender aos critérios, dentro do escopo autorizado. Um gate falho interrompe a sequência de comandos para correção, não encerra a investigação. Bloqueios reais, cancelamento e autorizações continuam respeitados; nunca declarar sucesso parcial.
+- **Verificado:** sintaxe dos dois scripts, auto-checagem isolada com teste adicional de recuperação após falha, execução direta do hook a partir de `lib/`, JSON/frontmatter restrito, links/caminhos/cercas/espaços, LF dos scripts e exclusão dos planos locais. `git diff --check` aprovado com avisos LF/CRLF conhecidos; app, lockfiles e staging intactos.
+- **Limites:** regras textuais não garantem adesão dos modelos. O hook cobre somente formato/análise e pode interromper repetição automática sem resolver a tarefa; não declarar conclusão nesse caso. Validação real nos clientes e macOS/Linux pendente; gates Flutter não repetidos por ser revisão documental e do autoteste isolado, sem mudança da aplicação.
+
+#### Aprovação do commit — 11/11/2026
+- **Autorizado pelo usuário:** criar o commit desta entrega com descrição curta dos arquivos e funcionalidades de regras, skills, adaptadores e validações no corpo da mensagem, para apoiar a revisão do futuro PR.
+- **Limite da autorização:** sem push, abertura de PR ou merge. Validação real nos clientes, mobile e macOS/Linux permanece pendente; o corpo do commit deve distinguir as checagens finais do baseline Flutter anterior.
+
+## Prompt-modelo
+```text
+Leia .plan/geral/documentacao-agentes/index.md, AGENTS.md e .ai/rules/index.md.
+Confira o acompanhamento antes de executar qualquer trabalho adicional.
+Se eu pedir uma revisão da S01, limite-se à documentação e aos adaptadores.
+Não implemente Firebase, altere a aplicação nem faça commit/push automaticamente.
+Apresente verificações, pendências e commit proposto; pergunte “Aprova o commit?”.
+```
+
+## Acompanhamento
+| Sessão | Status | Branch | Escopo resolvido | Validações / Pendências |
+| --- | --- | --- | --- | --- |
+| S01 | Implementada e revisada; commit autorizado | `feature/3-cria-documentacao-e-regras-execucao-projeto` | Auditoria, regras, planos, adaptadores, skills e hook | Baseline Flutter e checagens documentais/isoladas aprovados; clientes reais pendentes; push/PR não autorizados |

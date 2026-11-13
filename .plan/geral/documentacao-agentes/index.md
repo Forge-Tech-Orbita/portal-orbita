@@ -82,6 +82,40 @@ O usuário já escolheu `feature/3-cria-documentacao-e-regras-execucao-projeto`.
 - **Autorizado pelo usuário:** criar o commit desta entrega com descrição curta dos arquivos e funcionalidades de regras, skills, adaptadores e validações no corpo da mensagem, para apoiar a revisão do futuro PR.
 - **Limite da autorização:** sem push, abertura de PR ou merge. Validação real nos clientes, mobile e macOS/Linux permanece pendente; o corpo do commit deve distinguir as checagens finais do baseline Flutter anterior.
 
+### S02: Refinar as regras de consulta dos agentes
+- **Objetivo:** tornar as instruções diretas e precisas, separando orientação operacional de histórico de descoberta, sem enfraquecer políticas aprovadas.
+- **Responsável:** agente executor; revisão e aprovação pelo solicitante.
+- **Referência — 12/11/2026:** HEAD `1e6c227e096f5d6710e1fab8cc9a71110553e30e`; referência local `origin/development` em `fc3caaa6a01f81bf0c95f4ae8a85c7a5ea3f42e9`, sem atualização remota nesta etapa. Preservar a branch indicada `feature/3-cria-documentacao-e-regras-execucao-projeto` e continuar este plano, sem reescrever a S01.
+- **Escopo / arquivos:** os sete arquivos em `.ai/rules/`; conferir consumidores em `AGENTS.md`, `CLAUDE.md`, `.agents/skills/`, `.agents/rules/`, `.github/` e `.ai/compatibilidade.md`, ajustando apenas referências e resumos necessários à consistência. Atualizar este acompanhamento.
+- **Fora do escopo:** aplicação, testes Flutter, dependências, configuração nativa, comportamento dos hooks, novas políticas, novos adaptadores, instalação de ferramentas e operações remotas.
+- **Decisões necessárias:** nenhuma para o refinamento editorial. Perguntar antes de alterar significado ou resolver conflito entre políticas.
+- **Passos:**
+  1. Conferir estado do Git e reler regras e consumidores antes de editar. Usar `.ai/auditoria.md` como evidência histórica, não como instrução operacional permanente.
+  2. Refinar cada regra conforme a tabela abaixo, preservando comandos, contratos, condições de parada e autorizações necessários.
+  3. Concentrar cada assunto em uma fonte principal e usar referências curtas nos consumidores. Não duplicar regras em adaptadores nem impor leitura integral da auditoria a toda tarefa.
+  4. Conferir o conjunto contra as instruções anteriores: retirar histórico e redundância, sem remover requisitos de segurança, acessibilidade, validação ou conclusão verificável.
+  5. Validar documentação e diff, registrar resultados reais e propor commit sem staging ou execução automática.
+
+| Arquivo | Refinamento previsto |
+| --- | --- |
+| `.ai/rules/index.md` | Manter mapa de leitura e limite de carregamento de `paths`; retirar justificativas históricas. |
+| `.ai/rules/geral.md` | Concentrar escopo, segurança, planejamento e conclusão verificável; reduzir exemplos e referências circunstanciais à migração. |
+| `.ai/rules/branches.md` | Manter nomenclatura, destinos de PRs, proteção das principais e autorizações; retirar resultados antigos de API, referências locais desatualizadas e exceções desta entrega. |
+| `.ai/rules/commits.md` | Manter formato, tipos, português no infinitivo e aprovação; substituir tabela de commits reais por poucos exemplos diretos e retirar erros históricos/discussão do prompt original. |
+| `.ai/rules/arquitetura.md` | Manter estrutura, contratos de navegação/estado e limites demonstrativos relevantes; reduzir inventário, contagens e negações redundantes de arquiteturas inexistentes. |
+| `.ai/rules/qualidade.md` | Manter comandos, pré-requisitos, tratamento de falhas e validação por tipo de mudança; deixar contagens e resultados históricos na auditoria. |
+| `.ai/rules/ui-widgets.md` | Manter reutilização, composição, acessibilidade e ciclo de vida; retirar tabela de cores duplicada do código e exemplos redundantes. |
+
+- **Validação técnica:** conferir caminhos, links, frontmatter, importação `@AGENTS.md`, referências dos consumidores e `git diff --check`; conferir separadamente arquivos não rastreados, caso existam. Não executar gates Flutter para mudanças exclusivamente documentais.
+- **Validação manual:** revisão editorial do conjunto e comparação das políticas antes/depois. Carregamento real nos clientes de IA permanece pendente e não será apresentado como validado.
+- **Critério de conclusão:** cada instrução define ação, condição ou limite útil; histórico não ocupa as regras operacionais; fontes e consumidores permanecem coerentes; nenhuma política aprovada é perdida; verificações documentais passam e limites são registrados.
+- **Commit proposto:** `docs(agents): refinar regras de consulta dos agentes`
+
+#### Preparação da S02 — issue 3 — 12/11/2026
+- **Autorizado:** salvar o plano de continuação neste diretório. A revisão das regras ainda não foi executada.
+- **Registrado:** escopo, refinamento por arquivo, responsáveis, referências Git, limites e critérios de validação.
+- **Pendências:** executar a S02 e registrar suas verificações; aprovação de commit e operações remotas continuam separadas.
+
 ## Prompt-modelo
 ```text
 Leia .plan/geral/documentacao-agentes/index.md, AGENTS.md e .ai/rules/index.md.
@@ -95,3 +129,4 @@ Apresente verificações, pendências e commit proposto; pergunte “Aprova o co
 | Sessão | Status | Branch | Escopo resolvido | Validações / Pendências |
 | --- | --- | --- | --- | --- |
 | S01 | Implementada e revisada; commit autorizado | `feature/3-cria-documentacao-e-regras-execucao-projeto` | Auditoria, regras, planos, adaptadores, skills e hook | Baseline Flutter e checagens documentais/isoladas aprovados; clientes reais pendentes; push/PR não autorizados |
+| S02 | Planejada; execução pendente | `feature/3-cria-documentacao-e-regras-execucao-projeto` | Plano de refinamento registrado | Revisão das regras e validações documentais pendentes; sem autorização de commit/push/PR |

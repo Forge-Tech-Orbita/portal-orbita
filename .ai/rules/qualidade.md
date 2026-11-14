@@ -4,17 +4,24 @@ paths: ["lib/**", "test/**", "pubspec.yaml", "pubspec.lock", "analysis_options.y
 
 # Qualidade e validação
 
-## Configuração real
+## Padrão Dart
 
-- `analysis_options.yaml` inclui `package:flutter_lints/flutter.yaml` e exclui `build/**`, `android/**`, `ios/**`, `web/**`. Isso não valida Kotlin, Swift, HTML nem build nativo.
-- `pubspec.yaml` declara `flutter_lints: ^6.0.0` e `flutter_test`; `pubspec.lock` resolve `flutter_lints` 6.0.0. Não há linter customizado nem flags `strict-casts`, `strict-inference` ou `strict-raw-types` configuradas.
-- Use indentação de 2 espaços e o resultado do `dart format`; não aplique um limite de linha inventado ou formatter adicional.
-- Use null safety e tipos explícitos nos campos/contratos como em `lib/features/grades/data/grade.dart` e `lib/core/widgets/orbita_bottom_nav.dart`. Inferência local com `final`/`var` é legítima e existente. Evite `dynamic` e mapas sem contrato; não acrescente flags estritas ao analyzer sem aprovação.
-- Preserve construtores `const` e use instâncias constantes quando possível, como `StudentIdCard` e `HomeScreen`. Não force `const` em valores de runtime.
+- Siga `analysis_options.yaml` e `flutter_lints`; não desative diagnósticos nem adicione regras estritas sem aprovação. Exclusões do analyzer não validam arquivos nativos/Web.
+- Use `dart format`, indentação de 2 espaços e null safety. Arquivos: `snake_case.dart`; classes: `PascalCase`; membros: `lowerCamelCase`; privados: `_`.
+- Tipe campos, callbacks e contratos. Inferência local com `final`/`var` é aceita; evite `dynamic` e mapas sem contrato. Use `const` quando possível.
 
-## Gate de conclusão
+## Execução e pré-requisitos
 
-Execute na raiz, um comando por vez. No primeiro erro, interrompa a sequência para diagnosticar/corrigir e depois reexecute a verificação que falhou e as restantes; não abandone a tarefa por uma tentativa falha:
+- Execute comandos na raiz, junto de `pubspec.yaml`, com CLI Flutter/Dart nativo. Confira SDKs com `flutter --version` e o ambiente com `flutter doctor --verbose`; constraints vigentes estão no manifest.
+- Liste alvos com `flutter devices` antes de usar `flutter run -d <id>`. Não presuma emulador ou SDK disponível.
+- Dependências devem estar resolvidas. Se faltar `.dart_tool/package_config.json`, execute `flutter pub get` quando autorizado e confira alterações no manifest/lockfile. Não instale ferramentas, atualize versões ou execute `pub upgrade` silenciosamente.
+- Execute cada comando e confira seu código de saída. Não execute comandos Flutter simultaneamente.
+- Não use `flutter clean` como tentativa inicial; siga `.agents/skills/diagnostico-mobile/SKILL.md` antes de limpar caches ou alterar SDKs/pacotes.
+- Em falta de SDK, pacote, acesso, credencial ou dispositivo, registre comando/erro e pare só a etapa bloqueada. Não declare sucesso.
+
+## Gate para Dart e configuração da aplicação
+
+Execute separadamente:
 
 ```text
 dart format --output=none --set-exit-if-changed lib test
@@ -23,30 +30,31 @@ flutter test --no-pub
 git diff --check
 ```
 
-- Pré-requisito: Flutter/Dart disponíveis e dependências resolvidas. Use `flutter pub get` para preparar as dependências declaradas quando necessário e autorizado; não use `pub upgrade` como reparo automático.
-- Se o formato falhar, formate somente os arquivos afetados: `dart format <caminho>`. `dart format .` existe, mas é amplo; não o use para alterar arquivos fora do escopo.
-- No PowerShell 5.1 não use `&&`; execute cada linha e confira seu código de saída. Não existe script agregador de qualidade da aplicação.
-- Baseline medido: análise sem problemas, 52 arquivos Dart formatados sem diferenças, 123 testes aprovados. Preserve zero novos erros/warnings. Não desligue diagnósticos nem atualize snapshots/expectativas para esconder regressões.
-- Build Web passou com aviso de fontes `MaterialIcons`/`CupertinoIcons`. Não instale `cupertino_icons` apenas para remover esse aviso durante uma tarefa não relacionada.
-- Se uma verificação global já falhar no início, registre comando e diagnóstico. Não declare gate verde nem absorva correções fora do escopo.
+- No primeiro erro, investigue/corrija, reexecute a verificação que falhou e complete as restantes, conforme `.ai/rules/geral.md`.
+- Formate somente arquivos afetados com `dart format <caminho>`; não use formatação ampla para modificar trabalho fora do escopo.
+- Não introduza novos erros/warnings. Registre falhas e avisos preexistentes sem escondê-los ou corrigi-los fora do pedido; não altere expectativas para mascarar regressões.
 
-## Testes existentes
+## Testes
 
-- Há 14 arquivos em `test/`, cobrindo modelos, fixtures, widgets, navegação e fluxos demonstrativos; não há apenas teste de contador.
-- Exemplos canônicos: `test/grades_test.dart` (AV2 nula/zero e média), `test/login_test.dart` (validação, espera e descarte), `test/navigation_test.dart` (pilha/rotas) e `test/migration_audit_test.dart` (fluxos e viewports).
-- Ao mudar lógica, deixe um teste pequeno de regressão usando `flutter_test`. Ao mudar contratos, atualize consumidores e fixtures envolvidos. Não introduza outro framework de testes.
-- Para acelerar diagnóstico, execute o arquivo afetado, por exemplo `flutter test --no-pub test/grades_test.dart`; antes de concluir implementação, execute a suíte completa.
-- Testes controlam o avanço dos 900 ms simulados; preserve determinismo. Redefina viewport/teclado em teardown como em `test/migration_audit_test.dart`.
+- Preserve a stack `flutter_test`. Mudança de lógica não trivial exige regressão pequena; contratos alterados exigem atualização de consumidores, testes e fixtures.
+- Use testes relacionados para diagnóstico, como `flutter test --no-pub test/grades_test.dart`; execute a suíte completa antes de concluir implementação.
+- Referências: `test/grades_test.dart` para média/AV2, `test/login_test.dart` para validação/espera/descarte, `test/navigation_test.dart` para rotas e `test/migration_audit_test.dart` para fluxos/viewports.
+- Controle o avanço do tempo simulado e restaure viewport, teclado e escala de texto em teardown para manter determinismo.
 
 ## Build e validação manual
 
-- Use `flutter build web --no-pub` como fumaça quando a alteração justificar. Não equivale a uma compilação Android/iOS.
-- Build Android: `flutter build apk --debug --no-pub`, com SDK configurado. iOS: `flutter build ios --no-codesign --no-pub`, apenas em macOS/Xcode. Não execute nem alegue sucesso sem pré-requisitos.
-- Para UI/fluxos, peça ao desenvolvedor para executar `flutter run -d <id>` em mobile e conferir login com teclado, rolagem, abas, secundárias, retorno e logout afetados. Confira texto ampliado; registre resultado/responsável.
-- Ausência de exceção em widget test não comprova fidelidade visual nem acessibilidade completa.
+| Alvo | Comando | Pré-requisito |
+| --- | --- | --- |
+| Web | `flutter build web --no-pub` | Toolchain Web |
+| Android debug | `flutter build apk --debug --no-pub` | Android SDK configurado |
+| iOS sem assinatura | `flutter build ios --no-codesign --no-pub` | macOS/Xcode |
+
+- Compile quando o impacto da alteração justificar. Web e widget tests não comprovam build nativo, fidelidade visual ou acessibilidade completa. Não exija limpeza de cache para considerar build bem-sucedido.
+- Para UI/fluxos, peça ao desenvolvedor `flutter run -d <id>` em mobile, conferindo telas afetadas, teclado, rolagem, abas, retorno, logout e texto ampliado. Registre responsável e resultado.
 
 ## Documentação e hook
 
-- Em mudanças apenas documentais, confira caminhos, links, referências dos adaptadores, frontmatter, JSON e `git diff --check`; confira também arquivos não rastreados, que não aparecem no diff normal. Valide a importação `@AGENTS.md` em `CLAUDE.md`, fora de crases/cercas, com alvo existente e sem cópia das regras. Uma frase curta como `Leia @AGENTS.md` é aceita; não exija igualdade literal entre as entradas.
-- Ao alterar `.claude/hooks/check.sh`, execute `bash -n .claude/hooks/check.sh` e `bash .claude/hooks/check-self-test.sh` em Bash. Os testes do hook são isolados e não substituem a suíte Flutter.
-- O hook executa formato/análise somente quando há Dart ativo ou configuração relevante no status. Não é CI, não executa testes nem build, não comprova proteções Git e não autoriza commit.
+- Para documentação apenas, confira caminhos, links, referências dos consumidores, frontmatter/JSON aplicáveis e `git diff --check`. Confira arquivos não rastreados separadamente; não rode gates Flutter nem reformate o app sem necessidade.
+- Preserve `@AGENTS.md` em `CLAUDE.md`, fora de crases/cercas, com alvo existente e sem cópia das regras. Uma frase curta junto da importação é aceita.
+- Ao alterar `.claude/hooks/check.sh`, execute `bash -n .claude/hooks/check.sh` e `bash .claude/hooks/check-self-test.sh` em Bash. Os testes isolados não substituem a suíte Flutter.
+- O hook cobre formato/análise de alterações relevantes no status; não substitui testes, build ou validação funcional nem autoriza operações Git.

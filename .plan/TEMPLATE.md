@@ -19,7 +19,7 @@
 3. Siga `.ai/rules/branches.md`: base `development` atualizada, branch `<tipo>/<issue>-<descricao>` e PR para `development`. Peça a issue se ausente. Atualize com `git pull --ff-only origin development` somente na branch base e no contexto autorizado; pare em divergência. Se o usuário já indicar a branch correta, preserve-a.
 4. Confirme arquivos e consumidores antes de editar. Reutilize `lib/core/` e as features existentes; não crie pastas raiz em `lib/` nem adicione pacotes sem aprovação.
 5. Implemente apenas o escopo da sessão. Faça alterações adicionais somente quando indispensáveis à entrega e registre-as. Anote bugs/melhorias independentes para outra sessão.
-6. Resolva decisões bloqueantes antes de mudar negócio, navegação ou contratos. Não restaure nem consulte o legado removido como padrão atual.
+6. Resolva decisões bloqueantes antes de mudar negócio, navegação ou contratos.
 7. Siga `.ai/rules/qualidade.md`: formate somente arquivos afetados quando necessário e execute as verificações abaixo separadamente. No primeiro erro, interrompa a sequência, investigue/corrija e reexecute antes de prosseguir:
    - `dart format --output=none --set-exit-if-changed lib test`
    - `flutter analyze --no-pub`

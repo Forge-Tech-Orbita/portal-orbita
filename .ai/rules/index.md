@@ -1,6 +1,6 @@
 # Índice de regras
 
-Leia `AGENTS.md` ou `CLAUDE.md` primeiro. Depois leia **todas** as regras que corresponderem aos caminhos da tarefa, antes de editar. `paths` é metadado deste índice: sua presença não configura carregamento automático nos editores.
+Leia `AGENTS.md` ou `CLAUDE.md` primeiro. Antes de editar, leia as regras correspondentes aos caminhos e ao tipo de tarefa. O metadado `paths` indica o escopo de cada regra.
 
 | Caminhos afetados | Regra | Quando ler |
 | --- | --- | --- |
@@ -11,4 +11,4 @@ Leia `AGENTS.md` ou `CLAUDE.md` primeiro. Depois leia **todas** as regras que co
 | `lib/**`, `pubspec.yaml`, `pubspec.lock`, `android/**`, `ios/**`, `web/**` | [arquitetura.md](arquitetura.md) | Estrutura, dependências, rotas e plataformas |
 | `lib/**`, `test/**` | [ui-widgets.md](ui-widgets.md) | Telas, componentes, tema e testes visuais |
 
-Fatos e comandos medidos: `.ai/auditoria.md`. Integrações e limites de descoberta: `.ai/compatibilidade.md`. Planejamento: `.plan/TEMPLATE.md`. Não há regra de API/Firestore porque essas integrações não existem.
+Planejamento: `.plan/TEMPLATE.md`. Para alterar integrações dos agentes ou o hook: `.ai/compatibilidade.md`.

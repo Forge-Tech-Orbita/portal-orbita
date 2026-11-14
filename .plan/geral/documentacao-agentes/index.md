@@ -34,7 +34,7 @@ O usuário já escolheu `feature/3-cria-documentacao-e-regras-execucao-projeto`.
 
 #### Execução da S01 — issue 3 — 10/11/2026
 - **Implementado:** entradas, regras, template, registro de auditoria, adaptadores, três skills locais e hook de formato/análise com auto-checagem. README aponta para a documentação atual; o plano histórico recebeu aviso sem reescrita das etapas concluídas.
-- **Verificado:** `flutter analyze --no-pub` sem problemas; `dart format --output=none --set-exit-if-changed lib test` sem alterações nos 52 arquivos; `flutter test --no-pub --reporter expanded` com 123 testes aprovados; `flutter build web --no-pub` concluído. Sintaxe/auto-checagem isolada do hook, execução direta sem alterações Dart, atributos LF, JSON/frontmatter restrito, links/caminhos, sincronização das entradas e espaços do diff conferidos. Aplicação/lockfile intactos e nenhum staging no projeto; veja `.ai/auditoria.md`.
+- **Verificado:** `flutter analyze --no-pub` sem problemas; `dart format --output=none --set-exit-if-changed lib test` sem alterações nos 52 arquivos; `flutter test --no-pub --reporter expanded` com 123 testes aprovados; `flutter build web --no-pub` concluído. Sintaxe/auto-checagem isolada do hook, execução direta sem alterações Dart, atributos LF, JSON/frontmatter restrito, links/caminhos, sincronização das entradas e espaços do diff conferidos. Aplicação/lockfile intactos e nenhum staging no projeto.
 - **Baseline / bloqueios:** build Web avisa sobre fontes MaterialIcons/CupertinoIcons; Android SDK e Visual Studio ausentes; iOS requer macOS/Xcode. API pública confirma branch padrão/proteção genérica, mas o endpoint detalhado respondeu 401. Clientes de IA não disponíveis no PATH.
 - **Pendências:** validar carregamento e disparo real do hook nos clientes usados pela equipe; revisão e aprovação do commit. Não houve conferência visual mobile, commit ou push.
 - **Commit proposto:** `docs(agents): documentar regras e fluxo de execucao do projeto`
@@ -90,7 +90,7 @@ O usuário já escolheu `feature/3-cria-documentacao-e-regras-execucao-projeto`.
 - **Fora do escopo:** aplicação, testes Flutter, dependências, configuração nativa, comportamento dos hooks, novas políticas, novos adaptadores, instalação de ferramentas e operações remotas.
 - **Decisões necessárias:** nenhuma para o refinamento editorial. Perguntar antes de alterar significado ou resolver conflito entre políticas.
 - **Passos:**
-  1. Conferir estado do Git e reler regras e consumidores antes de editar. Usar `.ai/auditoria.md` como evidência histórica, não como instrução operacional permanente.
+  1. Conferir estado do Git e reler regras e consumidores antes de editar. Confirmar fatos no código e configuração atuais.
   2. Refinar cada regra conforme a tabela abaixo, preservando comandos, contratos, condições de parada e autorizações necessários.
   3. Concentrar cada assunto em uma fonte principal e usar referências curtas nos consumidores. Não duplicar regras em adaptadores nem impor leitura integral da auditoria a toda tarefa.
   4. Conferir o conjunto contra as instruções anteriores: retirar histórico e redundância, sem remover requisitos de segurança, acessibilidade, validação ou conclusão verificável.
@@ -117,7 +117,7 @@ O usuário já escolheu `feature/3-cria-documentacao-e-regras-execucao-projeto`.
 - **Pendências:** executar a S02 e registrar suas verificações; aprovação de commit e operações remotas continuam separadas.
 
 #### Execução da S02 — issue 3 — 12/11/2026
-- **Autorizado:** aplicar o refinamento. O solicitante apontou excesso de informação em `.ai/auditoria.md` e indicou possível exclusão ao fim das melhorias; o arquivo permanece como histórico, sem leitura obrigatória nas instruções operacionais.
+- **Autorizado:** aplicar o refinamento. O solicitante apontou excesso de informação no registro de auditoria e indicou possível exclusão ao fim das melhorias; nesta etapa, o arquivo permaneceu como histórico, sem leitura obrigatória nas instruções operacionais.
 - **Implementado:** sete regras refinadas, com remoção de relatos de descoberta, commits históricos, resultados antigos da API, inventário excessivo, contagens de baseline e paleta duplicada. `AGENTS.md` e Copilot reduzidos para encaminhar às fontes temáticas; skills de convenções/diagnóstico e compatibilidade alinhadas ao uso de evidência atual.
 - **Preservado:** políticas Git e autorizações, planejamento compartilhado/local, contratos demonstrativos, segurança, acessibilidade, gates e persistência até resolução ou bloqueio real. Histórico da S01, importação Claude, adaptador Antigravity e comportamento dos hooks mantidos.
 - **Verificado:** revisão editorial do diff e dos consumidores; checagem com Python da biblioteca padrão em 18 Markdown, 11 frontmatters no subconjunto usado, 14 links locais e 217 caminhos literais, além da importação Claude e JSON do hook. O verificador inicial confundiu exemplos de sintaxe e um caminho explicitamente não criado com referências quebradas; corrigida a classificação, a checagem passou sem alterar a documentação para mascarar erro. `git diff --check` aprovado, com avisos de conversão LF/CRLF. Status sem arquivos não rastreados e staging vazio; aplicação, dependências, plataformas, hooks e auditoria intactos. Gates Flutter não executados por ser mudança exclusivamente documental.
@@ -136,6 +136,18 @@ O usuário já escolheu `feature/3-cria-documentacao-e-regras-execucao-projeto`.
 - **Autorizado pelo solicitante:** criar o commit `docs(agents): refinar regras de consulta dos agentes`, incluindo as revisões documentais acima.
 - **Limites:** sem push, PR, merge, release ou deploy. A auditoria permanece intacta até decisão própria.
 
+#### Arquivamento local da auditoria — 13/11/2026
+- **Solicitado e aplicado:** agrupar `P01.md` a `P14.md` em `.plan/local/sol/planos/` e mover a auditoria para `.plan/local/sol/auditoria/auditoria.md`, fora da árvore versionada.
+- **Verificado:** os 15 arquivos mantêm seus hashes SHA-256 e todos os destinos são ignorados pelo Git. Links, cercas Markdown, espaços e ausência de referências versionadas aos caminhos antigos conferidos; `git diff --check` aprovado, com aviso LF/CRLF. O arquivo local não é pré-requisito para executar tarefas compartilhadas.
+- **Pendências nesta etapa:** aprovação do commit da retirada. O histórico Git existente não foi reescrito; app, hooks e regras permanecem intactos. Sem testes Flutter por ser reorganização documental.
+- **Commit proposto:** `docs(agents): retirar auditoria historica do versionamento`
+
+#### Autorização de publicação — 13/11/2026
+- **Autorizado:** criar o commit da retirada, revisar os commits da sessão, publicar a branch e abrir PR para `development` como `ricardopmartins`, nome confirmado pelo solicitante. Merge autorizado se não houver conflitos e forem atendidas as aprovações e verificações aplicáveis, sem bypass.
+- **Conferido:** conta autenticada pela API; `origin/development` atualizado com `git fetch origin`. O PR anterior da documentação já consta na base; os commits de planejamento e refinamento permanecem fora dela.
+- **Ferramentas:** GitHub CLI indisponível; usar a API com a credencial existente da conta confirmada, sem instalar ferramentas nem expor credenciais.
+- **Revisão:** nenhuma falha bloqueante nos commits de planejamento/refinamento e na retirada pendente; políticas e contratos preservados, sem alteração da aplicação ou dos hooks. Revalidados 18 Markdown, 11 frontmatters restritos, 14 links, 186 caminhos, importação Claude e JSON do hook; 15 arquivos locais presentes e ignorados. Testes Flutter não aplicáveis ao diff documental.
+
 ## Prompt-modelo
 ```text
 Leia .plan/geral/documentacao-agentes/index.md, AGENTS.md e .ai/rules/index.md.
@@ -149,4 +161,4 @@ Apresente verificações, pendências e commit proposto; pergunte “Aprova o co
 | Sessão | Status | Branch | Escopo resolvido | Validações / Pendências |
 | --- | --- | --- | --- | --- |
 | S01 | Implementada e revisada; commit autorizado | `feature/3-cria-documentacao-e-regras-execucao-projeto` | Auditoria, regras, planos, adaptadores, skills e hook | Baseline Flutter e checagens documentais/isoladas aprovados; clientes reais pendentes; push/PR não autorizados |
-| S02 | Implementada e revisada; commit autorizado | `feature/3-cria-documentacao-e-regras-execucao-projeto` | Regras e consumidores refinados; compatibilidade restrita à manutenção; auditoria preservada | Checagens documentais aprovadas; decisão sobre auditoria pendente; push/PR não autorizados |
+| S02 | Refinamento commitado em `092a055`; commit da retirada e publicação autorizados | `feature/3-cria-documentacao-e-regras-execucao-projeto` | Regras refinadas; auditoria e planos individuais organizados em pasta local ignorada | Documentação validada; revisão dos commits e publicação em andamento; merge condicionado a conflitos, aprovações e gates |

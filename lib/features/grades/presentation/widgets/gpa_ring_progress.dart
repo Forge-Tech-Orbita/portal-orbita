@@ -12,7 +12,7 @@ class GpaRingProgress extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Semantics(
-      label: 'CRA demonstrativo',
+      label: 'Média do semestre',
       value: '${value.toStringAsFixed(1)} de 10',
       child: ExcludeSemantics(
         child: SizedBox.square(
@@ -35,7 +35,7 @@ class GpaRingProgress extends StatelessWidget {
                     value.toStringAsFixed(1),
                     style: textTheme.headlineSmall,
                   ),
-                  Text('CRA', style: textTheme.bodySmall),
+                  Text('Média', style: textTheme.bodySmall),
                 ],
               ),
             ],

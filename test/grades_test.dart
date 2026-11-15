@@ -108,17 +108,17 @@ void main() {
     expect(grade.average, 4);
   });
 
-  testWidgets('CRA e resumo são fixos e independentes do filtro', (
+  testWidgets('resumo calculado do semestre independe do filtro', (
     tester,
   ) async {
     await openGrades(tester);
 
     expect(find.text('Notas & frequência'), findsOneWidget);
     expect(find.text('Resumo demonstrativo'), findsOneWidget);
-    expect(find.bySemanticsLabel('CRA demonstrativo'), findsOneWidget);
+    expect(find.bySemanticsLabel('Média do semestre'), findsOneWidget);
     expect(
       tester.widget<GpaRingProgress>(find.byType(GpaRingProgress)).value,
-      8.7,
+      8.0625,
     );
     expect(
       tester
@@ -126,23 +126,15 @@ void main() {
             find.byType(CircularProgressIndicator),
           )
           .value,
-      closeTo(0.87, 0.00001),
+      closeTo(0.80625, 0.00001),
     );
-    for (final label in [
-      'Aprovadas',
-      'Cursando',
-      'Pendentes',
-      '18',
-      '5',
-      '0',
-    ]) {
+    for (final label in ['Aprovadas', 'Cursando', '4', '1']) {
       expect(find.text(label), findsWidgets);
     }
     await selectFilter(tester, 'Cursando');
-    expect(find.text('8.7'), findsOneWidget);
-    expect(find.text('18'), findsOneWidget);
-    expect(find.text('5'), findsOneWidget);
-    expect(find.text('0'), findsOneWidget);
+    expect(find.text('8.1'), findsOneWidget);
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
   });
 
   for (final (filter, codes) in [

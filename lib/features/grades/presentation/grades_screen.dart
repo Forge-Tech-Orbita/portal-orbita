@@ -29,6 +29,16 @@ class _GradesScreenState extends State<GradesScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final averages = demoGrades.map((grade) => grade.average).whereType<double>();
+    final semesterAverage = averages.isEmpty
+        ? null
+        : averages.reduce((sum, average) => sum + average) / averages.length;
+    final approved = demoGrades
+        .where((grade) => grade.status == GradeStatus.completed)
+        .length;
+    final inProgress = demoGrades
+        .where((grade) => grade.status == GradeStatus.inProgress)
+        .length;
     final grades = demoGrades.where(
       (grade) => _filter.status == null || grade.status == _filter.status,
     );
@@ -43,28 +53,25 @@ class _GradesScreenState extends State<GradesScreen> {
           const SizedBox(height: 16),
           Text('Resumo demonstrativo', style: textTheme.labelSmall),
           const SizedBox(height: 8),
-          Row(
+          Wrap(
+            spacing: 16,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              // shortcut: CRA e legenda fixos do protótipo, calcular com histórico acadêmico completo.
-              const GpaRingProgress(value: 8.7),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
+              if (semesterAverage != null)
+                GpaRingProgress(value: semesterAverage)
+              else
+                const Text('Média do semestre indisponível'),
+              for (final (label, count) in [
+                ('Aprovadas', approved),
+                ('Cursando', inProgress),
+              ])
+                Column(
                   children: [
-                    for (final (label, value) in const [
-                      ('Aprovadas', '18'),
-                      ('Cursando', '5'),
-                      ('Pendentes', '0'),
-                    ])
-                      Row(
-                        children: [
-                          Expanded(child: Text(label)),
-                          Text(value),
-                        ],
-                      ),
+                    Text('$count', style: textTheme.headlineSmall),
+                    Text(label, style: textTheme.labelMedium),
                   ],
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -99,16 +106,20 @@ class _GradeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final average = grade.average;
-    final color = average == null
-        ? OrbitaTheme.terracotta
-        : (average >= 7 ? OrbitaTheme.green : OrbitaTheme.amber);
+    final color = grade.status == GradeStatus.completed
+        ? OrbitaTheme.green
+        : OrbitaTheme.terracotta;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       color: OrbitaTheme.surface,
       child: ExpansionTile(
         title: Text(grade.subject),
-        subtitle: Text(grade.code),
+        subtitle: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [Text(grade.code), Text(grade.status.label)],
+        ),
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -117,7 +128,7 @@ class _GradeCard extends StatelessWidget {
           ),
           child: Text(
             average?.toStringAsFixed(1) ?? 'Cursando',
-            style: const TextStyle(color: OrbitaTheme.text),
+            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
         children: [

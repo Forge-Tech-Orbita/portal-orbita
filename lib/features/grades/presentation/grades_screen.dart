@@ -29,7 +29,9 @@ class _GradesScreenState extends State<GradesScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final averages = demoGrades.map((grade) => grade.average).whereType<double>();
+    final averages = demoGrades
+        .map((grade) => grade.average)
+        .whereType<double>();
     final semesterAverage = averages.isEmpty
         ? null
         : averages.reduce((sum, average) => sum + average) / averages.length;

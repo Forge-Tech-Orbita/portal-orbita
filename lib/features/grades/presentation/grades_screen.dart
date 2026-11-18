@@ -32,9 +32,7 @@ class _GradesScreenState extends State<GradesScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final (:average, :approved, :inProgress) = summarizeGrades(
-      widget.grades,
-    );
+    final (:average, :approved, :inProgress) = summarizeGrades(widget.grades);
     final grades = widget.grades.where(
       (grade) => _filter.status == null || grade.status == _filter.status,
     );
@@ -87,16 +85,13 @@ class _GradesScreenState extends State<GradesScreen> {
           ),
           const SizedBox(height: 16),
           if (grades.isEmpty)
-            Text(
-              switch (_filter) {
-                _GradeFilter.all => 'Nenhuma disciplina neste semestre.',
-                _GradeFilter.inProgress =>
-                  'Nenhuma disciplina cursando neste semestre.',
-                _GradeFilter.completed =>
-                  'Nenhuma disciplina concluída neste semestre.',
-              },
-              style: textTheme.bodyMedium,
-            ),
+            Text(switch (_filter) {
+              _GradeFilter.all => 'Nenhuma disciplina neste semestre.',
+              _GradeFilter.inProgress =>
+                'Nenhuma disciplina cursando neste semestre.',
+              _GradeFilter.completed =>
+                'Nenhuma disciplina concluída neste semestre.',
+            }, style: textTheme.bodyMedium),
           for (final grade in grades)
             _GradeCard(key: ValueKey((_filter, grade.code)), grade: grade),
         ],
@@ -143,9 +138,14 @@ class _GradeCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               children: [
-                _AssessmentRow(label: 'AV1', value: grade.av1),
-                const SizedBox(height: 8),
-                _AssessmentRow(label: 'AV2', value: grade.av2),
+                _StageDetails(number: 1, stage: grade.firstStage),
+                const SizedBox(height: 16),
+                _StageDetails(number: 2, stage: grade.secondStage),
+                const SizedBox(height: 12),
+                Text(
+                  'Nota final: ${average == null ? 'Pendente' : '${average.toStringAsFixed(1)} de 10'}',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   'Frequência: ${grade.frequency}% · Situação: ${grade.status.label}',
@@ -160,26 +160,72 @@ class _GradeCard extends StatelessWidget {
   }
 }
 
-class _AssessmentRow extends StatelessWidget {
-  const _AssessmentRow({required this.label, required this.value});
+class _StageDetails extends StatelessWidget {
+  const _StageDetails({required this.number, required this.stage});
 
-  final String label;
-  final double? value;
+  final int number;
+  final GradeStage stage;
 
   @override
   Widget build(BuildContext context) {
-    final formatted = value?.toStringAsFixed(1) ?? '—';
+    final textTheme = Theme.of(context).textTheme;
+    final total = stage.total;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 8,
+      children: [
+        Text('${number}ª etapa', style: textTheme.titleSmall),
+        _AssessmentRow(
+          label: 'AV$number',
+          value: stage.exam,
+          maximum: GradeStage.examMax,
+        ),
+        _AssessmentRow(
+          label: 'TED',
+          value: stage.ted,
+          maximum: GradeStage.tedMax,
+        ),
+        _AssessmentRow(
+          label: 'Avaliação Integrada',
+          value: stage.integratedAssessment,
+          maximum: GradeStage.integratedMax,
+        ),
+        Text(
+          'Subtotal: ${total == null ? 'Pendente' : '${total.toStringAsFixed(1)} de 10'}',
+          style: textTheme.labelLarge,
+        ),
+      ],
+    );
+  }
+}
+
+class _AssessmentRow extends StatelessWidget {
+  const _AssessmentRow({
+    required this.label,
+    required this.value,
+    required this.maximum,
+  });
+
+  final String label;
+  final double? value;
+  final double maximum;
+
+  @override
+  Widget build(BuildContext context) {
+    final value = this.value;
+    final formatted = value == null
+        ? 'Não informada'
+        : '${value.toStringAsFixed(1)} de ${maximum.toStringAsFixed(0)}';
 
     return Semantics(
-      label: '$label: ${value == null ? 'Não informada' : '$formatted de 10'}',
+      label: '$label: $formatted',
       excludeSemantics: true,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 4,
         children: [
-          Text(label),
-          const SizedBox(width: 10),
-          Expanded(child: LinearProgressIndicator(value: (value ?? 0) / 10)),
-          const SizedBox(width: 10),
-          Text(formatted),
+          Text('$label: $formatted'),
+          if (value != null) LinearProgressIndicator(value: value / maximum),
         ],
       ),
     );

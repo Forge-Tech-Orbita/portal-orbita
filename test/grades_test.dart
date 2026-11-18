@@ -36,24 +36,27 @@ Future<Finder> expandGrade(WidgetTester tester, String subject) async {
 
 void main() {
   test('resumo sem disciplinas tem média indisponível e totais zerados', () {
-    expect(
-      summarizeGrades(const []),
-      (average: null, approved: 0, inProgress: 0),
-    );
+    expect(summarizeGrades(const []), (
+      average: null,
+      approved: 0,
+      inProgress: 0,
+    ));
   });
 
   test('resumo conta disciplinas sem média pela situação', () {
     final completed = demoGrades.first;
     final inProgress = demoGrades.last;
 
-    expect(
-      summarizeGrades([inProgress]),
-      (average: null, approved: 0, inProgress: 1),
-    );
-    expect(
-      summarizeGrades([completed, inProgress]),
-      (average: completed.average, approved: 1, inProgress: 1),
-    );
+    expect(summarizeGrades([inProgress]), (
+      average: null,
+      approved: 0,
+      inProgress: 1,
+    ));
+    expect(summarizeGrades([completed, inProgress]), (
+      average: completed.average,
+      approved: 1,
+      inProgress: 1,
+    ));
   });
 
   test('fixtures preservam as cinco notas e seus status explícitos', () {
@@ -63,8 +66,8 @@ void main() {
             (grade) => (
               grade.subject,
               grade.code,
-              grade.av1,
-              grade.av2,
+              grade.firstStage.total,
+              grade.secondStage.total,
               grade.frequency,
               grade.status,
             ),
@@ -101,33 +104,41 @@ void main() {
     );
   });
 
-  test('média exige AV2 e é exibida com uma casa decimal', () {
-    expect(demoGrades.map((grade) => grade.average), [
-      8.75,
-      7.5,
-      6.75,
-      9.25,
-      null,
-    ]);
-    expect(demoGrades.map((grade) => grade.average?.toStringAsFixed(1)), [
-      '8.8',
-      '7.5',
-      '6.8',
-      '9.3',
-      null,
-    ]);
-  });
+  test(
+    'média exige as duas etapas completas e é exibida com uma casa decimal',
+    () {
+      expect(demoGrades.map((grade) => grade.average), [
+        8.75,
+        7.5,
+        6.75,
+        9.25,
+        null,
+      ]);
+      expect(demoGrades.map((grade) => grade.average?.toStringAsFixed(1)), [
+        '8.8',
+        '7.5',
+        '6.8',
+        '9.3',
+        null,
+      ]);
+    },
+  );
 
-  test('AV2 zero é uma nota válida, não uma avaliação ausente', () {
+  test('zero é uma nota lançada e entra na média', () {
     const grade = Grade(
       subject: 'Exemplo',
       code: 'TEST',
-      av1: 8,
-      av2: 0,
+      firstStage: GradeStage(exam: 5, ted: 2, integratedAssessment: 1),
+      secondStage: GradeStage(exam: 0, ted: 0, integratedAssessment: 0),
       frequency: 100,
       status: GradeStatus.completed,
     );
     expect(grade.average, 4);
+  });
+
+  test('etapa com TED pendente mantém o subtotal indisponível', () {
+    const stage = GradeStage(exam: 6, integratedAssessment: 1);
+    expect(stage.total, isNull);
   });
 
   testWidgets('resumo calculado do semestre independe do filtro', (
@@ -159,9 +170,7 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 
-  testWidgets('filtro vazio mostra mensagem e mantém o resumo', (
-    tester,
-  ) async {
+  testWidgets('filtro vazio mostra mensagem e mantém o resumo', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(body: GradesScreen(grades: [demoGrades.first])),
@@ -224,10 +233,13 @@ void main() {
 
     for (final text in [
       '8.8',
-      'AV1',
-      'AV2',
-      '8.5',
-      '9.0',
+      'AV1: 5.0 de 6',
+      '1ª etapa',
+      '2ª etapa',
+      'Nota final: 8.8 de 10',
+      'AV2: 5.5 de 6',
+      'Subtotal: 8.5 de 10',
+      'Subtotal: 9.0 de 10',
       'Frequência: 96% · Situação: Aprovado',
     ]) {
       expect(
@@ -244,25 +256,31 @@ void main() {
             ),
           )
           .map((bar) => bar.value),
-      [0.85, 0.9],
+      [5 / 6, 2.5 / 3, 1, 5.5 / 6, 2.5 / 3, 1],
     );
     final title = find.descendant(of: card, matching: find.text(subject));
     await tester.ensureVisible(title);
     await tester.pumpAndSettle();
     await tester.tap(title);
     await tester.pumpAndSettle();
-    expect(find.descendant(of: card, matching: find.text('AV1')), findsNothing);
+    expect(
+      find.descendant(of: card, matching: find.text('1ª etapa')),
+      findsNothing,
+    );
   });
 
-  testWidgets('AV2 ausente aparece como traço e não como zero', (tester) async {
+  testWidgets('etapa sem notas exibe pendências', (tester) async {
     await openGrades(tester);
     await selectFilter(tester, 'Cursando');
     final card = await expandGrade(tester, 'Cálculo Numérico');
 
     for (final text in [
       'Cursando',
-      '5.5',
-      '—',
+      'Subtotal: 5.5 de 10',
+      'AV2: Não informada',
+      'TED: Não informada',
+      'Avaliação Integrada: Não informada',
+      'Nota final: Pendente',
       'Frequência: 82% · Situação: Em andamento',
     ]) {
       expect(
@@ -278,9 +296,9 @@ void main() {
           ),
         )
         .toList();
-    expect(bars.map((bar) => bar.value), [0.55, 0]);
+    expect(bars.map((bar) => bar.value), [3.5 / 6, 1.5 / 3, 0.5]);
     expect(find.bySemanticsLabel('AV2: Não informada'), findsOneWidget);
-    expect(find.bySemanticsLabel('AV1: 5.5 de 10'), findsOneWidget);
+    expect(find.bySemanticsLabel('AV1: 3.5 de 6'), findsOneWidget);
     expect(find.descendant(of: card, matching: find.text('0.0')), findsNothing);
   });
 
@@ -307,10 +325,10 @@ void main() {
   testWidgets('trocar filtro fecha os detalhes anteriores', (tester) async {
     await openGrades(tester);
     await expandGrade(tester, 'Arquitetura de Software');
-    expect(find.text('AV1'), findsOneWidget);
+    expect(find.text('1ª etapa'), findsOneWidget);
     await selectFilter(tester, 'Cursando');
     await selectFilter(tester, 'Todas');
-    expect(find.text('AV1'), findsNothing);
+    expect(find.text('1ª etapa'), findsNothing);
     expect(find.byType(Card), findsNWidgets(5));
   });
 
@@ -332,7 +350,7 @@ void main() {
       isTrue,
     );
     expect(find.byType(Card), findsOneWidget);
-    expect(find.text('AV2'), findsOneWidget);
+    expect(find.text('2ª etapa'), findsOneWidget);
   });
 
   for (final size in [

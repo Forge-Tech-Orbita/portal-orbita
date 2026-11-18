@@ -128,16 +128,32 @@ void main() {
     const grade = Grade(
       subject: 'Exemplo',
       code: 'TEST',
-      firstStage: GradeStage(exam: 5, ted: 2, integratedAssessment: 1),
-      secondStage: GradeStage(exam: 0, ted: 0, integratedAssessment: 0),
+      firstStage: GradeStage.first(exam: 6, ted: 2),
+      secondStage: GradeStage.second(exam: 0, ted: 0, integratedAssessment: 0),
       frequency: 100,
       status: GradeStatus.completed,
     );
     expect(grade.average, 4);
   });
 
+  test('AV1 soma prova de sete e TED de três sem integrada', () {
+    const stage = GradeStage.first(exam: 7, ted: 3);
+    expect(stage.examMax, 7);
+    expect(stage.total, 10);
+    expect(stage.integratedAssessment, isNull);
+    expect(const GradeStage.first(exam: 7).total, isNull);
+  });
+
+  test('AV2 exige integrada para completar dez pontos', () {
+    expect(
+      const GradeStage.second(exam: 6, ted: 3, integratedAssessment: 1).total,
+      10,
+    );
+    expect(const GradeStage.second(exam: 6, ted: 3).total, isNull);
+  });
+
   test('etapa com TED pendente mantém o subtotal indisponível', () {
-    const stage = GradeStage(exam: 6, integratedAssessment: 1);
+    const stage = GradeStage.second(exam: 6, integratedAssessment: 1);
     expect(stage.total, isNull);
   });
 
@@ -233,7 +249,7 @@ void main() {
 
     for (final text in [
       '8.8',
-      'AV1: 5.0 de 6',
+      'AV1: 6.0 de 7',
       '1ª etapa',
       '2ª etapa',
       'Nota final: 8.8 de 10',
@@ -248,6 +264,10 @@ void main() {
       );
     }
     expect(
+      find.bySemanticsLabel('Avaliação Integrada: 1.0 de 1'),
+      findsOneWidget,
+    );
+    expect(
       tester
           .widgetList<LinearProgressIndicator>(
             find.descendant(
@@ -256,7 +276,7 @@ void main() {
             ),
           )
           .map((bar) => bar.value),
-      [5 / 6, 2.5 / 3, 1, 5.5 / 6, 2.5 / 3, 1],
+      [6 / 7, 2.5 / 3, 5.5 / 6, 2.5 / 3, 1],
     );
     final title = find.descendant(of: card, matching: find.text(subject));
     await tester.ensureVisible(title);
@@ -296,9 +316,9 @@ void main() {
           ),
         )
         .toList();
-    expect(bars.map((bar) => bar.value), [3.5 / 6, 1.5 / 3, 0.5]);
+    expect(bars.map((bar) => bar.value), [4 / 7, 1.5 / 3]);
     expect(find.bySemanticsLabel('AV2: Não informada'), findsOneWidget);
-    expect(find.bySemanticsLabel('AV1: 3.5 de 6'), findsOneWidget);
+    expect(find.bySemanticsLabel('AV1: 4.0 de 7'), findsOneWidget);
     expect(find.descendant(of: card, matching: find.text('0.0')), findsNothing);
   });
 

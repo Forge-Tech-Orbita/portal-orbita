@@ -178,18 +178,19 @@ class _StageDetails extends StatelessWidget {
         _AssessmentRow(
           label: 'AV$number',
           value: stage.exam,
-          maximum: GradeStage.examMax,
+          maximum: stage.examMax,
         ),
         _AssessmentRow(
           label: 'TED',
           value: stage.ted,
           maximum: GradeStage.tedMax,
         ),
-        _AssessmentRow(
-          label: 'Avaliação Integrada',
-          value: stage.integratedAssessment,
-          maximum: GradeStage.integratedMax,
-        ),
+        if (stage.includesIntegrated)
+          _AssessmentRow(
+            label: 'Avaliação Integrada',
+            value: stage.integratedAssessment,
+            maximum: GradeStage.integratedMax,
+          ),
         Text(
           'Subtotal: ${total == null ? 'Pendente' : '${total.toStringAsFixed(1)} de 10'}',
           style: textTheme.labelLarge,

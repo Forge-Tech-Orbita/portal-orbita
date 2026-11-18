@@ -8,19 +8,40 @@ enum GradeStatus {
 }
 
 class GradeStage {
-  const GradeStage({this.exam, this.ted, this.integratedAssessment})
-    : assert(exam == null || (exam >= 0 && exam <= examMax)),
-      assert(ted == null || (ted >= 0 && ted <= tedMax)),
-      assert(
-        integratedAssessment == null ||
-            (integratedAssessment >= 0 &&
-                integratedAssessment <= integratedMax),
-      );
+  const GradeStage.first({double? exam, double? ted})
+    : this._(exam: exam, ted: ted, includesIntegrated: false);
 
-  static const double examMax = 6;
+  const GradeStage.second({
+    double? exam,
+    double? ted,
+    double? integratedAssessment,
+  }) : this._(
+         exam: exam,
+         ted: ted,
+         integratedAssessment: integratedAssessment,
+         includesIntegrated: true,
+       );
+
+  const GradeStage._({
+    this.exam,
+    this.ted,
+    this.integratedAssessment,
+    required this.includesIntegrated,
+  }) : assert(
+         exam == null || (exam >= 0 && exam <= (includesIntegrated ? 6 : 7)),
+       ),
+       assert(ted == null || (ted >= 0 && ted <= tedMax)),
+       assert(
+         integratedAssessment == null ||
+             (integratedAssessment >= 0 &&
+                 integratedAssessment <= integratedMax),
+       );
+
+  double get examMax => includesIntegrated ? 6 : 7;
   static const double tedMax = 3;
   static const double integratedMax = 1;
 
+  final bool includesIntegrated;
   final double? exam;
   final double? ted;
   final double? integratedAssessment;
@@ -29,7 +50,9 @@ class GradeStage {
     final exam = this.exam;
     final ted = this.ted;
     final integrated = integratedAssessment;
-    if (exam == null || ted == null || integrated == null) return null;
+    if (exam == null || ted == null) return null;
+    if (!includesIntegrated) return exam + ted;
+    if (integrated == null) return null;
     return exam + ted + integrated;
   }
 }

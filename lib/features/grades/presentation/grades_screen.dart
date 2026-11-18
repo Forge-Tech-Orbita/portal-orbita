@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/orbita_theme.dart';
 import '../data/grade.dart';
 import '../data/grades_mock.dart';
+import '../data/grades_summary.dart';
 import 'widgets/gpa_ring_progress.dart';
 
 enum _GradeFilter {
@@ -29,18 +30,7 @@ class _GradesScreenState extends State<GradesScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final averages = demoGrades
-        .map((grade) => grade.average)
-        .whereType<double>();
-    final semesterAverage = averages.isEmpty
-        ? null
-        : averages.reduce((sum, average) => sum + average) / averages.length;
-    final approved = demoGrades
-        .where((grade) => grade.status == GradeStatus.completed)
-        .length;
-    final inProgress = demoGrades
-        .where((grade) => grade.status == GradeStatus.inProgress)
-        .length;
+    final (:average, :approved, :inProgress) = summarizeGrades(demoGrades);
     final grades = demoGrades.where(
       (grade) => _filter.status == null || grade.status == _filter.status,
     );
@@ -60,8 +50,8 @@ class _GradesScreenState extends State<GradesScreen> {
             runSpacing: 12,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              if (semesterAverage != null)
-                GpaRingProgress(value: semesterAverage)
+              if (average != null)
+                GpaRingProgress(value: average)
               else
                 const Text('Média do semestre indisponível'),
               for (final (label, count) in [

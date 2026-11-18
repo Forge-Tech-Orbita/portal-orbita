@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/features/grades/data/grade.dart';
 import 'package:portal_orbita/features/grades/data/grades_mock.dart';
+import 'package:portal_orbita/features/grades/data/grades_summary.dart';
 import 'package:portal_orbita/features/grades/presentation/grades_screen.dart';
 import 'package:portal_orbita/features/grades/presentation/widgets/gpa_ring_progress.dart';
 
@@ -34,6 +35,27 @@ Future<Finder> expandGrade(WidgetTester tester, String subject) async {
 }
 
 void main() {
+  test('resumo sem disciplinas tem média indisponível e totais zerados', () {
+    expect(
+      summarizeGrades(const []),
+      (average: null, approved: 0, inProgress: 0),
+    );
+  });
+
+  test('resumo conta disciplinas sem média pela situação', () {
+    final completed = demoGrades.first;
+    final inProgress = demoGrades.last;
+
+    expect(
+      summarizeGrades([inProgress]),
+      (average: null, approved: 0, inProgress: 1),
+    );
+    expect(
+      summarizeGrades([completed, inProgress]),
+      (average: completed.average, approved: 1, inProgress: 1),
+    );
+  });
+
   test('fixtures preservam as cinco notas e seus status explícitos', () {
     expect(
       demoGrades

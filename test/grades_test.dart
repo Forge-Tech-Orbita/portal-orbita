@@ -159,6 +159,36 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 
+  testWidgets('filtro vazio mostra mensagem e mantém o resumo', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: GradesScreen(grades: [demoGrades.first])),
+      ),
+    );
+
+    final summary = find.byType(GpaRingProgress);
+    final expectedAverage = demoGrades.first.average;
+    expect(tester.widget<GpaRingProgress>(summary).value, expectedAverage);
+    expect(find.byType(Card), findsOneWidget);
+
+    await selectFilter(tester, 'Cursando');
+    expect(
+      find.text('Nenhuma disciplina cursando neste semestre.'),
+      findsOneWidget,
+    );
+    expect(find.byType(Card), findsNothing);
+    expect(tester.widget<GpaRingProgress>(summary).value, expectedAverage);
+
+    await selectFilter(tester, 'Todas');
+    expect(
+      find.text('Nenhuma disciplina cursando neste semestre.'),
+      findsNothing,
+    );
+    expect(find.byType(Card), findsOneWidget);
+  });
+
   for (final (filter, codes) in [
     ('Todas', ['ESW-304', 'ESW-412', 'ESW-298', 'ESW-355', 'MAT-210']),
     ('Cursando', ['MAT-210']),

@@ -18,7 +18,9 @@ enum _GradeFilter {
 }
 
 class GradesScreen extends StatefulWidget {
-  const GradesScreen({super.key});
+  const GradesScreen({super.key, this.grades = demoGrades});
+
+  final List<Grade> grades;
 
   @override
   State<GradesScreen> createState() => _GradesScreenState();
@@ -30,8 +32,10 @@ class _GradesScreenState extends State<GradesScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final (:average, :approved, :inProgress) = summarizeGrades(demoGrades);
-    final grades = demoGrades.where(
+    final (:average, :approved, :inProgress) = summarizeGrades(
+      widget.grades,
+    );
+    final grades = widget.grades.where(
       (grade) => _filter.status == null || grade.status == _filter.status,
     );
 
@@ -82,6 +86,17 @@ class _GradesScreenState extends State<GradesScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          if (grades.isEmpty)
+            Text(
+              switch (_filter) {
+                _GradeFilter.all => 'Nenhuma disciplina neste semestre.',
+                _GradeFilter.inProgress =>
+                  'Nenhuma disciplina cursando neste semestre.',
+                _GradeFilter.completed =>
+                  'Nenhuma disciplina concluída neste semestre.',
+              },
+              style: textTheme.bodyMedium,
+            ),
           for (final grade in grades)
             _GradeCard(key: ValueKey((_filter, grade.code)), grade: grade),
         ],

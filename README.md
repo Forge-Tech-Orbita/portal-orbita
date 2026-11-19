@@ -15,7 +15,7 @@ Portal acadêmico desenvolvido em Flutter/Dart para reunir informações e servi
 
 ## Status do projeto
 
-A versão atual é demonstrativa e utiliza dados locais, sem backend ou persistência. Login e biometria são simulados; emissão de boletos, chamados de suporte, busca no acervo, dados pessoais, foto e preferências do perfil ainda não têm integração real nem persistência.
+A versão atual é demonstrativa e utiliza dados locais, sem persistência. A integração com o Firebase está em andamento: por enquanto ele é inicializado apenas na Web, ainda sem uso de autenticação ou Firestore pelas telas. Login e biometria são simulados; emissão de boletos, chamados de suporte, busca no acervo, dados pessoais, foto e preferências do perfil ainda não têm integração real nem persistência.
 
 ## Pré-requisitos
 
@@ -34,7 +34,10 @@ Para executar no Chrome, use `flutter run -d chrome`.
 ## Verificações e testes
 
 ```bash
-flutter analyze
-flutter test
-flutter build web
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze --no-pub
+flutter test --no-pub
+git diff --check
 ```
+
+Para compilar a versão Web, use `flutter build web --no-pub`.

@@ -8,7 +8,8 @@ paths: ["lib/**", "pubspec.yaml", "pubspec.lock", "android/**", "ios/**", "web/*
 
 | Caminho | Responsabilidade |
 | --- | --- |
-| `lib/main.dart`, `lib/app.dart` | Inicialização de `MainApp`, `MaterialApp`, tema e rotas |
+| `lib/main.dart`, `lib/app.dart` | Inicialização do Firebase (somente Web), `MainApp`, `MaterialApp`, tema e rotas |
+| `lib/firebase_options.dart`, `firebase.json` | Configuração gerada pelo FlutterFire CLI, apenas para Web; não edite manualmente |
 | `lib/core/constants/app_routes.dart` | Constantes `AppRoutes` |
 | `lib/core/theme/orbita_theme.dart` | Paleta e `ThemeData` |
 | `lib/core/models/`, `lib/core/mock/`, `lib/core/widgets/` | Modelos, fixtures e componentes compartilhados |
@@ -29,7 +30,7 @@ paths: ["lib/**", "pubspec.yaml", "pubspec.lock", "android/**", "ios/**", "web/*
 
 ## Dados e limites demonstrativos
 
-- O app usa fixtures locais, sem backend, autenticação real ou persistência. Não crie integrações por antecipação; pacotes, SDK/lockfile e novas camadas exigem aprovação.
+- O app usa fixtures locais, sem autenticação real ou persistência. O Firebase é inicializado só na Web (`kIsWeb`); `firebase_auth` e `cloud_firestore` estão declarados no manifest, mas nenhuma tela os usa. Android/iOS não têm configuração Firebase. A integração está em andamento na frente da issue 6 (`chore/6-configurar-firebase`); não altere a configuração Firebase nem esses pacotes fora dela sem alinhar com o responsável. Não crie integrações por antecipação; uso desses serviços, novos pacotes, SDK/lockfile e novas camadas exigem aprovação.
 - Preserve login/biometria simulados de 900 ms, métricas fixas, busca passiva, barras decorativas e feedback via `SnackBar`. Switches de Perfil não persistem nem alteram o tema.
 - Valores financeiros são strings para exibição, não cálculo ou cobrança real.
 - `Grade.average` só calcula com AV2 informada; status acadêmico vem da fixture, não da média. `ScheduleDay.forDate` mapeia domingo para sábado. Não altere essas decisões silenciosamente.

@@ -10,7 +10,7 @@
 
 ## Projeto e fontes principais
 
-Aplicação Flutter/Dart para Android, iOS e Web, com fixtures locais, sem backend, autenticação real ou persistência. `lib/main.dart` inicia `MainApp` em `lib/app.dart`.
+Aplicação Flutter/Dart para Android, iOS e Web, com fixtures locais, sem autenticação real ou persistência. O Firebase, em configuração por outra frente da equipe, só é inicializado na Web; `firebase_auth` e `cloud_firestore` estão declarados, mas não são usados em `lib/`. `lib/main.dart` inicia `MainApp` em `lib/app.dart`.
 
 | Assunto | Fonte |
 | --- | --- |

@@ -5,10 +5,16 @@ import '../theme/orbita_theme.dart';
 import 'decorative_barcode.dart';
 
 class StudentIdCard extends StatelessWidget {
-  const StudentIdCard({super.key, required this.student, this.compact = false});
+  const StudentIdCard({
+    super.key,
+    required this.student,
+    this.compact = false,
+    this.photo,
+  });
 
   final Student student;
   final bool compact;
+  final ImageProvider? photo;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +55,8 @@ class StudentIdCard extends StatelessWidget {
                   radius: 26,
                   backgroundColor: OrbitaTheme.text,
                   foregroundColor: OrbitaTheme.surface,
-                  child: Text(student.initials),
+                  backgroundImage: photo,
+                  child: photo == null ? Text(student.initials) : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

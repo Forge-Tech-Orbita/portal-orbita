@@ -10,11 +10,12 @@ Portal acadêmico desenvolvido em Flutter/Dart para reunir informações e servi
 - Disciplinas do semestre.
 - Financeiro com fatura e histórico de pagamentos demonstrativos.
 - Biblioteca com empréstimos demonstrativos.
-- Mural de avisos, central de suporte e perfil do estudante.
+- Mural de avisos e central de suporte com abertura simulada de chamados e aba da equipe de suporte.
+- Perfil do estudante com atualização de telefone, e-mail pessoal e foto de perfil.
 
 ## Status do projeto
 
-A versão atual é demonstrativa e utiliza dados locais, sem backend ou persistência. Login e biometria são simulados; emissão de boletos, abertura de chamados, busca no acervo e preferências do perfil ainda não têm integração real.
+A versão atual é demonstrativa e utiliza dados locais, sem backend ou persistência. Login e biometria são simulados; emissão de boletos, chamados de suporte, busca no acervo, dados pessoais, foto e preferências do perfil ainda não têm integração real nem persistência.
 
 ## Pré-requisitos
 

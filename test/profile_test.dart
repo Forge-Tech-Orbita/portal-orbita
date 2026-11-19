@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/constants/app_routes.dart';
 import 'package:portal_orbita/core/mock/student_mock.dart';
@@ -9,6 +12,7 @@ import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
 import 'package:portal_orbita/features/more/presentation/more_screen.dart';
 import 'package:portal_orbita/features/navigation/presentation/main_navigation_screen.dart';
 import 'package:portal_orbita/features/profile/presentation/profile_screen.dart';
+import 'package:portal_orbita/features/profile/presentation/widgets/edit_personal_data_sheet.dart';
 import 'package:portal_orbita/features/support/presentation/support_screen.dart';
 
 Future<void> openProfile(WidgetTester tester) async {
@@ -31,7 +35,149 @@ Future<void> openProfile(WidgetTester tester) async {
 Finder switchForLabel(String label) =>
     find.widgetWithText(SwitchListTile, label);
 
+final transparentPixel = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+);
+
+Future<void> pumpProfile(WidgetTester tester, PickProfilePhoto pickPhoto) {
+  return tester.pumpWidget(
+    MaterialApp(
+      theme: OrbitaTheme.data,
+      home: ProfileScreen(pickPhoto: pickPhoto),
+    ),
+  );
+}
+
+CircleAvatar profileAvatar(WidgetTester tester) {
+  return tester.widget<CircleAvatar>(
+    find.descendant(
+      of: find.byType(StudentIdCard),
+      matching: find.byType(CircleAvatar),
+    ),
+  );
+}
+
+Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
 void main() {
+  test('telefone e e-mail pessoal são validados e formatados', () {
+    expect(formatPhone('11912345678'), '(11) 91234-5678');
+    expect(formatPhone('1132345678'), '(11) 3234-5678');
+    expect(validatePhone(''), 'Informe o telefone com DDD.');
+    expect(validatePhone('1191234'), isNotNull);
+    expect(validatePhone('(11) 91234-5678'), isNull);
+    expect(validatePersonalEmail(''), isNull);
+    expect(validatePersonalEmail('marina@'), 'Informe um e-mail válido.');
+    expect(validatePersonalEmail(demoStudent.email), isNotNull);
+    expect(validatePersonalEmail('marina@email.com'), isNull);
+  });
+
+  testWidgets('editar dados pessoais valida e atualiza telefone e e-mail', (
+    tester,
+  ) async {
+    await openProfile(tester);
+    expect(find.text('Não informado'), findsOneWidget);
+    await tapVisible(
+      tester,
+      find.widgetWithText(OutlinedButton, 'Editar dados pessoais'),
+    );
+    expect(find.byType(EditPersonalDataSheet), findsOneWidget);
+
+    final save = find.widgetWithText(FilledButton, 'Salvar alterações');
+    await tapVisible(tester, save);
+    expect(find.text('Informe o telefone com DDD.'), findsOneWidget);
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Telefone com DDD'),
+      '11912345678',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'E-mail pessoal (opcional)'),
+      'marina@email.com',
+    );
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    await tester.pump();
+    expect(find.text('SALVANDO...'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EditPersonalDataSheet), findsNothing);
+    expect(find.text('Dados pessoais atualizados.'), findsOneWidget);
+    expect(find.text('(11) 91234-5678'), findsOneWidget);
+    expect(find.text('marina@email.com'), findsOneWidget);
+    expect(find.text(demoStudent.maskedPhone), findsNothing);
+    expect(find.text(demoStudent.maskedCpf), findsOneWidget);
+  });
+
+  testWidgets('foto de perfil é adicionada pela galeria e removida', (
+    tester,
+  ) async {
+    final sources = <ImageSource>[];
+    await pumpProfile(tester, (source) async {
+      sources.add(source);
+      return XFile.fromData(transparentPixel, mimeType: 'image/png');
+    });
+    expect(profileAvatar(tester).backgroundImage, isNull);
+    expect(find.text(demoStudent.initials), findsOneWidget);
+
+    await tapVisible(tester, find.text('Adicionar foto'));
+    expect(find.text('Remover foto'), findsNothing);
+    await tapVisible(tester, find.text('Escolher da galeria'));
+
+    expect(sources, [ImageSource.gallery]);
+    expect(profileAvatar(tester).backgroundImage, isA<MemoryImage>());
+    expect(find.text(demoStudent.initials), findsNothing);
+    expect(find.text('Foto de perfil atualizada.'), findsOneWidget);
+
+    await tapVisible(tester, find.text('Alterar foto'));
+    await tapVisible(tester, find.text('Remover foto'));
+    expect(profileAvatar(tester).backgroundImage, isNull);
+    expect(find.text('Adicionar foto'), findsOneWidget);
+    expect(find.text('Foto de perfil removida.'), findsOneWidget);
+  });
+
+  testWidgets('falha ou cancelamento do seletor preserva a foto atual', (
+    tester,
+  ) async {
+    var fail = true;
+    await pumpProfile(tester, (source) async {
+      if (fail) throw Exception('permissão negada');
+      return null;
+    });
+
+    await tapVisible(tester, find.text('Adicionar foto'));
+    await tapVisible(tester, find.text('Tirar foto'));
+    expect(
+      find.text('Não foi possível carregar a foto. Verifique as permissões.'),
+      findsOneWidget,
+    );
+    expect(profileAvatar(tester).backgroundImage, isNull);
+
+    fail = false;
+    await tapVisible(tester, find.text('Adicionar foto'));
+    await tapVisible(tester, find.text('Escolher da galeria'));
+    expect(profileAvatar(tester).backgroundImage, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('correção de nome ou CPF abre a central de suporte', (
+    tester,
+  ) async {
+    await openProfile(tester);
+    await tapVisible(tester, find.text('Corrigir nome ou CPF com o suporte'));
+    expect(find.byType(SupportScreen), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byType(ProfileScreen), findsOneWidget);
+  });
+
   testWidgets(
     'perfil exibe carteirinha compacta compartilhada e dados mascarados',
     (tester) async {

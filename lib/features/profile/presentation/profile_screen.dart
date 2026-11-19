@@ -134,11 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text('CONTA', style: textTheme.labelMedium),
               const SizedBox(height: 8),
-              StudentIdCard(
-                student: demoStudent,
-                compact: true,
-                photo: _photo,
-              ),
+              StudentIdCard(student: demoStudent, compact: true, photo: _photo),
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerLeft,

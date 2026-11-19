@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/support_tickets_mock.dart';
 
-typedef NewTicketData = ({
-  String category,
-  String subject,
-  String description,
-});
+typedef NewTicketData = ({String category, String subject, String description});
 
 class NewTicketSheet extends StatefulWidget {
   const NewTicketSheet({super.key});

@@ -25,7 +25,7 @@ Leia `AGENTS.md`, `.ai/rules/arquitetura.md`, `.ai/rules/qualidade.md`, `.ai/rul
 
 ## Firebase/Firestore — limite atual
 
-Não há Firebase, Firestore ou serviços remotos em `pubspec.yaml`/`lib/`. Não crie integração, repositório vazio, código de inicialização ou regras de segurança por antecipação.
+`firebase_core`, `firebase_auth` e `cloud_firestore` estão em `pubspec.yaml`, mas `lib/main.dart` só chama `Firebase.initializeApp` na Web (`lib/firebase_options.dart`, gerado, só tem configuração Web). Nenhuma tela usa Auth ou Firestore. A integração está em andamento em outra frente da equipe (issue 6); não altere essa configuração fora dela. Não crie integração, repositório vazio, configuração Android/iOS ou regras de segurança por antecipação.
 
 Se uma tarefa futura autorizar a integração, pergunte primeiro sobre serviços, ambientes, autenticação e contratos de dados. Só então planeje loading/erro, validação na fronteira, autorização no backend e descarte de listeners, sem embutir segredos ou alegar segurança por esconder a UI. Esses cuidados são condicionais, não arquitetura já existente.
 

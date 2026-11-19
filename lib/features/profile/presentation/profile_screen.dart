@@ -4,6 +4,7 @@ import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
 import '../../../core/theme/orbita_theme.dart';
 import '../../../core/widgets/student_id_card.dart';
+import 'widgets/edit_personal_data_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,6 +17,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var _pushNotifications = true;
   var _darkMode = true;
   var _facialBiometrics = false;
+  // shortcut: dados ficam só no estado da tela, sem persistência.
+  var _phone = demoStudent.maskedPhone;
+  var _personalEmail = '';
+
+  Future<void> _editPersonalData() async {
+    final data = await showModalBottomSheet<PersonalData>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) =>
+          EditPersonalDataSheet(initialPersonalEmail: _personalEmail),
+    );
+    if (!mounted || data == null) return;
+
+    setState(() {
+      _phone = data.phone;
+      _personalEmail = data.personalEmail;
+    });
+    _showMessage('Dados pessoais atualizados.');
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +75,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           'E-mail institucional',
                           demoStudent.email,
                         ),
+                        (Icons.phone_outlined, 'Telefone', _phone),
                         (
-                          Icons.phone_outlined,
-                          'Telefone',
-                          demoStudent.maskedPhone,
+                          Icons.alternate_email,
+                          'E-mail pessoal',
+                          _personalEmail.isEmpty
+                              ? 'Não informado'
+                              : _personalEmail,
                         ),
                       ])
                         Padding(
@@ -78,6 +108,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _editPersonalData,
+                icon: const Icon(Icons.edit_outlined),
+                label: const Text('Editar dados pessoais'),
+              ),
+              TextButton.icon(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.support),
+                icon: const Icon(Icons.support_agent_outlined),
+                label: const Text('Corrigir nome ou CPF com o suporte'),
               ),
               const SizedBox(height: 16),
               Text(

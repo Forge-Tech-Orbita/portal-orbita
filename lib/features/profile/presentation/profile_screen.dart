@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
@@ -6,8 +7,24 @@ import '../../../core/theme/orbita_theme.dart';
 import '../../../core/widgets/student_id_card.dart';
 import 'widgets/edit_personal_data_sheet.dart';
 
+typedef PickProfilePhoto = Future<XFile?> Function(ImageSource source);
+
+Future<XFile?> _pickWithImagePicker(ImageSource source) {
+  return ImagePicker().pickImage(
+    source: source,
+    maxWidth: 512,
+    maxHeight: 512,
+    imageQuality: 85,
+  );
+}
+
+enum _PhotoAction { gallery, camera, remove }
+
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, this.pickPhoto});
+
+  /// Permite substituir o seletor de imagens em testes.
+  final PickProfilePhoto? pickPhoto;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -17,9 +34,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var _pushNotifications = true;
   var _darkMode = true;
   var _facialBiometrics = false;
-  // shortcut: dados ficam só no estado da tela, sem persistência.
+  // shortcut: dados e foto ficam só no estado da tela, sem persistência.
   var _phone = demoStudent.maskedPhone;
   var _personalEmail = '';
+  ImageProvider? _photo;
+
+  Future<void> _changePhoto() async {
+    final action = await showModalBottomSheet<_PhotoAction>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Escolher da galeria'),
+              onTap: () => Navigator.of(context).pop(_PhotoAction.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Tirar foto'),
+              onTap: () => Navigator.of(context).pop(_PhotoAction.camera),
+            ),
+            if (_photo != null)
+              ListTile(
+                leading: const Icon(
+                  Icons.delete_outline,
+                  color: OrbitaTheme.alert,
+                ),
+                title: const Text('Remover foto'),
+                onTap: () => Navigator.of(context).pop(_PhotoAction.remove),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || action == null) return;
+
+    if (action == _PhotoAction.remove) {
+      setState(() => _photo = null);
+      _showMessage('Foto de perfil removida.');
+      return;
+    }
+
+    final pick = widget.pickPhoto ?? _pickWithImagePicker;
+    try {
+      final source = action == _PhotoAction.camera
+          ? ImageSource.camera
+          : ImageSource.gallery;
+      final file = await pick(source);
+      if (file == null) return;
+      final bytes = await file.readAsBytes();
+      if (!mounted) return;
+      setState(() => _photo = MemoryImage(bytes));
+      _showMessage('Foto de perfil atualizada.');
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage(
+        'Não foi possível carregar a foto. Verifique as permissões.',
+      );
+    }
+  }
 
   Future<void> _editPersonalData() async {
     final data = await showModalBottomSheet<PersonalData>(
@@ -58,8 +134,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text('CONTA', style: textTheme.labelMedium),
               const SizedBox(height: 8),
-              const StudentIdCard(student: demoStudent, compact: true),
-              const SizedBox(height: 16),
+              StudentIdCard(
+                student: demoStudent,
+                compact: true,
+                photo: _photo,
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: _changePhoto,
+                  icon: const Icon(Icons.add_a_photo_outlined),
+                  label: Text(
+                    _photo == null ? 'Adicionar foto' : 'Alterar foto',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               Card(
                 margin: EdgeInsets.zero,
                 color: OrbitaTheme.surface,

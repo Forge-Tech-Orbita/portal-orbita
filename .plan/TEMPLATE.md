@@ -16,7 +16,7 @@
 ## Regras para todas as sessões
 1. Leia `AGENTS.md` ou `CLAUDE.md`, `.ai/rules/index.md` e todas as regras aplicáveis aos caminhos da sessão.
 2. Confira `git status --short --branch` e preserve alterações existentes. Não descarte nem inclua trabalho alheio.
-3. Siga `.ai/rules/branches.md`: base `development` atualizada, branch `<tipo>/<issue>-<descricao>` e PR para `development`. Peça a issue se ausente. Atualize com `git pull --ff-only origin development` somente na branch base e no contexto autorizado; pare em divergência. Se o usuário já indicar a branch correta, preserve-a.
+3. Siga `.ai/rules/branches.md`: base `development` atualizada, branch `<tipo>/<descricao>` sem números e PR para `development`. As tarefas ficam no Kanban; não exija issue do GitHub. Atualize com `git pull --ff-only origin development` somente na branch base e no contexto autorizado; pare em divergência. Se o usuário já indicar a branch correta, preserve-a.
 4. Confirme arquivos e consumidores antes de editar. Reutilize `lib/core/` e as features existentes; não crie pastas raiz em `lib/` nem adicione pacotes sem aprovação.
 5. Implemente apenas o escopo da sessão. Faça alterações adicionais somente quando indispensáveis à entrega e registre-as. Anote bugs/melhorias independentes para outra sessão.
 6. Resolva decisões bloqueantes antes de mudar negócio, navegação ou contratos.

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'orbita_theme.dart';
+
 /// Paleta de cores usada pelas telas.
 ///
 /// Cada tema do aplicativo fornece a sua própria paleta por meio desta
@@ -53,6 +55,27 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
 
   /// Erros, atrasos e ações destrutivas.
   final Color alert;
+
+  /// Paleta do tema ativo. Sem tema configurado (por exemplo, em um teste
+  /// com `MaterialApp` simples), usa o tema vintage.
+  static OrbitaColors of(BuildContext context) {
+    return Theme.of(context).extension<OrbitaColors>() ?? vintage;
+  }
+
+  /// Tema padrão do aplicativo, com a estética retrô original.
+  static const vintage = OrbitaColors(
+    brightness: Brightness.light,
+    background: OrbitaTheme.background,
+    surface: OrbitaTheme.surface,
+    border: OrbitaTheme.border,
+    text: OrbitaTheme.text,
+    primary: OrbitaTheme.primary,
+    onPrimary: OrbitaTheme.surface,
+    secondary: OrbitaTheme.terracotta,
+    success: OrbitaTheme.green,
+    warning: OrbitaTheme.amber,
+    alert: OrbitaTheme.alert,
+  );
 
   @override
   OrbitaColors copyWith({

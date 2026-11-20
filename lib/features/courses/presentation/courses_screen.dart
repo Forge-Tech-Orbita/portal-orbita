@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/status_tag.dart';
 import '../data/courses_mock.dart';
@@ -11,6 +11,7 @@ class CoursesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return SingleChildScrollView(
@@ -64,7 +65,7 @@ class CoursesScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: course.progress / 100,
-                          color: OrbitaTheme.terracotta,
+                          color: colors.secondary,
                           semanticsLabel:
                               'Progresso do semestre em ${course.subject}',
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../data/schedule.dart';
 import '../data/schedule_mock.dart';
@@ -20,6 +21,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final lessons = demoSchedule[_currentDay]!;
     final todayLabel =
@@ -88,7 +90,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             child: Icon(
                               Icons.circle,
                               size: 8,
-                              color: lesson.color,
+                              // Cor vintage da fixture traduzida para o tema.
+                              color: colors.resolve(lesson.color),
                             ),
                           ),
                         ],

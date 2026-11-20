@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/status_tag.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/coordination.dart';
 import '../data/coordination_mock.dart';
 
@@ -34,6 +34,7 @@ class CoordinationClassesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final classes = courseClasses.where(filter.matches);
 
@@ -68,10 +69,7 @@ class CoordinationClassesScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(14),
                   child: Row(
                     children: [
-                      const Icon(
-                        Icons.menu_book_outlined,
-                        color: OrbitaTheme.primary,
-                      ),
+                      Icon(Icons.menu_book_outlined, color: colors.primary),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(

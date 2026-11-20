@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/status_tag.dart';
 import '../data/loan.dart';
 import '../data/loans_mock.dart';
@@ -128,6 +128,7 @@ class _BookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final edition = book.edition;
     final (tone, action) = switch (book.availability) {
@@ -142,7 +143,7 @@ class _BookCard extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
         child: Row(
           children: [
-            const Icon(Icons.menu_book_outlined, color: OrbitaTheme.terracotta),
+            Icon(Icons.menu_book_outlined, color: colors.secondary),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

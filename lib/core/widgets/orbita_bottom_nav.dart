@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 
 typedef OrbitaNavItem = ({IconData icon, String label});
 
@@ -30,19 +30,20 @@ class OrbitaBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(color: dark ? OrbitaTheme.text : OrbitaTheme.border),
+          top: BorderSide(color: dark ? colors.text : colors.border),
         ),
       ),
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: onTap,
-        backgroundColor: dark ? OrbitaTheme.text : null,
-        selectedItemColor: dark ? OrbitaTheme.surface : null,
+        backgroundColor: dark ? colors.text : null,
+        selectedItemColor: dark ? colors.surface : null,
         unselectedItemColor: dark
-            ? OrbitaTheme.surface.withValues(alpha: 0.6)
+            ? colors.surface.withValues(alpha: 0.6)
             : null,
         items: [
           for (final item in items)

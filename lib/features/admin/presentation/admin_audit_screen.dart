@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/status_tag.dart';
 import '../data/admin.dart';
 
@@ -41,6 +41,7 @@ class AdminAuditScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final visible = entries.where(filter.matches).toList();
 
@@ -73,10 +74,10 @@ class AdminAuditScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.description_outlined,
                             size: 20,
-                            color: OrbitaTheme.muted,
+                            color: colors.muted,
                           ),
                           const SizedBox(width: 10),
                           Expanded(

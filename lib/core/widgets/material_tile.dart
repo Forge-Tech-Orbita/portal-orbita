@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/learning_material.dart';
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 import 'status_tag.dart';
 
 class MaterialTile extends StatelessWidget {
@@ -12,6 +12,7 @@ class MaterialTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final isPdf = material.kind == MaterialKind.pdf;
 
@@ -22,7 +23,7 @@ class MaterialTile extends StatelessWidget {
           children: [
             Icon(
               isPdf ? Icons.description_outlined : Icons.link,
-              color: isPdf ? OrbitaTheme.terracotta : OrbitaTheme.primary,
+              color: isPdf ? colors.secondary : colors.primary,
             ),
             const SizedBox(width: 12),
             Expanded(

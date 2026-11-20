@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/student.dart';
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 import 'decorative_barcode.dart';
 
 class StudentIdCard extends StatelessWidget {
@@ -18,6 +18,7 @@ class StudentIdCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Card(
@@ -31,22 +32,14 @@ class StudentIdCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'INSTITUTO ÓRBITA',
-                    style: textTheme.labelMedium?.copyWith(
-                      color: OrbitaTheme.text,
-                    ),
+                    style: textTheme.labelMedium?.copyWith(color: colors.text),
                   ),
                 ),
-                const Icon(
-                  Icons.memory_outlined,
-                  size: 16,
-                  color: OrbitaTheme.green,
-                ),
+                Icon(Icons.memory_outlined, size: 16, color: colors.success),
                 const SizedBox(width: 4),
                 Text(
                   'ATIVO',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: OrbitaTheme.alert,
-                  ),
+                  style: textTheme.labelSmall?.copyWith(color: colors.alert),
                 ),
               ],
             ),
@@ -58,8 +51,8 @@ class StudentIdCard extends StatelessWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: OrbitaTheme.primary.withValues(alpha: 0.08),
-                    border: Border.all(color: OrbitaTheme.primary, width: 1.5),
+                    color: colors.primary.withValues(alpha: 0.08),
+                    border: Border.all(color: colors.primary, width: 1.5),
                     image: photo == null
                         ? null
                         : DecorationImage(image: photo!, fit: BoxFit.cover),
@@ -67,9 +60,9 @@ class StudentIdCard extends StatelessWidget {
                   child: photo == null
                       ? Semantics(
                           label: 'Foto de ${student.name} não cadastrada',
-                          child: const Icon(
+                          child: Icon(
                             Icons.person_outline,
-                            color: OrbitaTheme.primary,
+                            color: colors.primary,
                           ),
                         )
                       : null,
@@ -85,7 +78,7 @@ class StudentIdCard extends StatelessWidget {
                             ? student.course
                             : '${student.course} · ${student.period}',
                         style: textTheme.bodySmall?.copyWith(
-                          color: OrbitaTheme.text,
+                          color: colors.text,
                         ),
                       ),
                     ],

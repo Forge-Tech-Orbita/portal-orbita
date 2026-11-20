@@ -1,10 +1,14 @@
 enum GradeStatus {
   inProgress('Cursando'),
-  completed('Aprovado');
+  completed('Concluído'),
+  approved('Aprovado'),
+  failed('Reprovado');
 
   const GradeStatus(this.label);
 
   final String label;
+
+  bool get isCompleted => this != inProgress;
 }
 
 class GradeStage {

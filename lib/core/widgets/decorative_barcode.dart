@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 
 class DecorativeBarcode extends StatelessWidget {
   const DecorativeBarcode({super.key, this.count = 14}) : assert(count > 0);
@@ -9,6 +9,7 @@ class DecorativeBarcode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     // shortcut: barras apenas decorativas, substituir se houver identificação escaneável real.
     const heights = [
       8.0,
@@ -37,7 +38,7 @@ class DecorativeBarcode extends StatelessWidget {
             SizedBox(
               width: 2,
               height: heights[index % heights.length],
-              child: const ColoredBox(color: OrbitaTheme.text),
+              child: ColoredBox(color: colors.text),
             ),
         ],
       ),

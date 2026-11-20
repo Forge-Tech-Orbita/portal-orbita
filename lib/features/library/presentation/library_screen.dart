@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/status_tag.dart';
 import '../data/loan.dart';
@@ -34,6 +34,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final loans = demoLoans.where(
       (loan) =>
@@ -99,9 +100,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       padding: const EdgeInsets.all(14),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.menu_book_outlined,
-                            color: OrbitaTheme.terracotta,
+                            color: colors.secondary,
                           ),
                           const SizedBox(width: 12),
                           Expanded(

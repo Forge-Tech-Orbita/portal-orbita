@@ -6,7 +6,7 @@ paths: ["lib/**", "test/**"]
 
 ## Tema e composição
 
-- Use `OrbitaTheme` de `lib/core/theme/orbita_theme.dart` e `Theme.of(context).textTheme`. Não duplique cores com literais; use `withValues(alpha: ...)` para transparência.
+- Leia as cores do tema ativo com `OrbitaColors.of(context)` (`lib/core/theme/orbita_colors.dart`) e use `Theme.of(context).textTheme`. As constantes de `OrbitaTheme` são só a paleta vintage: use-as em fixtures e traduza com `colors.resolve(...)` na tela. Não duplique cores com literais; use `withValues(alpha: ...)` para transparência.
 - Siga espaçamentos, raios e composição dos arquivos irmãos. Não crie um sistema de tokens ou wrappers Material sem necessidade concreta.
 - Reutilize `StudentIdCard`, `NoticeTile`, `DecorativeBarcode` e `OrbitaBottomNav` em `lib/core/widgets/`.
 - Mantenha widgets exclusivos na feature; widgets pequenos privados podem ficar no arquivo da tela.

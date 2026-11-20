@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/page_heading.dart';
 
@@ -10,6 +10,7 @@ class MoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -68,8 +69,8 @@ class MoreScreen extends StatelessWidget {
                 subtitle: description,
                 icon: icon,
                 iconColor: route == AppRoutes.login
-                    ? OrbitaTheme.terracotta
-                    : OrbitaTheme.primary,
+                    ? colors.secondary
+                    : colors.primary,
                 showChevron: route != AppRoutes.login,
                 onTap: () {
                   if (route == AppRoutes.login) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/mock/notifications_mock.dart';
 import '../../../core/models/app_notification.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/info_card.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -38,6 +38,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -98,10 +99,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           onTap: item.read ? null : () => _markRead(item.id),
                           trailing: item.read
                               ? null
-                              : const Icon(
+                              : Icon(
                                   Icons.circle,
                                   size: 8,
-                                  color: OrbitaTheme.primary,
+                                  color: colors.primary,
                                 ),
                         ),
                       ),

@@ -81,14 +81,8 @@ void main() {
     expect(find.text(demoStudent.maskedCpf), findsOneWidget);
     expect(find.text(demoStudent.email), findsOneWidget);
     expect(find.text('(11) 9••••-4521'), findsOneWidget);
-    expect(
-      tester.widget<SwitchListTile>(switchFor('Modo escuro')).onChanged,
-      isNull,
-    );
-    expect(
-      find.text('Disponível quando o tema escuro existir'),
-      findsOneWidget,
-    );
+    // O antigo "Modo escuro" deu lugar ao seletor de tema.
+    expect(switchFor('Modo escuro'), findsNothing);
 
     await tapVisible(tester, switchFor('Notificações push'));
     expect(

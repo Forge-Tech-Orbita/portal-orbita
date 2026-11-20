@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/support_ticket.dart';
 
 class TicketSentScreen extends StatelessWidget {
@@ -11,6 +11,7 @@ class TicketSentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -28,13 +29,9 @@ class TicketSentScreen extends StatelessWidget {
                   height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: OrbitaTheme.primary.withValues(alpha: 0.14),
+                    color: colors.primary.withValues(alpha: 0.14),
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    size: 32,
-                    color: OrbitaTheme.primary,
-                  ),
+                  child: Icon(Icons.check, size: 32, color: colors.primary),
                 ),
               ),
               const SizedBox(height: 12),

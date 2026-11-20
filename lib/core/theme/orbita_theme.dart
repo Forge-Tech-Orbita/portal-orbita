@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'orbita_colors.dart';
+
 abstract final class OrbitaTheme {
+  // Cores do tema vintage, o padrão do aplicativo.
   static const background = Color(0xFFF6F1E3);
   static const surface = Color(0xFFFBF8EF);
   static const border = Color(0xFFE3D8BF);
@@ -15,28 +18,40 @@ abstract final class OrbitaTheme {
   static const _radius = BorderRadius.all(Radius.circular(12));
   static const _fieldRadius = BorderRadius.all(Radius.circular(10));
 
-  static final data = _build();
+  /// Tema vintage, usado quando nenhum outro foi escolhido.
+  static final data = build(OrbitaColors.vintage);
 
-  static ThemeData _build() {
-    final base = ThemeData(
-      scaffoldBackgroundColor: background,
-      colorScheme: ColorScheme.fromSeed(seedColor: primary).copyWith(
-        primary: primary,
-        onPrimary: surface,
-        secondary: terracotta,
-        onSecondary: surface,
-        tertiary: green,
-        onTertiary: surface,
-        error: alert,
-        onError: surface,
-        surface: surface,
-        onSurface: text,
-        onSurfaceVariant: muted,
-        outline: border,
-        outlineVariant: border,
-      ),
+  /// Monta o [ThemeData] completo, com os componentes do protótipo, a partir
+  /// de uma paleta.
+  static ThemeData build(OrbitaColors colors) {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: colors.primary,
+      brightness: colors.brightness,
     );
-    final textTheme = base.textTheme.apply(bodyColor: text, displayColor: text);
+    final base = ThemeData(
+      brightness: colors.brightness,
+      scaffoldBackgroundColor: colors.background,
+      colorScheme: scheme.copyWith(
+        primary: colors.primary,
+        onPrimary: colors.onPrimary,
+        secondary: colors.secondary,
+        onSecondary: colors.onPrimary,
+        tertiary: colors.success,
+        onTertiary: colors.onPrimary,
+        error: colors.alert,
+        onError: colors.onPrimary,
+        surface: colors.surface,
+        onSurface: colors.text,
+        onSurfaceVariant: colors.muted,
+        outline: colors.border,
+        outlineVariant: colors.border,
+      ),
+      extensions: [colors],
+    );
+    final textTheme = base.textTheme.apply(
+      bodyColor: colors.text,
+      displayColor: colors.text,
+    );
     const stadium = StadiumBorder();
     const buttonText = TextStyle(fontSize: 14, fontWeight: FontWeight.w700);
 
@@ -44,39 +59,39 @@ abstract final class OrbitaTheme {
       textTheme: textTheme.copyWith(
         headlineSmall: textTheme.headlineSmall?.copyWith(fontSize: 22),
         bodyLarge: textTheme.bodyLarge?.copyWith(fontSize: 15),
-        bodySmall: textTheme.bodySmall?.copyWith(color: muted),
+        bodySmall: textTheme.bodySmall?.copyWith(color: colors.muted),
         labelMedium: textTheme.labelMedium?.copyWith(
-          color: muted,
+          color: colors.muted,
           letterSpacing: 0.6,
         ),
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: background,
-        foregroundColor: text,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.background,
+        foregroundColor: colors.text,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          color: text,
+          color: colors.text,
           fontSize: 18,
           fontWeight: FontWeight.w500,
         ),
       ),
-      cardTheme: const CardThemeData(
-        color: surface,
+      cardTheme: CardThemeData(
+        color: colors.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: _radius,
-          side: BorderSide(color: border),
+          side: BorderSide(color: colors.border),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: primary,
-          foregroundColor: surface,
+          backgroundColor: colors.primary,
+          foregroundColor: colors.onPrimary,
           minimumSize: const Size(48, 48),
           shape: stadium,
           textStyle: buttonText,
@@ -84,77 +99,82 @@ abstract final class OrbitaTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: primary,
+          foregroundColor: colors.primary,
           minimumSize: const Size(48, 48),
           shape: stadium,
-          side: const BorderSide(color: primary),
+          side: BorderSide(color: colors.primary),
           textStyle: buttonText,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: primary),
+        style: TextButton.styleFrom(foregroundColor: colors.primary),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: surface,
-        selectedColor: primary.withValues(alpha: 0.14),
-        checkmarkColor: primary,
-        side: const BorderSide(color: border),
+        backgroundColor: colors.surface,
+        selectedColor: colors.primary.withValues(alpha: 0.14),
+        checkmarkColor: colors.primary,
+        side: BorderSide(color: colors.border),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
-        labelStyle: const TextStyle(color: text, fontSize: 13),
+        labelStyle: TextStyle(color: colors.text, fontSize: 13),
         showCheckmark: true,
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surface,
-        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        fillColor: colors.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: _fieldRadius,
-          borderSide: BorderSide(color: border),
+          borderSide: BorderSide(color: colors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: _fieldRadius,
-          borderSide: BorderSide(color: border),
+          borderSide: BorderSide(color: colors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: _fieldRadius,
-          borderSide: BorderSide(color: primary, width: 1.5),
+          borderSide: BorderSide(color: colors.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: _fieldRadius,
-          borderSide: BorderSide(color: alert),
+          borderSide: BorderSide(color: colors.alert),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: _fieldRadius,
-          borderSide: BorderSide(color: alert, width: 1.5),
+          borderSide: BorderSide(color: colors.alert, width: 1.5),
         ),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: surface,
-        selectedItemColor: primary,
-        unselectedItemColor: muted,
-        selectedLabelStyle: TextStyle(
+        backgroundColor: colors.surface,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: colors.muted,
+        selectedLabelStyle: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: TextStyle(fontSize: 11),
+        unselectedLabelStyle: const TextStyle(fontSize: 11),
         elevation: 0,
       ),
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? primary : border,
+          (states) => states.contains(WidgetState.selected)
+              ? colors.primary
+              : colors.border,
         ),
-        thumbColor: const WidgetStatePropertyAll(surface),
+        thumbColor: WidgetStatePropertyAll(colors.surface),
         trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: primary,
-        linearTrackColor: border,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: colors.primary,
+        linearTrackColor: colors.border,
         linearMinHeight: 4,
       ),
-      dividerTheme: const DividerThemeData(color: border, space: 1),
+      dividerTheme: DividerThemeData(color: colors.border, space: 1),
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../data/support_tickets_mock.dart';
 
@@ -55,6 +55,7 @@ class _NewTicketScreenState extends State<NewTicketScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -130,10 +131,7 @@ class _NewTicketScreenState extends State<NewTicketScreen> {
                       padding: const EdgeInsets.all(14),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.description_outlined,
-                            color: OrbitaTheme.muted,
-                          ),
+                          Icon(Icons.description_outlined, color: colors.muted),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -147,7 +145,7 @@ class _NewTicketScreenState extends State<NewTicketScreen> {
                               ],
                             ),
                           ),
-                          const Icon(Icons.add, color: OrbitaTheme.primary),
+                          Icon(Icons.add, color: colors.primary),
                         ],
                       ),
                     ),

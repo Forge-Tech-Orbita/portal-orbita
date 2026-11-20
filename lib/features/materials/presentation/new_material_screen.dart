@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/models/learning_material.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/labeled_field.dart';
 
 final _urlPattern = RegExp(
@@ -95,6 +95,7 @@ class _NewMaterialScreenState extends State<NewMaterialScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -160,10 +161,10 @@ class _NewMaterialScreenState extends State<NewMaterialScreen> {
                 const SizedBox(height: 12),
                 if (_kind == MaterialKind.pdf)
                   Material(
-                    color: OrbitaTheme.surface,
+                    color: colors.surface,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: OrbitaTheme.border),
+                      side: BorderSide(color: colors.border),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: InkWell(
@@ -172,15 +173,12 @@ class _NewMaterialScreenState extends State<NewMaterialScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         child: Column(
                           children: [
-                            const Icon(
-                              Icons.upload_outlined,
-                              color: OrbitaTheme.primary,
-                            ),
+                            Icon(Icons.upload_outlined, color: colors.primary),
                             const SizedBox(height: 4),
                             Text(
                               'Escolher arquivo PDF',
                               style: textTheme.bodyMedium?.copyWith(
-                                color: OrbitaTheme.primary,
+                                color: colors.primary,
                               ),
                             ),
                             Text(

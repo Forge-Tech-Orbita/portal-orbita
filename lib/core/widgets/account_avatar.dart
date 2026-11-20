@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/app_routes.dart';
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 
 /// Encerra a sessão acadêmica e limpa a pilha de navegação.
 void signOut(BuildContext context, {String route = AppRoutes.login}) {
@@ -22,6 +22,7 @@ class AccountAvatar extends StatelessWidget {
   final String role;
 
   Future<void> _openMenu(BuildContext context) async {
+    final colors = OrbitaColors.of(context);
     final leave = await showModalBottomSheet<bool>(
       context: context,
       showDragHandle: true,
@@ -31,15 +32,15 @@ class AccountAvatar extends StatelessWidget {
           children: [
             ListTile(
               leading: CircleAvatar(
-                backgroundColor: OrbitaTheme.text,
-                foregroundColor: OrbitaTheme.surface,
+                backgroundColor: colors.text,
+                foregroundColor: colors.surface,
                 child: Text(initials),
               ),
               title: Text(name),
               subtitle: Text(role),
             ),
             ListTile(
-              leading: const Icon(Icons.logout, color: OrbitaTheme.terracotta),
+              leading: Icon(Icons.logout, color: colors.secondary),
               title: const Text('Encerrar sessão'),
               onTap: () => Navigator.of(context).pop(true),
             ),
@@ -52,6 +53,7 @@ class AccountAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     return Semantics(
       button: true,
       label: 'Conta de $name',
@@ -63,8 +65,8 @@ class AccountAvatar extends StatelessWidget {
           onTap: () => _openMenu(context),
           child: CircleAvatar(
             radius: 20,
-            backgroundColor: OrbitaTheme.text,
-            foregroundColor: OrbitaTheme.surface,
+            backgroundColor: colors.text,
+            foregroundColor: colors.surface,
             child: Text(
               initials,
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),

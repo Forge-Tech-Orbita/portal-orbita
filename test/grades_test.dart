@@ -23,7 +23,7 @@ const _completedGrade = Grade(
   firstStage: GradeStage.first(exam: 7, ted: 3),
   secondStage: GradeStage.second(exam: 6, ted: 3, integratedAssessment: 1),
   frequency: 100,
-  status: GradeStatus.completed,
+  status: GradeStatus.approved,
 );
 
 Future<void> pumpGrades(
@@ -91,7 +91,7 @@ void main() {
       firstStage: GradeStage.first(exam: 6, ted: 2),
       secondStage: GradeStage.second(exam: 0, ted: 0, integratedAssessment: 0),
       frequency: 100,
-      status: GradeStatus.completed,
+      status: GradeStatus.approved,
     );
     expect(grade.average, 4);
   });
@@ -154,6 +154,51 @@ void main() {
     );
   });
 
+  testWidgets('concluídas incluem disciplinas concluídas e reprovadas', (
+    tester,
+  ) async {
+    const grades = [
+      Grade(
+        subject: 'Resultado não informado',
+        code: 'TEST-1',
+        firstStage: GradeStage.first(exam: 7, ted: 3),
+        secondStage: GradeStage.second(
+          exam: 6,
+          ted: 3,
+          integratedAssessment: 1,
+        ),
+        frequency: 100,
+        status: GradeStatus.completed,
+      ),
+      Grade(
+        subject: 'Disciplina reprovada',
+        code: 'TEST-2',
+        firstStage: GradeStage.first(exam: 0, ted: 0),
+        secondStage: GradeStage.second(
+          exam: 0,
+          ted: 0,
+          integratedAssessment: 0,
+        ),
+        frequency: 100,
+        status: GradeStatus.failed,
+      ),
+    ];
+    expect(summarizeGrades(grades), (
+      average: 5.0,
+      approved: 0,
+      inProgress: 0,
+      pending: 0,
+    ));
+
+    await pumpGrades(tester, grades);
+    await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Concluídas'));
+
+    expect(find.text('Resultado não informado'), findsOneWidget);
+    expect(find.text('Disciplina reprovada'), findsOneWidget);
+    expect(find.text('Concluído'), findsOneWidget);
+    expect(find.text('Reprovado'), findsOneWidget);
+  });
+
   testWidgets('card abre AV1, AV2, média, frequência e etapas', (tester) async {
     await pumpGrades(tester);
     await expandGrade(tester, 'Inteligência Artificial');
@@ -173,7 +218,13 @@ void main() {
     await pumpGrades(tester, const [_pendingGrade]);
     expect(find.text('Pendente'), findsOneWidget);
     await expandGrade(tester, 'Cálculo Numérico');
-    expect(find.text('Subtotal: Pendente'), findsOneWidget);
+    expect(find.text('Subtotal: 5.5 de 10'), findsOneWidget);
+    expect(
+      find.text(
+        'Subtotal pendente. Falta lançar: AV2, TED, Avaliação Integrada.',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('AV2: Não informada'), findsOneWidget);
     expect(find.text('Nota final: Pendente'), findsOneWidget);
   });

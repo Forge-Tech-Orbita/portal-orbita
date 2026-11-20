@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/student_id_card.dart';
 import 'edit_profile_screen.dart';
+import 'widgets/theme_selector.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, this.pickPhoto, this.isWeb = kIsWeb});
@@ -52,6 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -93,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Row(
                             children: [
-                              Icon(icon, size: 18, color: OrbitaTheme.muted),
+                              Icon(icon, size: 18, color: colors.muted),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Wrap(
@@ -129,13 +131,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onChanged: (value) =>
                           setState(() => _pushNotifications = value),
                     ),
-                    const SwitchListTile(
-                      secondary: Icon(Icons.dark_mode_outlined),
-                      title: Text('Modo escuro'),
-                      subtitle: Text('Disponível quando o tema escuro existir'),
-                      value: false,
-                      onChanged: null,
-                    ),
                     SwitchListTile(
                       secondary: const Icon(Icons.fingerprint),
                       title: const Text('Biometria'),
@@ -148,14 +143,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: 14),
+              const ThemeSelector(),
               const SizedBox(height: 16),
               OutlinedButton.icon(
                 onPressed: () =>
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil(AppRoutes.login, (_) => false),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: OrbitaTheme.terracotta,
-                  side: const BorderSide(color: OrbitaTheme.terracotta),
+                  foregroundColor: colors.secondary,
+                  side: BorderSide(color: colors.secondary),
                 ),
                 icon: const Icon(Icons.logout),
                 label: const Text('Encerrar sessão'),

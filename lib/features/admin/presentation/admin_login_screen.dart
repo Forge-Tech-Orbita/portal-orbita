@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/info_banner.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../../core/widgets/orbit_logo.dart';
@@ -10,10 +10,13 @@ import '../data/admin.dart';
 import '../data/admin_mock.dart';
 
 /// Estilo dos botões principais do portal administrativo (escuros).
-final adminButtonStyle = FilledButton.styleFrom(
-  backgroundColor: OrbitaTheme.text,
-  foregroundColor: OrbitaTheme.surface,
-);
+ButtonStyle adminButtonStyle(BuildContext context) {
+  final colors = OrbitaColors.of(context);
+  return FilledButton.styleFrom(
+    backgroundColor: colors.text,
+    foregroundColor: colors.surface,
+  );
+}
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -50,6 +53,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -102,7 +106,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     FilledButton.icon(
-                      style: adminButtonStyle,
+                      style: adminButtonStyle(context),
                       onPressed: _loading ? null : _continue,
                       icon: const Icon(Icons.lock_outline, size: 18),
                       label: Text(_loading ? 'VERIFICANDO...' : 'Continuar'),
@@ -112,9 +116,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       'admin.orbita.edu · sessão própria\n'
                       'Não compartilhe login com o portal acadêmico',
                       textAlign: TextAlign.center,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: OrbitaTheme.text,
-                      ),
+                      style: textTheme.bodySmall?.copyWith(color: colors.text),
                     ),
                   ],
                 ),

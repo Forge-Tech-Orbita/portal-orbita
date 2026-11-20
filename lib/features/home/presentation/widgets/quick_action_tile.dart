@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/orbita_theme.dart';
+import '../../../../core/theme/orbita_colors.dart';
 
 class QuickActionTile extends StatelessWidget {
   const QuickActionTile({
@@ -16,12 +16,13 @@ class QuickActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     return OutlinedButton(
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
-        backgroundColor: OrbitaTheme.surface,
-        side: BorderSide(color: OrbitaTheme.primary.withValues(alpha: 0.35)),
+        backgroundColor: colors.surface,
+        side: BorderSide(color: colors.primary.withValues(alpha: 0.35)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         textStyle: const TextStyle(fontSize: 12),
       ),

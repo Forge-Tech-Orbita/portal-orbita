@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/status_tag.dart';
 import '../data/admin.dart';
@@ -35,6 +35,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   var _group = AccountGroup.academic;
 
   Future<void> _openAccount(AdminAccount account) async {
+    final colors = OrbitaColors.of(context);
     final toggle = await showModalBottomSheet<bool>(
       context: context,
       showDragHandle: true,
@@ -53,7 +54,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                   account.status == AccountStatus.blocked
                       ? Icons.lock_open_outlined
                       : Icons.block,
-                  color: OrbitaTheme.terracotta,
+                  color: colors.secondary,
                 ),
                 title: Text(
                   account.status == AccountStatus.blocked
@@ -145,7 +146,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             ),
           const SizedBox(height: 4),
           FilledButton.icon(
-            style: adminButtonStyle,
+            style: adminButtonStyle(context),
             onPressed: _invite,
             icon: const Icon(Icons.add),
             label: const Text('Convidar usuário'),
@@ -218,7 +219,7 @@ class _InviteDialogState extends State<_InviteDialog> {
           child: const Text('Cancelar'),
         ),
         FilledButton(
-          style: adminButtonStyle,
+          style: adminButtonStyle(context),
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;
             Navigator.of(context)

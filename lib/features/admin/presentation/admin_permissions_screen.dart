@@ -158,7 +158,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
             ),
             const SizedBox(height: 12),
             FilledButton.icon(
-              style: adminButtonStyle,
+              style: adminButtonStyle(context),
               onPressed: _submit,
               icon: const Icon(Icons.send_outlined, size: 18),
               label: const Text('Enviar para aprovação'),

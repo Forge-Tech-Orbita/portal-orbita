@@ -5,7 +5,7 @@ import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/metric_tile.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/status_tag.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/professor.dart';
 import '../data/professor_mock.dart';
 
@@ -29,6 +29,7 @@ class ProfessorHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final nextCode = professorNextClass.code;
     final atRisk = classAttendance[nextCode]!
@@ -146,7 +147,7 @@ class ProfessorHomeScreen extends StatelessWidget {
           const SizedBox(height: 8),
           InfoCard(
             icon: Icons.warning_amber_outlined,
-            iconColor: OrbitaTheme.alert,
+            iconColor: colors.alert,
             title: '$atRisk alunos abaixo de $minimumAttendance% em IA',
             subtitle: 'Frequência importada do sistema acadêmico',
             trailing: const StatusTag(label: 'Risco', tone: TagTone.danger),

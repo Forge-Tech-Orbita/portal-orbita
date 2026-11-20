@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/metric_tile.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/status_tag.dart';
@@ -23,6 +23,7 @@ class AttendanceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final students = classAttendance[classCode]!;
     final atRisk = students
@@ -66,7 +67,7 @@ class AttendanceScreen extends StatelessWidget {
                 child: MetricTile(
                   value: '${atRisk.length}',
                   label: 'Abaixo de $minimumAttendance%',
-                  valueColor: OrbitaTheme.terracotta,
+                  valueColor: colors.secondary,
                 ),
               ),
               const Expanded(
@@ -131,10 +132,11 @@ class _AttendanceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final percent = attendancePercent(student, professorMeetings);
     final risk = isAtRisk(student, professorMeetings);
-    final color = risk ? OrbitaTheme.alert : OrbitaTheme.primary;
+    final color = risk ? colors.alert : colors.primary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

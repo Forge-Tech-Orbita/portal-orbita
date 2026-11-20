@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/admin.dart';
 import 'admin_login_screen.dart';
 
@@ -67,6 +67,7 @@ class _AdminMfaScreenState extends State<AdminMfaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final error = _locked
         ? 'Conta bloqueada após $maxMfaAttempts tentativas. O superadmin foi avisado.'
@@ -74,11 +75,9 @@ class _AdminMfaScreenState extends State<AdminMfaScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: OrbitaTheme.text,
-        foregroundColor: OrbitaTheme.surface,
-        titleTextStyle: textTheme.titleMedium?.copyWith(
-          color: OrbitaTheme.surface,
-        ),
+        backgroundColor: colors.text,
+        foregroundColor: colors.surface,
+        titleTextStyle: textTheme.titleMedium?.copyWith(color: colors.surface),
         title: const Text('Portal Administrativo'),
       ),
       body: SafeArea(
@@ -92,9 +91,9 @@ class _AdminMfaScreenState extends State<AdminMfaScreen> {
                 child: Container(
                   width: 64,
                   height: 64,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: OrbitaTheme.surface,
+                    color: colors.surface,
                   ),
                   child: const Icon(Icons.lock_outline, size: 30),
                 ),
@@ -131,12 +130,12 @@ class _AdminMfaScreenState extends State<AdminMfaScreen> {
                                   ),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: OrbitaTheme.surface,
+                                    color: colors.surface,
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
                                       color: index == value.text.length
-                                          ? OrbitaTheme.text
-                                          : OrbitaTheme.border,
+                                          ? colors.text
+                                          : colors.border,
                                     ),
                                   ),
                                   child: Text(
@@ -179,14 +178,12 @@ class _AdminMfaScreenState extends State<AdminMfaScreen> {
                 Text(
                   error,
                   textAlign: TextAlign.center,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: OrbitaTheme.alert,
-                  ),
+                  style: textTheme.bodySmall?.copyWith(color: colors.alert),
                 ),
               ],
               const SizedBox(height: 20),
               FilledButton.icon(
-                style: adminButtonStyle,
+                style: adminButtonStyle(context),
                 onPressed: _loading || _locked ? null : _verify,
                 icon: const Icon(Icons.check, size: 18),
                 label: Text(_loading ? 'VERIFICANDO...' : 'Verificar e entrar'),

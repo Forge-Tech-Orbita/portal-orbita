@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/account_avatar.dart';
 import '../../../core/widgets/orbita_bottom_nav.dart';
 import '../data/admin.dart';
@@ -205,17 +205,18 @@ class _AdminHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return ColoredBox(
-      color: OrbitaTheme.text,
+      color: colors.text,
       child: SafeArea(
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 10, 4, 10),
           child: Row(
             children: [
-              const Icon(Icons.shield_outlined, color: OrbitaTheme.amber),
+              Icon(Icons.shield_outlined, color: colors.warning),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -224,7 +225,7 @@ class _AdminHeader extends StatelessWidget {
                     Text(
                       'ÓRBITA ADMIN · PORTAL SEPARADO',
                       style: textTheme.labelSmall?.copyWith(
-                        color: OrbitaTheme.amber,
+                        color: colors.warning,
                         letterSpacing: 0.6,
                       ),
                     ),
@@ -233,7 +234,7 @@ class _AdminHeader extends StatelessWidget {
                       child: Text(
                         title,
                         style: textTheme.titleMedium?.copyWith(
-                          color: OrbitaTheme.surface,
+                          color: colors.surface,
                         ),
                       ),
                     ),
@@ -242,7 +243,7 @@ class _AdminHeader extends StatelessWidget {
               ),
               IconButton(
                 tooltip: 'Sair do portal administrativo',
-                color: OrbitaTheme.surface,
+                color: colors.surface,
                 onPressed: () => signOut(context, route: AppRoutes.adminLogin),
                 icon: const Icon(Icons.logout),
               ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/orbita_theme.dart';
+import '../../../../core/theme/orbita_colors.dart';
 
 class GpaRingProgress extends StatelessWidget {
   const GpaRingProgress({super.key, required this.value});
@@ -9,6 +9,7 @@ class GpaRingProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Semantics(
@@ -24,8 +25,8 @@ class GpaRingProgress extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: value / 10,
                   strokeWidth: 7,
-                  backgroundColor: OrbitaTheme.border,
-                  color: OrbitaTheme.primary,
+                  backgroundColor: colors.border,
+                  color: colors.primary,
                 ),
               ),
               Column(

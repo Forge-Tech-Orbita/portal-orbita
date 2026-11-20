@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 
 /// Marca orbital do Instituto Órbita com nome e lema.
 class OrbitLogo extends StatelessWidget {
@@ -13,15 +13,16 @@ class OrbitLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return Column(
       children: [
         Semantics(
           label: 'Símbolo orbital do Instituto Órbita',
           image: true,
-          child: const CustomPaint(
-            size: Size.square(64),
-            painter: _OrbitMarkPainter(),
+          child: CustomPaint(
+            size: const Size.square(64),
+            painter: _OrbitMarkPainter(colors),
           ),
         ),
         const SizedBox(height: 12),
@@ -33,7 +34,7 @@ class OrbitLogo extends StatelessWidget {
         Text(
           tagline,
           textAlign: TextAlign.center,
-          style: textTheme.labelMedium?.copyWith(color: OrbitaTheme.text),
+          style: textTheme.labelMedium?.copyWith(color: colors.text),
         ),
       ],
     );
@@ -41,23 +42,25 @@ class OrbitLogo extends StatelessWidget {
 }
 
 class _OrbitMarkPainter extends CustomPainter {
-  const _OrbitMarkPainter();
+  const _OrbitMarkPainter(this.colors);
+
+  final OrbitaColors colors;
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.translate(size.width / 2, size.height / 2);
-    final paint = Paint()..color = OrbitaTheme.surface;
+    final paint = Paint()..color = colors.surface;
     canvas.drawCircle(Offset.zero, 30, paint);
     paint
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.3
-      ..color = OrbitaTheme.border;
+      ..color = colors.border;
     canvas.drawCircle(Offset.zero, 30, paint);
 
     for (final (angle, color) in [
-      (0.0, OrbitaTheme.text),
-      (math.pi / 3, OrbitaTheme.terracotta),
-      (2 * math.pi / 3, OrbitaTheme.amber),
+      (0.0, colors.text),
+      (math.pi / 3, colors.secondary),
+      (2 * math.pi / 3, colors.warning),
     ]) {
       canvas.save();
       canvas.rotate(angle);
@@ -71,10 +74,11 @@ class _OrbitMarkPainter extends CustomPainter {
 
     paint
       ..style = PaintingStyle.fill
-      ..color = OrbitaTheme.text;
+      ..color = colors.text;
     canvas.drawCircle(Offset.zero, 5.5, paint);
   }
 
   @override
-  bool shouldRepaint(covariant _OrbitMarkPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _OrbitMarkPainter oldDelegate) =>
+      oldDelegate.colors != colors;
 }

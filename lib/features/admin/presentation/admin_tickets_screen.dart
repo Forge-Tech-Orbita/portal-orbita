@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../../core/widgets/status_tag.dart';
 import '../data/admin.dart';
@@ -148,6 +148,7 @@ class _TicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final next = ticket.status.next;
 
@@ -163,7 +164,7 @@ class _TicketCard extends StatelessWidget {
               child: Row(
                 children: [
                   if (!expanded) ...[
-                    const Icon(Icons.help_outline, color: OrbitaTheme.primary),
+                    Icon(Icons.help_outline, color: colors.primary),
                     const SizedBox(width: 12),
                   ],
                   Expanded(
@@ -230,7 +231,7 @@ class _TicketCard extends StatelessWidget {
                           Text(
                             value,
                             style: label == 'Prazo de resposta'
-                                ? const TextStyle(color: OrbitaTheme.alert)
+                                ? TextStyle(color: colors.alert)
                                 : null,
                           ),
                         ],
@@ -240,7 +241,7 @@ class _TicketCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: OrbitaTheme.background,
+                      color: colors.background,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(ticket.description, style: textTheme.bodySmall),
@@ -275,7 +276,7 @@ class _TicketCard extends StatelessWidget {
                       ),
                       if (next != null)
                         FilledButton.icon(
-                          style: adminButtonStyle,
+                          style: adminButtonStyle(context),
                           onPressed: onAdvance,
                           icon: const Icon(Icons.check, size: 18),
                           label: Text(
@@ -337,7 +338,7 @@ class _ReplyDialogState extends State<_ReplyDialog> {
           child: const Text('Cancelar'),
         ),
         FilledButton(
-          style: adminButtonStyle,
+          style: adminButtonStyle(context),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               Navigator.of(context).pop(true);

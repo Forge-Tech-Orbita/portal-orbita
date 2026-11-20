@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/orbita_colors.dart';
 import '../theme/orbita_theme.dart';
 
 /// Linha em card com ícone, título, subtítulo e conteúdo final opcional.
@@ -25,6 +26,7 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final subtitle = this.subtitle;
     final trailing = this.trailing;
@@ -38,7 +40,7 @@ class InfoCard extends StatelessWidget {
           child: Row(
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 22, color: iconColor),
+                Icon(icon, size: 22, color: colors.resolve(iconColor)),
                 const SizedBox(width: 12),
               ],
               Expanded(
@@ -60,7 +62,7 @@ class InfoCard extends StatelessWidget {
               ],
               if (showChevron) ...[
                 const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: OrbitaTheme.muted),
+                Icon(Icons.chevron_right, color: colors.muted),
               ],
             ],
           ),

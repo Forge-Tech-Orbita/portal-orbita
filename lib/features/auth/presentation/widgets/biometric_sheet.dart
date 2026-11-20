@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/orbita_theme.dart';
+import '../../../../core/theme/orbita_colors.dart';
 
 /// Confirmação biométrica simulada; retorna `true` quando aprovada.
 class BiometricSheet extends StatelessWidget {
@@ -10,6 +10,7 @@ class BiometricSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return SafeArea(
@@ -24,13 +25,9 @@ class BiometricSheet extends StatelessWidget {
                 height: 64,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: OrbitaTheme.primary.withValues(alpha: 0.14),
+                  color: colors.primary.withValues(alpha: 0.14),
                 ),
-                child: const Icon(
-                  Icons.fingerprint,
-                  size: 34,
-                  color: OrbitaTheme.primary,
-                ),
+                child: Icon(Icons.fingerprint, size: 34, color: colors.primary),
               ),
             ),
             const SizedBox(height: 12),

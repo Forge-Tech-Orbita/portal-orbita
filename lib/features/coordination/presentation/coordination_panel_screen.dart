@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/account_avatar.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/metric_tile.dart';
@@ -21,6 +21,7 @@ class CoordinationPanelScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return SingleChildScrollView(
@@ -49,7 +50,7 @@ class CoordinationPanelScreen extends StatelessWidget {
               ),
               IconButton(
                 tooltip: 'Encerrar sessão',
-                color: OrbitaTheme.terracotta,
+                color: colors.secondary,
                 onPressed: () => signOut(context),
                 icon: const Icon(Icons.logout),
               ),
@@ -87,7 +88,7 @@ class CoordinationPanelScreen extends StatelessWidget {
                 child: MetricTile(
                   value: '${coursePanel.studentsAtRisk}',
                   label: 'Alunos em risco',
-                  valueColor: OrbitaTheme.terracotta,
+                  valueColor: colors.secondary,
                 ),
               ),
             ],
@@ -114,7 +115,7 @@ class CoordinationPanelScreen extends StatelessWidget {
           const SizedBox(height: 8),
           InfoCard(
             icon: Icons.warning_amber_outlined,
-            iconColor: OrbitaTheme.alert,
+            iconColor: colors.alert,
             title:
                 '${coursePanel.lowAttendanceStudents} alunos com frequência abaixo de 75%',
             subtitle: 'Dados do sistema acadêmico',

@@ -6,10 +6,12 @@ Portal acadêmico desenvolvido em Flutter/Dart para reunir informações e servi
 
 Interface baseada no protótipo "Portal Órbita — Protótipo de interface", com quatro perfis.
 
-- **Aluno:** início com carteirinha, indicadores, próxima aula calculada pela grade e notificações; horário semanal; notas com AV1/AV2, TED e avaliação integrada; disciplinas; financeiro com pagamento simulado por Pix ou boleto; biblioteca com busca e acervo (reserva e fila); materiais das disciplinas; mural com confirmação de presença; suporte com novo chamado e confirmação; perfil com edição de dados e foto.
+- **Aluno:** início com carteirinha, indicadores, próxima aula calculada pela grade e notificações; horário semanal; notas com AV1/AV2, TED e avaliação integrada; disciplinas; financeiro com pagamento simulado por Pix ou boleto; biblioteca com busca e acervo (reserva e fila); materiais das disciplinas; mural com confirmação de presença; suporte com novo chamado e confirmação; perfil com edição de dados, foto e escolha do tema do aplicativo.
 - **Professor:** início, turmas, materiais (novo PDF ou link), frequência somente leitura e comunicados.
 - **Coordenação:** painel com indicadores agregados, turmas do curso, materiais e publicação de eventos e comunicados.
 - **Portal Administrativo (separado):** login próprio com verificação em duas etapas, painel, usuários, chamados, permissões com segunda aprovação e auditoria.
+
+Temas do aplicativo, escolhidos no Perfil: Vintage (padrão), Básico com cor de destaque selecionável, Forge Tech (escuro) e UniSapiens.
 
 ## Contas de demonstração
 
@@ -26,7 +28,7 @@ Outras matrículas mostram erro de credencial e, após 5 tentativas, bloqueio te
 
 ## Status do projeto
 
-A versão atual é demonstrativa e utiliza dados locais, sem persistência. A integração com o Firebase está em andamento: por enquanto ele é inicializado apenas na Web, ainda sem uso de autenticação ou Firestore pelas telas. Login, biometria e MFA são simulados; pagamentos, chamados, reservas, materiais, comunicados, dados pessoais, foto e preferências ainda não têm integração real nem persistência. Abrir PDF ou link de material e anexar arquivos informam que dependem da integração.
+A versão atual é demonstrativa e utiliza dados locais, sem persistência. A integração com o Firebase está em andamento: por enquanto ele é inicializado apenas na Web, ainda sem uso de autenticação ou Firestore pelas telas. Login, biometria e MFA são simulados; pagamentos, chamados, reservas, materiais, comunicados, dados pessoais, foto, tema escolhido e preferências ainda não têm integração real nem persistência. Abrir PDF ou link de material e anexar arquivos informam que dependem da integração.
 
 ## Pré-requisitos
 

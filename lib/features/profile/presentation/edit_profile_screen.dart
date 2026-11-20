@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/labeled_field.dart';
 
 typedef PersonalData = ({
@@ -101,6 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _saving = false;
 
   Future<void> _changePhoto() async {
+    final colors = OrbitaColors.of(context);
     final action = await showModalBottomSheet<_PhotoAction>(
       context: context,
       showDragHandle: true,
@@ -120,10 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             if (_photo != null)
               ListTile(
-                leading: const Icon(
-                  Icons.delete_outline,
-                  color: OrbitaTheme.alert,
-                ),
+                leading: Icon(Icons.delete_outline, color: colors.alert),
                 title: const Text('Remover foto'),
                 onTap: () => Navigator.of(context).pop(_PhotoAction.remove),
               ),
@@ -194,6 +192,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
     final photo = _photo;
 
@@ -222,20 +221,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       height: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: OrbitaTheme.primary.withValues(alpha: 0.08),
-                        border: Border.all(
-                          color: OrbitaTheme.primary,
-                          width: 1.5,
-                        ),
+                        color: colors.primary.withValues(alpha: 0.08),
+                        border: Border.all(color: colors.primary, width: 1.5),
                         image: photo == null
                             ? null
                             : DecorationImage(image: photo, fit: BoxFit.cover),
                       ),
                       child: photo == null
-                          ? const Icon(
+                          ? Icon(
                               Icons.person_outline,
                               size: 30,
-                              color: OrbitaTheme.primary,
+                              color: colors.primary,
                             )
                           : null,
                     ),

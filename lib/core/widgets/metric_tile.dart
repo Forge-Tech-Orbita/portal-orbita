@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/orbita_colors.dart';
 import '../theme/orbita_theme.dart';
 
 class MetricTile extends StatelessWidget {
@@ -16,6 +17,7 @@ class MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Card(
@@ -26,12 +28,14 @@ class MetricTile extends StatelessWidget {
             Text(
               value,
               textAlign: TextAlign.center,
-              style: textTheme.headlineSmall?.copyWith(color: valueColor),
+              style: textTheme.headlineSmall?.copyWith(
+                color: colors.resolve(valueColor),
+              ),
             ),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: textTheme.bodySmall?.copyWith(color: OrbitaTheme.text),
+              style: textTheme.bodySmall?.copyWith(color: colors.text),
             ),
           ],
         ),

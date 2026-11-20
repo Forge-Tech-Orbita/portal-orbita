@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/metric_tile.dart';
 import '../../../core/widgets/status_tag.dart';
@@ -29,6 +29,7 @@ class AdminPanelScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return SingleChildScrollView(
@@ -63,7 +64,7 @@ class AdminPanelScreen extends StatelessWidget {
                 child: MetricTile(
                   value: '${criticalAlerts.length}',
                   label: 'Alertas',
-                  valueColor: OrbitaTheme.terracotta,
+                  valueColor: colors.secondary,
                 ),
               ),
               Expanded(
@@ -85,8 +86,8 @@ class AdminPanelScreen extends StatelessWidget {
                     ? Icons.warning_amber_outlined
                     : Icons.shield_outlined,
                 iconColor: alert.result == AuditResult.blocked
-                    ? OrbitaTheme.alert
-                    : OrbitaTheme.amber,
+                    ? colors.alert
+                    : colors.warning,
                 title: '${alert.title} · ${alert.actor}',
                 subtitle: '${alert.result.label} · ${alert.time}',
                 trailing: StatusTag(

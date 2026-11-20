@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/decorative_barcode.dart';
 import '../../../core/widgets/info_banner.dart';
 import '../data/financial_mock.dart';
@@ -35,6 +35,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -118,7 +119,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         demoInvoice.barcode,
                         style: textTheme.bodySmall?.copyWith(
                           fontFamily: 'monospace',
-                          color: OrbitaTheme.text,
+                          color: colors.text,
                         ),
                       ),
                       const SizedBox(height: 12),

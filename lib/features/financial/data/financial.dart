@@ -5,12 +5,16 @@ class Invoice {
     required this.amount,
     required this.dueDate,
     required this.discount,
+    required this.total,
+    required this.daysLeft,
   });
 
   final String label;
   final String amount;
   final String dueDate;
   final String discount;
+  final String total;
+  final int daysLeft;
 }
 
 class Payment {

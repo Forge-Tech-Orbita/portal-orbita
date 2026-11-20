@@ -84,7 +84,7 @@ void main() {
       expect(find.textContaining('em migração'), findsNothing);
 
       for (final (label, screenType, expectedText) in [
-        ('Financeiro', FinancialScreen, 'MENSALIDADE · SETEMBRO'),
+        ('Financeiro', FinancialScreen, 'MENSALIDADE · NOVEMBRO'),
         ('Biblioteca', LibraryScreen, 'Estruturas de Dados e Algoritmos'),
         ('Mural de avisos', NoticesScreen, 'Matrícula do próximo período'),
         ('Suporte', SupportScreen, 'FALE COM A SECRETARIA'),
@@ -182,7 +182,7 @@ void main() {
         await tester.pumpAndSettle();
 
         for (final (label, lastTargetText) in [
-          ('Financeiro', 'Maio/2026'),
+          ('Financeiro', 'Agosto/2026'),
           ('Biblioteca', '18 dias'),
           ('Mural de avisos', '16/11/2026'),
           ('Suporte', 'Acesse Notas → detalhes da disciplina.'),

@@ -5,6 +5,7 @@ import 'core/models/app_notification.dart';
 import 'core/theme/orbita_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/financial/presentation/financial_screen.dart';
+import 'features/financial/presentation/payment_screen.dart';
 import 'features/library/presentation/library_screen.dart';
 import 'features/materials/presentation/materials_screen.dart';
 import 'features/navigation/presentation/main_navigation_screen.dart';
@@ -28,6 +29,11 @@ class MainApp extends StatelessWidget {
           AppRoutes.login => const LoginScreen(),
           AppRoutes.main => const MainNavigationScreen(),
           AppRoutes.financial => const FinancialScreen(),
+          AppRoutes.payment => PaymentScreen(
+            initialMethod: arguments is PaymentMethod
+                ? arguments
+                : PaymentMethod.pix,
+          ),
           AppRoutes.library => const LibraryScreen(),
           AppRoutes.materials => const MaterialsScreen(),
           AppRoutes.notices => const NoticesScreen(),

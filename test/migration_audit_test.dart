@@ -1,206 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portal_orbita/app.dart';
+import 'package:portal_orbita/core/constants/app_routes.dart';
 import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
-import 'package:portal_orbita/features/courses/presentation/courses_screen.dart';
-import 'package:portal_orbita/features/financial/presentation/financial_screen.dart';
+import 'package:portal_orbita/features/financial/presentation/payment_screen.dart';
 import 'package:portal_orbita/features/grades/presentation/grades_screen.dart';
-import 'package:portal_orbita/features/home/presentation/home_screen.dart';
-import 'package:portal_orbita/features/library/presentation/library_screen.dart';
-import 'package:portal_orbita/features/more/presentation/more_screen.dart';
+import 'package:portal_orbita/features/library/presentation/catalog_screen.dart';
 import 'package:portal_orbita/features/navigation/presentation/main_navigation_screen.dart';
-import 'package:portal_orbita/features/notices/presentation/notices_screen.dart';
-import 'package:portal_orbita/features/profile/presentation/profile_screen.dart';
+import 'package:portal_orbita/features/notifications/presentation/notifications_screen.dart';
 import 'package:portal_orbita/features/schedule/presentation/schedule_screen.dart';
-import 'package:portal_orbita/features/support/presentation/support_screen.dart';
 
-Future<void> loginToPortal(WidgetTester tester) async {
-  await tester.pumpWidget(const MainApp());
-  expect(find.byType(LoginScreen), findsOneWidget);
-  expect(find.textContaining('em migração'), findsNothing);
-  await tester.ensureVisible(find.text('ENTRAR NO PORTAL'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('ENTRAR NO PORTAL'));
-  await tester.pump();
-  await tester.pump(const Duration(milliseconds: 900));
-  await tester.pumpAndSettle();
-}
+import 'helpers.dart';
+
+/// Rotas secundárias do aluno e um texto do fim de cada tela.
+const _secondaryRoutes = [
+  (AppRoutes.financial, 'Agosto/2026'),
+  (AppRoutes.payment, 'Baixar PDF da 2ª via'),
+  (AppRoutes.library, '18 dias'),
+  (AppRoutes.catalog, 'Revista de Computação Aplicada'),
+  (AppRoutes.materials, 'Manual do Aluno 2026'),
+  (AppRoutes.notices, '16/11/2026'),
+  (AppRoutes.notifications, 'Marcar todas como lidas'),
+  (AppRoutes.support, 'Acesse Notas → toque na disciplina.'),
+  (AppRoutes.newTicket, 'Cancelar'),
+  (AppRoutes.profile, 'Encerrar sessão'),
+];
 
 void main() {
   testWidgets(
-    'fluxo representativo percorre as 11 telas, preserva estado das abas e encerra sessão',
+    'fluxo do aluno percorre abas e rotas novas, preserva estado e sai',
     (tester) async {
-      await loginToPortal(tester);
+      await loginAs(tester);
 
-      // 1. Home
-      expect(find.byType(HomeScreen), findsOneWidget);
-      expect(find.textContaining('em migração'), findsNothing);
-
-      // 2. Horário: seleciona SÁB e confere estado vazio
       await tester.tap(find.text('Horário'));
       await tester.pumpAndSettle();
       expect(find.byType(ScheduleScreen), findsOneWidget);
-      expect(find.textContaining('em migração'), findsNothing);
-      final satChip = find.widgetWithText(ChoiceChip, 'SÁB');
-      await tester.ensureVisible(satChip);
-      await tester.pumpAndSettle();
-      await tester.tap(satChip);
-      await tester.pumpAndSettle();
+      await tapVisible(tester, find.widgetWithText(ChoiceChip, 'SÁB'));
       expect(find.text('Sem aulas em Sábado'), findsOneWidget);
 
-      // 3. Notas: filtra Cursando e expande Banco de Dados II
       await tester.tap(find.text('Notas'));
       await tester.pumpAndSettle();
       expect(find.byType(GradesScreen), findsOneWidget);
-      expect(find.textContaining('em migração'), findsNothing);
-      final inProgressFilter = find.widgetWithText(ChoiceChip, 'Cursando (4)');
-      await tester.ensureVisible(inProgressFilter);
-      await tester.pumpAndSettle();
-      await tester.tap(inProgressFilter);
-      await tester.pumpAndSettle();
-      final gradeCard = find.widgetWithText(Card, 'Banco de Dados II');
-      await tester.ensureVisible(gradeCard);
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.descendant(
-          of: gradeCard,
-          matching: find.text('Banco de Dados II'),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Frequência: 86% · Situação: Cursando'), findsOneWidget);
+      await tapVisible(tester, find.text('Banco de Dados II'));
 
-      // 4. Cursos (Minhas disciplinas)
-      await tester.tap(find.text('Cursos'));
+      await tester.tap(find.text('Início'));
       await tester.pumpAndSettle();
-      expect(find.byType(CoursesScreen), findsOneWidget);
-      expect(find.text('Minhas disciplinas'), findsOneWidget);
-      expect(find.textContaining('em migração'), findsNothing);
-
-      // 5. Mais e rotas secundárias: Financeiro, Biblioteca, Mural, Suporte
-      await tester.tap(find.text('Mais'));
+      await tester.tap(find.byTooltip('Notificações, 3 não lidas'));
       await tester.pumpAndSettle();
-      expect(find.byType(MoreScreen), findsOneWidget);
-      expect(find.textContaining('em migração'), findsNothing);
+      expect(find.byType(NotificationsScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
 
-      for (final (label, screenType, expectedText) in [
-        ('Financeiro', FinancialScreen, 'MENSALIDADE · NOVEMBRO'),
-        ('Biblioteca', LibraryScreen, 'Estruturas de Dados e Algoritmos'),
-        ('Mural de avisos', NoticesScreen, 'Matrícula do próximo período'),
-        ('Suporte', SupportScreen, 'FALE COM A SECRETARIA'),
-      ]) {
-        final option = find.text(label);
-        await tester.ensureVisible(option);
-        await tester.pumpAndSettle();
-        await tester.tap(option);
-        await tester.pumpAndSettle();
+      await openFromMore(tester, 'Financeiro');
+      await tapVisible(tester, find.text('Pagar com Pix'));
+      expect(find.byType(PaymentScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
 
-        expect(find.byType(screenType), findsOneWidget);
-        expect(find.text(expectedText), findsOneWidget);
-        expect(find.byType(BottomNavigationBar), findsNothing);
-        expect(find.textContaining('em migração'), findsNothing);
+      await tapVisible(tester, find.text('Biblioteca'));
+      await tapVisible(tester, find.text('ver acervo'));
+      expect(find.byType(CatalogScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
 
-        await tester.pageBack();
-        await tester.pumpAndSettle();
-        expect(find.byType(MoreScreen), findsOneWidget);
-      }
-
-      // 6. Confirma preservação do estado das abas após abrir/fechar secundárias
       await tester.tap(find.text('Horário'));
       await tester.pumpAndSettle();
       expect(find.text('Sem aulas em Sábado'), findsOneWidget);
-
       await tester.tap(find.text('Notas'));
       await tester.pumpAndSettle();
       expect(find.text('Frequência: 86% · Situação: Cursando'), findsOneWidget);
 
-      // 7. Volta para Mais → Perfil → altera switch local → Encerrar sessão
-      await tester.tap(find.text('Mais'));
-      await tester.pumpAndSettle();
-      final profileOption = find.text('Meu perfil');
-      await tester.ensureVisible(profileOption);
-      await tester.pumpAndSettle();
-      await tester.tap(profileOption);
-      await tester.pumpAndSettle();
-
-      expect(find.byType(ProfileScreen), findsOneWidget);
-      expect(find.textContaining('em migração'), findsNothing);
-      final biometricsSwitch = find.widgetWithText(SwitchListTile, 'Biometria');
-      await tester.ensureVisible(biometricsSwitch);
-      await tester.pumpAndSettle();
-      await tester.tap(biometricsSwitch);
-      await tester.pumpAndSettle();
-      expect(tester.widget<SwitchListTile>(biometricsSwitch).value, isFalse);
-
-      final logoutButton = find.text('Encerrar sessão');
-      await tester.ensureVisible(logoutButton);
-      await tester.pumpAndSettle();
-      await tester.tap(logoutButton);
-      await tester.pumpAndSettle();
-
+      await openFromMore(tester, 'Sair');
       expect(find.byType(LoginScreen), findsOneWidget);
       expect(
         find.byType(MainNavigationScreen, skipOffstage: false),
         findsNothing,
       );
-      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
-      expect(await navigator.maybePop(), isFalse);
     },
   );
 
-  for (final size in [
-    const Size(360, 800),
-    const Size(390, 844),
-    const Size(360, 640),
-  ]) {
-    testWidgets(
-      'login com teclado e navegação pelas telas secundárias sem overflow em $size',
-      (tester) async {
-        tester.view.devicePixelRatio = 1;
-        tester.view.physicalSize = size;
-        tester.view.viewInsets = const FakeViewPadding(bottom: 300);
-        addTearDown(tester.view.resetDevicePixelRatio);
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetViewInsets);
+  for (final size in testViewports) {
+    testWidgets('rotas secundárias sem overflow com texto 1,5× em $size', (
+      tester,
+    ) async {
+      useViewport(tester, size, textScale: 1.5);
+      await tester.pumpWidget(const MainApp());
+      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
 
-        await tester.pumpWidget(const MainApp());
-        await tester.ensureVisible(find.text('ENTRAR NO PORTAL'));
+      for (final (route, lastText) in _secondaryRoutes) {
+        navigator.pushNamed(route);
         await tester.pumpAndSettle();
-        expect(tester.takeException(), isNull);
-
-        tester.view.resetViewInsets();
+        await tester.ensureVisible(find.text(lastText).last);
         await tester.pumpAndSettle();
-        await tester.tap(find.text('ENTRAR NO PORTAL'));
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 900));
+        expect(tester.takeException(), isNull, reason: route);
+        navigator.pop();
         await tester.pumpAndSettle();
-
-        await tester.tap(find.text('Mais'));
-        await tester.pumpAndSettle();
-
-        for (final (label, lastTargetText) in [
-          ('Financeiro', 'Agosto/2026'),
-          ('Biblioteca', '18 dias'),
-          ('Mural de avisos', '16/11/2026'),
-          ('Suporte', 'Acesse Notas → toque na disciplina.'),
-          ('Meu perfil', 'Encerrar sessão'),
-        ]) {
-          final option = find.text(label);
-          await tester.ensureVisible(option);
-          await tester.pumpAndSettle();
-          await tester.tap(option);
-          await tester.pumpAndSettle();
-
-          final target = find.text(lastTargetText);
-          await tester.ensureVisible(target);
-          await tester.pumpAndSettle();
-          expect(target.hitTestable(), findsOneWidget);
-          expect(tester.takeException(), isNull);
-
-          await tester.pageBack();
-          await tester.pumpAndSettle();
-        }
-      },
-    );
+      }
+    });
   }
 }

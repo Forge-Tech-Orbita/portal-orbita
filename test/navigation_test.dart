@@ -79,8 +79,8 @@ void main() {
   for (final (label, screenType, route) in [
     ('Financeiro', FinancialScreen, AppRoutes.financial),
     ('Biblioteca', LibraryScreen, AppRoutes.library),
-    ('Mural', NoticesScreen, AppRoutes.notices),
-    ('Perfil', ProfileScreen, AppRoutes.profile),
+    ('Mural de avisos', NoticesScreen, AppRoutes.notices),
+    ('Meu perfil', ProfileScreen, AppRoutes.profile),
     ('Suporte', SupportScreen, AppRoutes.support),
   ]) {
     testWidgets('$label abre sem barra inferior e retorna à aba Mais', (

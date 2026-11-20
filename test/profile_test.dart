@@ -25,7 +25,7 @@ Future<void> openProfile(WidgetTester tester) async {
   await tester.pumpAndSettle();
   await tester.tap(find.text('Mais'));
   await tester.pumpAndSettle();
-  final profileOption = find.widgetWithText(OutlinedButton, 'Perfil');
+  final profileOption = find.text('Meu perfil');
   await tester.ensureVisible(profileOption);
   await tester.pumpAndSettle();
   await tester.tap(profileOption);
@@ -272,7 +272,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(MoreScreen), findsOneWidget);
 
-      final profileOption = find.widgetWithText(OutlinedButton, 'Perfil');
+      final profileOption = find.text('Meu perfil');
       await tester.ensureVisible(profileOption);
       await tester.pumpAndSettle();
       await tester.tap(profileOption);

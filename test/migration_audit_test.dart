@@ -86,10 +86,10 @@ void main() {
       for (final (label, screenType, expectedText) in [
         ('Financeiro', FinancialScreen, 'MENSALIDADE · SETEMBRO'),
         ('Biblioteca', LibraryScreen, 'Estruturas de Dados e Algoritmos'),
-        ('Mural', NoticesScreen, 'Matrícula do próximo período'),
+        ('Mural de avisos', NoticesScreen, 'Matrícula do próximo período'),
         ('Suporte', SupportScreen, 'FALE COM A SECRETARIA'),
       ]) {
-        final option = find.widgetWithText(OutlinedButton, label);
+        final option = find.text(label);
         await tester.ensureVisible(option);
         await tester.pumpAndSettle();
         await tester.tap(option);
@@ -117,7 +117,7 @@ void main() {
       // 7. Volta para Mais → Perfil → altera switch local → Encerrar sessão
       await tester.tap(find.text('Mais'));
       await tester.pumpAndSettle();
-      final profileOption = find.widgetWithText(OutlinedButton, 'Perfil');
+      final profileOption = find.text('Meu perfil');
       await tester.ensureVisible(profileOption);
       await tester.pumpAndSettle();
       await tester.tap(profileOption);
@@ -184,11 +184,11 @@ void main() {
         for (final (label, lastTargetText) in [
           ('Financeiro', 'Maio/2026'),
           ('Biblioteca', '18 dias'),
-          ('Mural', '16/11/2026'),
+          ('Mural de avisos', '16/11/2026'),
           ('Suporte', 'Acesse Notas → detalhes da disciplina.'),
-          ('Perfil', 'Encerrar sessão'),
+          ('Meu perfil', 'Encerrar sessão'),
         ]) {
-          final option = find.widgetWithText(OutlinedButton, label);
+          final option = find.text(label);
           await tester.ensureVisible(option);
           await tester.pumpAndSettle();
           await tester.tap(option);

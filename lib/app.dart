@@ -6,6 +6,7 @@ import 'core/theme/orbita_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/financial/presentation/financial_screen.dart';
 import 'features/library/presentation/library_screen.dart';
+import 'features/materials/presentation/materials_screen.dart';
 import 'features/navigation/presentation/main_navigation_screen.dart';
 import 'features/notices/presentation/notices_screen.dart';
 import 'features/notifications/presentation/notifications_screen.dart';
@@ -28,6 +29,7 @@ class MainApp extends StatelessWidget {
           AppRoutes.main => const MainNavigationScreen(),
           AppRoutes.financial => const FinancialScreen(),
           AppRoutes.library => const LibraryScreen(),
+          AppRoutes.materials => const MaterialsScreen(),
           AppRoutes.notices => const NoticesScreen(),
           AppRoutes.notifications => NotificationsScreen(
             notifications: arguments is ValueNotifier<List<AppNotification>>

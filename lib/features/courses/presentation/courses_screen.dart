@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/orbita_theme.dart';
+import '../../../core/widgets/page_heading.dart';
+import '../../../core/widgets/status_tag.dart';
 import '../data/courses_mock.dart';
 
 class CoursesScreen extends StatelessWidget {
@@ -15,67 +18,71 @@ class CoursesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('SEMESTRE 2026.2', style: textTheme.labelMedium),
-          Text('Minhas disciplinas', style: textTheme.headlineSmall),
-          const SizedBox(height: 16),
+          PageHeading(
+            overline: 'Semestre 2026.2 · atual',
+            title: 'Minhas disciplinas',
+            trailing: TextButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.materials),
+              child: const Text('ver materiais'),
+            ),
+          ),
+          const SizedBox(height: 12),
           for (final course in demoCourses)
-            Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              color: OrbitaTheme.surface,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(course.subject, style: textTheme.titleSmall),
-                              Text(course.professor),
-                            ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  course.subject,
+                                  style: textTheme.bodyLarge,
+                                ),
+                                Text(course.professor),
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
+                          StatusTag(
+                            label: '${course.credits} créditos',
+                            tone: TagTone.neutral,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: course.progress / 100,
+                          color: OrbitaTheme.terracotta,
+                          semanticsLabel:
+                              'Progresso do semestre em ${course.subject}',
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 4,
+                        children: [
+                          Text(
+                            '${course.progress}% do semestre',
+                            style: textTheme.bodySmall,
                           ),
-                          decoration: BoxDecoration(
-                            color: OrbitaTheme.primary.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${course.credits} créditos',
-                            style: textTheme.labelSmall,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    LinearProgressIndicator(
-                      value: course.progress / 100,
-                      color: OrbitaTheme.terracotta,
-                      semanticsLabel:
-                          'Progresso do semestre em ${course.subject}',
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 4,
-                      children: [
-                        Text(
-                          '${course.progress}% do semestre',
-                          style: textTheme.bodySmall,
-                        ),
-                        Text(course.room, style: textTheme.bodySmall),
-                      ],
-                    ),
-                  ],
+                          Text(course.room, style: textTheme.bodySmall),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

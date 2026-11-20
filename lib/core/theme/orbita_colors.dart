@@ -107,6 +107,26 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     alert: Color(0xFFC62828),
   );
 
+  /// Tema básico: fundo neutro e a cor de destaque escolhida pelo usuário.
+  factory OrbitaColors.basic(BasicThemeColor color) {
+    const text = Color(0xFF1F2328);
+
+    return OrbitaColors(
+      brightness: Brightness.light,
+      background: const Color(0xFFF5F6F8),
+      surface: const Color(0xFFFFFFFF),
+      border: const Color(0xFFDADDE2),
+      text: text,
+      primary: color.color,
+      onPrimary: const Color(0xFFFFFFFF),
+      // Variação mais escura da cor escolhida, para não repetir o destaque.
+      secondary: Color.lerp(color.color, text, 0.35)!,
+      success: const Color(0xFF2E7D32),
+      warning: const Color(0xFFB26A00),
+      alert: const Color(0xFFC62828),
+    );
+  }
+
   @override
   OrbitaColors copyWith({
     Brightness? brightness,
@@ -154,4 +174,19 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
       alert: Color.lerp(alert, other.alert, t)!,
     );
   }
+}
+
+/// Cores de destaque disponíveis no tema básico.
+enum BasicThemeColor {
+  blue('Azul', Color(0xFF1565C0)),
+  green('Verde', Color(0xFF2E7D32)),
+  red('Vermelho', Color(0xFFC62828)),
+  purple('Roxo', Color(0xFF6A1B9A)),
+  orange('Laranja', Color(0xFFC24E00)),
+  gray('Cinza', Color(0xFF546E7A));
+
+  const BasicThemeColor(this.label, this.color);
+
+  final String label;
+  final Color color;
 }

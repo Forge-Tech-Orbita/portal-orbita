@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'orbita_colors.dart';
+
 abstract final class OrbitaTheme {
+  // Cores do tema vintage, o padrão do aplicativo.
   static const background = Color(0xFFF6F1E3);
   static const surface = Color(0xFFFBF8EF);
   static const border = Color(0xFFDECBA0);
@@ -11,20 +14,33 @@ abstract final class OrbitaTheme {
   static const amber = Color(0xFFC98A2E);
   static const alert = Color(0xFFAF3B2E);
 
-  static final data = ThemeData(
-    scaffoldBackgroundColor: background,
-    colorScheme: ColorScheme.fromSeed(seedColor: primary).copyWith(
-      primary: primary,
-      onPrimary: surface,
-      secondary: terracotta,
-      onSecondary: surface,
-      tertiary: green,
-      onTertiary: surface,
-      error: alert,
-      onError: surface,
-      surface: surface,
-      onSurface: text,
-      outline: border,
-    ),
-  );
+  /// Tema vintage, usado quando nenhum outro foi escolhido.
+  static final data = build(OrbitaColors.vintage);
+
+  /// Monta o [ThemeData] completo a partir de uma paleta.
+  static ThemeData build(OrbitaColors colors) {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: colors.primary,
+      brightness: colors.brightness,
+    );
+
+    return ThemeData(
+      brightness: colors.brightness,
+      scaffoldBackgroundColor: colors.background,
+      colorScheme: scheme.copyWith(
+        primary: colors.primary,
+        onPrimary: colors.onPrimary,
+        secondary: colors.secondary,
+        onSecondary: colors.onPrimary,
+        tertiary: colors.success,
+        onTertiary: colors.onPrimary,
+        error: colors.alert,
+        onError: colors.onPrimary,
+        surface: colors.surface,
+        onSurface: colors.text,
+        outline: colors.border,
+      ),
+      extensions: [colors],
+    );
+  }
 }

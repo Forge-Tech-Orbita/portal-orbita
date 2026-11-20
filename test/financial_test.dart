@@ -4,6 +4,8 @@ import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/widgets/decorative_barcode.dart';
 import 'package:portal_orbita/features/financial/data/financial_mock.dart';
 import 'package:portal_orbita/features/financial/presentation/financial_screen.dart';
+import 'package:portal_orbita/features/financial/presentation/widgets/decorative_qr_code.dart';
+import 'package:portal_orbita/features/financial/presentation/widgets/invoice_payment_sheet.dart';
 
 Future<void> openFinancial(WidgetTester tester) async {
   await tester.pumpWidget(const MainApp());
@@ -75,32 +77,85 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Gerar 2ª via informa ausência de integração sem alterar pagamentos',
-    (tester) async {
-      await openFinancial(tester);
-      final button = find.widgetWithText(FilledButton, 'Gerar 2ª via');
-      await tester.ensureVisible(button);
-      await tester.pumpAndSettle();
-      await tester.tap(button);
-      await tester.pumpAndSettle();
+  testWidgets('Gerar 2ª via abre modal com opções de boleto e Pix QR Code', (
+    tester,
+  ) async {
+    await openFinancial(tester);
+    final button = find.widgetWithText(FilledButton, 'Gerar 2ª via');
+    await tester.ensureVisible(button);
+    await tester.pumpAndSettle();
+    await tester.tap(button);
+    await tester.pumpAndSettle();
 
-      expect(
-        find.text('Recurso demonstrativo, sem integração'),
-        findsOneWidget,
-      );
-      expect(find.byType(FinancialScreen), findsOneWidget);
-      expect(find.text('Fatura em aberto'), findsOneWidget);
-      expect(find.text(r'R$ 1.240,00'), findsOneWidget);
-      expect(find.text(r'Pago · R$ 1.178,00'), findsNWidgets(4));
-    },
-  );
+    expect(find.byType(InvoicePaymentSheet), findsOneWidget);
+    expect(find.text('2ª via da fatura'), findsOneWidget);
+    expect(find.text('MENSALIDADE · SETEMBRO'), findsWidgets);
+    expect(find.text('10/09/2026'), findsWidgets);
+    expect(find.text(r'R$ 1.178,00'), findsOneWidget);
+
+    // Aba Boleto ativa por padrão
+    expect(find.text('Boleto'), findsOneWidget);
+    expect(find.text('Pix QR Code'), findsOneWidget);
+    expect(find.text(demoInvoice.barcode), findsOneWidget);
+
+    final copyBarcodeButton = find.widgetWithText(
+      FilledButton,
+      'Copiar código de barras',
+    );
+    expect(copyBarcodeButton, findsOneWidget);
+    await tester.ensureVisible(copyBarcodeButton);
+    await tester.pumpAndSettle();
+    await tester.tap(copyBarcodeButton);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Código de barras copiado!'), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    // Alterna para aba Pix
+    final pixTab = find.text('Pix QR Code');
+    await tester.ensureVisible(pixTab);
+    await tester.pumpAndSettle();
+    await tester.tap(pixTab);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DecorativeQrCode), findsOneWidget);
+    expect(
+      find.text('QR Code decorativo · sem valor bancário'),
+      findsOneWidget,
+    );
+    expect(find.text('Pix Copia e Cola'), findsOneWidget);
+    expect(find.text(demoInvoice.pixCode), findsOneWidget);
+
+    final copyPixButton = find.widgetWithText(
+      FilledButton,
+      'Copiar código Pix',
+    );
+    expect(copyPixButton, findsOneWidget);
+    await tester.ensureVisible(copyPixButton);
+    await tester.pumpAndSettle();
+    await tester.tap(copyPixButton);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Código Pix copiado!'), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    // Fecha o modal
+    final closeButton = find.byTooltip('Fechar');
+    expect(closeButton, findsOneWidget);
+    await tester.ensureVisible(closeButton);
+    await tester.pumpAndSettle();
+    await tester.tap(closeButton);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(InvoicePaymentSheet), findsNothing);
+    expect(find.byType(FinancialScreen), findsOneWidget);
+  });
 
   testWidgets('barras financeiras são decorativas e repetíveis', (
     tester,
   ) async {
     await openFinancial(tester);
-    final barcode = find.byType(DecorativeBarcode);
+    final barcode = find.byType(DecorativeBarcode).first;
     expect(tester.widget<DecorativeBarcode>(barcode).count, 46);
     final bars = find.descendant(
       of: barcode,
@@ -143,6 +198,37 @@ void main() {
       expect(lastPayment.hitTestable(), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('modal de pagamento alcançável sem overflow em $size', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      await openFinancial(tester);
+      await tester.ensureVisible(find.text('Gerar 2ª via'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Gerar 2ª via'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InvoicePaymentSheet), findsOneWidget);
+      final copyBarcode = find.text('Copiar código de barras');
+      await tester.ensureVisible(copyBarcode);
+      await tester.pumpAndSettle();
+      expect(copyBarcode.hitTestable(), findsOneWidget);
+
+      final pixOption = find.text('Pix QR Code');
+      await tester.ensureVisible(pixOption);
+      await tester.pumpAndSettle();
+      await tester.tap(pixOption);
+      await tester.pumpAndSettle();
+      final copyPix = find.text('Copiar código Pix');
+      await tester.ensureVisible(copyPix);
+      await tester.pumpAndSettle();
+      expect(copyPix.hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   }
 
   testWidgets(
@@ -166,6 +252,40 @@ void main() {
         await tester.pumpAndSettle();
         expect(target.hitTestable(), findsOneWidget);
       }
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'texto ampliado mantém modal de pagamento acessível por rolagem',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(360, 640);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await openFinancial(tester);
+      await tester.ensureVisible(find.text('Gerar 2ª via'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Gerar 2ª via'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InvoicePaymentSheet), findsOneWidget);
+      final copyBarcode = find.text('Copiar código de barras');
+      await tester.ensureVisible(copyBarcode);
+      await tester.pumpAndSettle();
+      expect(copyBarcode.hitTestable(), findsOneWidget);
+
+      final pixOption = find.text('Pix QR Code');
+      await tester.ensureVisible(pixOption);
+      await tester.pumpAndSettle();
+      await tester.tap(pixOption);
+      await tester.pumpAndSettle();
+      final copyPix = find.text('Copiar código Pix');
+      await tester.ensureVisible(copyPix);
+      await tester.pumpAndSettle();
+      expect(copyPix.hitTestable(), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

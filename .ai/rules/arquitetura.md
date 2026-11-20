@@ -23,15 +23,15 @@ paths: ["lib/**", "pubspec.yaml", "pubspec.lock", "android/**", "ios/**", "web/*
 ## Navegação e estado
 
 - Registre rotas em `AppRoutes` e associe-as em `lib/app.dart`. Preserve `MaterialPageRoute<void>`, `RouteSettings` e fallback `Rota não encontrada`.
-- Início, Horário, Notas, Cursos e Mais pertencem ao `IndexedStack` de `MainNavigationScreen`. Troque o índice com `setState`, preservando estado e rolagem, sem empilhar rotas.
+- Cada perfil tem uma casca com `IndexedStack`: aluno em `MainNavigationScreen` (Início, Horário, Notas, Cursos e Mais), professor em `ProfessorShell`, coordenação em `CoordinationShell` e portal administrativo em `AdminShell`. Troque o índice com `setState`, preservando estado e rolagem, sem empilhar rotas.
 - Telas secundárias usam `Navigator.pushNamed`, `Scaffold`/`AppBar` próprios e não exibem barra inferior.
-- Login/logout limpam a pilha com `pushNamedAndRemoveUntil(..., (_) => false)`. Confira `test/navigation_test.dart` e `test/profile_test.dart` ao alterar esse contrato.
+- Login/logout limpam a pilha com `pushNamedAndRemoveUntil(..., (_) => false)`. O perfil é escolhido pela matrícula em `core/mock/demo_accounts.dart`; o portal administrativo tem rotas próprias (`/admin`, `/admin/mfa`, `/admin/panel`) e não aceita contas acadêmicas. Confira `test/navigation_test.dart`, `test/profile_test.dart` e `test/admin_test.dart` ao alterar esse contrato.
 - Estado mutável é local em `StatefulWidget`/`setState`. Não introduza estado global, guards ou deep links fora do escopo aprovado.
 
 ## Dados e limites demonstrativos
 
 - O app usa fixtures locais, sem autenticação real ou persistência. O Firebase é inicializado só na Web (`kIsWeb`); `firebase_auth` e `cloud_firestore` estão declarados no manifest, mas nenhuma tela os usa. Android/iOS não têm configuração Firebase. A integração está em andamento na frente da issue 6 (`chore/6-configurar-firebase`); não altere a configuração Firebase nem esses pacotes fora dela sem alinhar com o responsável. Não crie integrações por antecipação; uso desses serviços, novos pacotes, SDK/lockfile e novas camadas exigem aprovação.
-- Preserve login/biometria simulados de 900 ms, métricas fixas, busca passiva, barras decorativas e feedback via `SnackBar`. Switches de Perfil não persistem nem alteram o tema.
+- Preserve login/biometria simulados de 900 ms, métricas fixas, barras decorativas e feedback via `SnackBar`. A busca da Biblioteca filtra empréstimos e acervo localmente. Switches de Perfil não persistem nem alteram o tema.
 - Valores financeiros são strings para exibição, não cálculo ou cobrança real.
 - `Grade.average` só calcula com AV2 informada; status acadêmico vem da fixture, não da média. `ScheduleDay.forDate` mapeia domingo para sábado. Não altere essas decisões silenciosamente.
 

@@ -1,4 +1,4 @@
-package com.example.portal_orbita
+package com.forgetech.plataformaorbita
 
 import io.flutter.embedding.android.FlutterActivity
 

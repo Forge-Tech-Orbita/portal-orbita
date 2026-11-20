@@ -7,14 +7,19 @@ import '../data/grades_summary.dart';
 import 'widgets/gpa_ring_progress.dart';
 
 enum _GradeFilter {
-  all('Todas', null),
-  inProgress('Cursando', GradeStatus.inProgress),
-  completed('Concluídas', GradeStatus.completed);
+  all('Todas'),
+  inProgress('Cursando'),
+  completed('Concluídas');
 
-  const _GradeFilter(this.label, this.status);
+  const _GradeFilter(this.label);
 
   final String label;
-  final GradeStatus? status;
+
+  bool includes(GradeStatus status) => switch (this) {
+    all => true,
+    inProgress => status == GradeStatus.inProgress,
+    completed => status.isCompleted,
+  };
 }
 
 class GradesScreen extends StatefulWidget {
@@ -34,7 +39,7 @@ class _GradesScreenState extends State<GradesScreen> {
     final textTheme = Theme.of(context).textTheme;
     final (:average, :approved, :inProgress) = summarizeGrades(widget.grades);
     final grades = widget.grades.where(
-      (grade) => _filter.status == null || grade.status == _filter.status,
+      (grade) => _filter.includes(grade.status),
     );
 
     return SingleChildScrollView(
@@ -108,7 +113,7 @@ class _GradeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final average = grade.average;
-    final color = grade.status == GradeStatus.completed
+    final color = grade.status == GradeStatus.approved
         ? OrbitaTheme.green
         : OrbitaTheme.terracotta;
 

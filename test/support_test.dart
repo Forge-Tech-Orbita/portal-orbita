@@ -4,7 +4,6 @@ import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/features/home/presentation/home_screen.dart';
 import 'package:portal_orbita/features/support/data/support_ticket.dart';
 import 'package:portal_orbita/features/support/data/support_tickets_mock.dart';
-import 'package:portal_orbita/features/support/presentation/support_screen.dart';
 import 'package:portal_orbita/features/support/presentation/widgets/new_ticket_sheet.dart';
 
 const expectedSupportFaqs = [

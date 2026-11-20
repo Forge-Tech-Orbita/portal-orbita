@@ -7,6 +7,8 @@ import 'package:portal_orbita/core/widgets/labeled_field.dart';
 import 'package:portal_orbita/core/widgets/material_tile.dart';
 import 'package:portal_orbita/core/widgets/metric_tile.dart';
 import 'package:portal_orbita/core/widgets/orbit_logo.dart';
+import 'package:portal_orbita/core/widgets/orbita_bottom_nav.dart';
+import 'package:portal_orbita/core/theme/orbita_theme.dart';
 import 'package:portal_orbita/core/widgets/page_heading.dart';
 import 'package:portal_orbita/core/widgets/status_tag.dart';
 
@@ -112,5 +114,38 @@ void main() {
       ),
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('barra inferior aceita itens de outro perfil e tema escuro', (
+    tester,
+  ) async {
+    int? tapped;
+    await pumpScreen(
+      tester,
+      Scaffold(
+        bottomNavigationBar: OrbitaBottomNav(
+          currentIndex: 0,
+          dark: true,
+          onTap: (index) => tapped = index,
+          items: const [
+            (icon: Icons.home_outlined, label: 'Painel'),
+            (icon: Icons.shield_outlined, label: 'Permissões'),
+          ],
+        ),
+      ),
+    );
+    await tester.tap(find.text('Permissões'));
+    expect(tapped, 1);
+    final bar = tester.widget<BottomNavigationBar>(
+      find.byType(BottomNavigationBar),
+    );
+    expect(bar.backgroundColor, OrbitaTheme.text);
+    expect(studentNavItems.map((item) => item.label), [
+      'Início',
+      'Horário',
+      'Notas',
+      'Cursos',
+      'Mais',
+    ]);
   });
 }

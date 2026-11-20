@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/decorative_barcode.dart';
 import '../data/financial_mock.dart';
 import 'widgets/invoice_payment_sheet.dart';
@@ -20,6 +20,7 @@ class FinancialScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Financeiro')),
@@ -37,15 +38,12 @@ class FinancialScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: OrbitaTheme.amber.withValues(alpha: 0.14),
+                  color: colors.warning.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.warning_amber_outlined,
-                      color: OrbitaTheme.amber,
-                    ),
+                    Icon(Icons.warning_amber_outlined, color: colors.warning),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -62,7 +60,7 @@ class FinancialScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Card(
                 margin: EdgeInsets.zero,
-                color: OrbitaTheme.surface,
+                color: colors.surface,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -106,7 +104,7 @@ class FinancialScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Card(
                 margin: EdgeInsets.zero,
-                color: OrbitaTheme.surface,
+                color: colors.surface,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(

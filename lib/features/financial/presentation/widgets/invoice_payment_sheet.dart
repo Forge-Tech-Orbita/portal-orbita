@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/orbita_theme.dart';
+import '../../../../core/theme/orbita_colors.dart';
 import '../../../../core/widgets/decorative_barcode.dart';
 import '../../data/financial.dart';
 import 'decorative_qr_code.dart';
@@ -39,6 +39,7 @@ class _InvoicePaymentSheetState extends State<InvoicePaymentSheet> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
     final invoice = widget.invoice;
 
     return SafeArea(
@@ -78,9 +79,9 @@ class _InvoicePaymentSheetState extends State<InvoicePaymentSheet> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: OrbitaTheme.surface,
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: OrbitaTheme.border),
+                  border: Border.all(color: colors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -106,7 +107,7 @@ class _InvoicePaymentSheetState extends State<InvoicePaymentSheet> {
                         Text(
                           invoice.netAmount,
                           style: textTheme.titleSmall?.copyWith(
-                            color: OrbitaTheme.green,
+                            color: colors.success,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -140,9 +141,9 @@ class _InvoicePaymentSheetState extends State<InvoicePaymentSheet> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: OrbitaTheme.surface,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: OrbitaTheme.border),
+                    border: Border.all(color: colors.border),
                   ),
                   child: SelectableText(
                     invoice.barcode,
@@ -192,9 +193,9 @@ class _InvoicePaymentSheetState extends State<InvoicePaymentSheet> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: OrbitaTheme.surface,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: OrbitaTheme.border),
+                    border: Border.all(color: colors.border),
                   ),
                   child: Text(
                     invoice.pixCode,

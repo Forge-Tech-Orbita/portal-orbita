@@ -22,10 +22,9 @@ enum OrbitaThemeOption {
 /// vintage. Persistir exigiria um pacote de armazenamento local aprovado.
 class OrbitaThemeController extends ChangeNotifier {
   OrbitaThemeController({
-    OrbitaThemeOption option = OrbitaThemeOption.vintage,
-    BasicThemeColor basicColor = BasicThemeColor.blue,
-  }) : _option = option,
-       _basicColor = basicColor;
+    this._option = OrbitaThemeOption.vintage,
+    this._basicColor = BasicThemeColor.blue,
+  });
 
   OrbitaThemeOption _option;
   BasicThemeColor _basicColor;
@@ -75,8 +74,8 @@ class OrbitaThemeScope extends InheritedNotifier<OrbitaThemeController> {
   /// Controlador do tema, ou `null` quando a tela é montada fora do app
   /// (por exemplo, em testes isolados).
   static OrbitaThemeController? maybeOf(BuildContext context) {
-    final scope =
-        context.dependOnInheritedWidgetOfExactType<OrbitaThemeScope>();
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<OrbitaThemeScope>();
     return scope?.notifier;
   }
 }

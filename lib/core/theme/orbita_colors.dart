@@ -92,6 +92,21 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     alert: Color(0xFFFF7A6E),
   );
 
+  /// Tema claro com as cores da UniSapiens: roxo, laranja e branco.
+  static const uniSapiens = OrbitaColors(
+    brightness: Brightness.light,
+    background: Color(0xFFFAF7FC),
+    surface: Color(0xFFFFFFFF),
+    border: Color(0xFFE3D6EE),
+    text: Color(0xFF2A1840),
+    primary: Color(0xFF5B2A86),
+    onPrimary: Color(0xFFFFFFFF),
+    secondary: Color(0xFFC2540A),
+    success: Color(0xFF2E7D32),
+    warning: Color(0xFFB26A00),
+    alert: Color(0xFFC62828),
+  );
+
   @override
   OrbitaColors copyWith({
     Brightness? brightness,

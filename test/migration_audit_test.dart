@@ -187,7 +187,7 @@ void main() {
         for (final (label, lastTargetText) in [
           ('Financeiro', 'Maio/2026'),
           ('Biblioteca', '18 dias'),
-          ('Mural', '4 dias atrás'),
+          ('Mural', '16/11/2026'),
           ('Suporte', 'Acesse Notas → detalhes da disciplina.'),
           ('Perfil', 'Encerrar sessão'),
         ]) {

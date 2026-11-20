@@ -48,13 +48,8 @@ Future<void> pumpProfile(WidgetTester tester, PickProfilePhoto pickPhoto) {
   );
 }
 
-CircleAvatar profileAvatar(WidgetTester tester) {
-  return tester.widget<CircleAvatar>(
-    find.descendant(
-      of: find.byType(StudentIdCard),
-      matching: find.byType(CircleAvatar),
-    ),
-  );
+ImageProvider? profilePhoto(WidgetTester tester) {
+  return tester.widget<StudentIdCard>(find.byType(StudentIdCard)).photo;
 }
 
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
@@ -124,21 +119,33 @@ void main() {
       sources.add(source);
       return XFile.fromData(transparentPixel, mimeType: 'image/png');
     });
-    expect(profileAvatar(tester).backgroundImage, isNull);
-    expect(find.text(demoStudent.initials), findsOneWidget);
+    expect(profilePhoto(tester), isNull);
+    expect(
+      find.descendant(
+        of: find.byType(StudentIdCard),
+        matching: find.byIcon(Icons.person_outline),
+      ),
+      findsOneWidget,
+    );
 
     await tapVisible(tester, find.text('Adicionar foto'));
     expect(find.text('Remover foto'), findsNothing);
     await tapVisible(tester, find.text('Escolher da galeria'));
 
     expect(sources, [ImageSource.gallery]);
-    expect(profileAvatar(tester).backgroundImage, isA<MemoryImage>());
-    expect(find.text(demoStudent.initials), findsNothing);
+    expect(profilePhoto(tester), isA<MemoryImage>());
+    expect(
+      find.descendant(
+        of: find.byType(StudentIdCard),
+        matching: find.byIcon(Icons.person_outline),
+      ),
+      findsNothing,
+    );
     expect(find.text('Foto de perfil atualizada.'), findsOneWidget);
 
     await tapVisible(tester, find.text('Alterar foto'));
     await tapVisible(tester, find.text('Remover foto'));
-    expect(profileAvatar(tester).backgroundImage, isNull);
+    expect(profilePhoto(tester), isNull);
     expect(find.text('Adicionar foto'), findsOneWidget);
     expect(find.text('Foto de perfil removida.'), findsOneWidget);
   });
@@ -158,12 +165,12 @@ void main() {
       find.text('Não foi possível carregar a foto. Verifique as permissões.'),
       findsOneWidget,
     );
-    expect(profileAvatar(tester).backgroundImage, isNull);
+    expect(profilePhoto(tester), isNull);
 
     fail = false;
     await tapVisible(tester, find.text('Adicionar foto'));
     await tapVisible(tester, find.text('Escolher da galeria'));
-    expect(profileAvatar(tester).backgroundImage, isNull);
+    expect(profilePhoto(tester), isNull);
     expect(tester.takeException(), isNull);
   });
 

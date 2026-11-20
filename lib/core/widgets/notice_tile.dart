@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/notice.dart';
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 
 class NoticeTile extends StatelessWidget {
   const NoticeTile({super.key, required this.notice, this.compact = false});
@@ -12,10 +12,11 @@ class NoticeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
     final color = switch (notice.category) {
-      NoticeCategory.academic => OrbitaTheme.primary,
-      NoticeCategory.events => OrbitaTheme.terracotta,
-      NoticeCategory.financial => OrbitaTheme.amber,
+      NoticeCategory.academic => colors.primary,
+      NoticeCategory.events => colors.secondary,
+      NoticeCategory.financial => colors.warning,
     };
     final tag = Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -25,7 +26,7 @@ class NoticeTile extends StatelessWidget {
       ),
       child: Text(
         notice.category.label,
-        style: textTheme.labelSmall?.copyWith(color: OrbitaTheme.text),
+        style: textTheme.labelSmall?.copyWith(color: colors.text),
       ),
     );
 

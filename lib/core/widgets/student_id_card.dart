@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/student.dart';
-import '../theme/orbita_theme.dart';
+import '../theme/orbita_colors.dart';
 import 'decorative_barcode.dart';
 
 class StudentIdCard extends StatelessWidget {
@@ -19,14 +19,15 @@ class StudentIdCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return Card(
       margin: EdgeInsets.zero,
-      color: OrbitaTheme.surface,
+      color: colors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: OrbitaTheme.border, width: 1.5),
+        side: BorderSide(color: colors.border, width: 1.5),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -38,13 +39,11 @@ class StudentIdCard extends StatelessWidget {
                 Expanded(
                   child: Text('INSTITUTO ÓRBITA', style: textTheme.titleSmall),
                 ),
-                const Icon(Icons.memory_outlined, color: OrbitaTheme.primary),
+                Icon(Icons.memory_outlined, color: colors.primary),
                 const SizedBox(width: 8),
                 Text(
                   'ATIVO',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: OrbitaTheme.alert,
-                  ),
+                  style: textTheme.labelSmall?.copyWith(color: colors.alert),
                 ),
               ],
             ),
@@ -53,8 +52,8 @@ class StudentIdCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 26,
-                  backgroundColor: OrbitaTheme.text,
-                  foregroundColor: OrbitaTheme.surface,
+                  backgroundColor: colors.text,
+                  foregroundColor: colors.surface,
                   backgroundImage: photo,
                   child: photo == null ? Text(student.initials) : null,
                 ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/orbita_theme.dart';
+import '../../../../core/theme/orbita_colors.dart';
 
 class AcademicStatTile extends StatelessWidget {
   const AcademicStatTile({super.key, required this.value, required this.label});
@@ -11,10 +11,11 @@ class AcademicStatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return Card(
       margin: EdgeInsets.zero,
-      color: OrbitaTheme.surface,
+      color: colors.surface,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -22,9 +23,7 @@ class AcademicStatTile extends StatelessWidget {
             Text(
               value,
               textAlign: TextAlign.center,
-              style: textTheme.headlineSmall?.copyWith(
-                color: OrbitaTheme.primary,
-              ),
+              style: textTheme.headlineSmall?.copyWith(color: colors.primary),
             ),
             Text(
               label,

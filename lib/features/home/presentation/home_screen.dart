@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/notices_mock.dart';
 import '../../../core/mock/student_mock.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/notice_tile.dart';
 import '../../../core/widgets/student_id_card.dart';
 import 'widgets/academic_stat_tile.dart';
@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -104,7 +105,7 @@ class HomeScreen extends StatelessWidget {
           ),
           Card(
             margin: EdgeInsets.zero,
-            color: OrbitaTheme.surface,
+            color: colors.surface,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(

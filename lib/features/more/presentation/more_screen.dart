@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -9,6 +9,7 @@ class MoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -70,7 +71,7 @@ class MoreScreen extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         alignment: Alignment.centerLeft,
                         padding: const EdgeInsets.all(16),
-                        backgroundColor: OrbitaTheme.surface,
+                        backgroundColor: colors.surface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -81,8 +82,8 @@ class MoreScreen extends StatelessWidget {
                           Icon(
                             icon,
                             color: route == AppRoutes.login
-                                ? OrbitaTheme.alert
-                                : OrbitaTheme.primary,
+                                ? colors.alert
+                                : colors.primary,
                           ),
                           const SizedBox(height: 12),
                           Text(label, style: textTheme.titleSmall),

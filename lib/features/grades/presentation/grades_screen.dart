@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/grade.dart';
 import '../data/grades_mock.dart';
 import '../data/grades_summary.dart';
@@ -112,14 +112,17 @@ class _GradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OrbitaColors.of(context);
     final average = grade.average;
-    final color = grade.status == GradeStatus.approved
-        ? OrbitaTheme.green
-        : OrbitaTheme.terracotta;
+    final color = switch (grade.status) {
+      GradeStatus.approved => colors.success,
+      GradeStatus.failed => colors.alert,
+      GradeStatus.inProgress || GradeStatus.completed => colors.secondary,
+    };
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      color: OrbitaTheme.surface,
+      color: colors.surface,
       child: ExpansionTile(
         title: Text(grade.subject),
         subtitle: Column(

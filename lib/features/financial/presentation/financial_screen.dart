@@ -56,7 +56,7 @@ class FinancialScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       _AmountRow(
                         label: 'Total até o vencimento',
-                        value: demoInvoice.total,
+                        value: demoInvoice.netAmount,
                         bold: true,
                       ),
                       const SizedBox(height: 14),

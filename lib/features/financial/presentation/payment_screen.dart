@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/orbita_theme.dart';
+import '../../../core/widgets/decorative_barcode.dart';
 import '../../../core/widgets/info_banner.dart';
 import '../data/financial_mock.dart';
+import 'widgets/decorative_qr_code.dart';
 
 enum PaymentMethod { pix, boleto }
 
@@ -75,23 +77,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             label: 'QR Code Pix fictício',
                             container: true,
                             image: true,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: OrbitaTheme.border),
-                              ),
-                              child: const CustomPaint(
-                                size: Size.square(132),
-                                painter: _FakeQrPainter(),
-                              ),
-                            ),
+                            child: const DecorativeQrCode(size: 152),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          demoInvoice.total,
+                          demoInvoice.netAmount,
                           textAlign: TextAlign.center,
                           style: textTheme.headlineSmall,
                         ),
@@ -102,10 +93,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                         const SizedBox(height: 12),
                         FilledButton.icon(
-                          onPressed: () => _copy(
-                            demoPixCode,
-                            'Código Pix copiado (simulação).',
-                          ),
+                          onPressed: () =>
+                              _copy(demoInvoice.pixCode, 'Código Pix copiado!'),
                           icon: const Icon(Icons.copy_outlined),
                           label: const Text('Copiar código Pix'),
                         ),
@@ -126,7 +115,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                       const SizedBox(height: 6),
                       SelectableText(
-                        demoBoletoLine,
+                        demoInvoice.barcode,
                         style: textTheme.bodySmall?.copyWith(
                           fontFamily: 'monospace',
                           color: OrbitaTheme.text,
@@ -136,13 +125,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       if (_method == PaymentMethod.boleto) ...[
                         FilledButton.icon(
                           onPressed: () => _copy(
-                            demoBoletoLine,
-                            'Linha digitável copiada (simulação).',
+                            demoInvoice.barcode,
+                            'Código de barras copiado!',
                           ),
                           icon: const Icon(Icons.copy_outlined),
-                          label: const Text('Copiar linha digitável'),
+                          label: const Text('Copiar código de barras'),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
+                        const Center(child: DecorativeBarcode(count: 46)),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Código decorativo · sem valor bancário',
+                          style: textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
                       ],
                       OutlinedButton.icon(
                         onPressed: () => _showMessage(
@@ -161,50 +158,4 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
     );
   }
-}
-
-/// Padrão determinístico com aparência de QR, sem dados codificados.
-class _FakeQrPainter extends CustomPainter {
-  const _FakeQrPainter();
-
-  static const _cells = 21;
-
-  bool _isFinder(int row, int col) {
-    bool inSquare(int r, int c) => r >= 0 && r < 7 && c >= 0 && c < 7;
-    for (final (r0, c0) in const [(0, 0), (0, 14), (14, 0)]) {
-      final r = row - r0;
-      final c = col - c0;
-      if (inSquare(r, c)) {
-        final ring = r == 0 || r == 6 || c == 0 || c == 6;
-        final core = r >= 2 && r <= 4 && c >= 2 && c <= 4;
-        return ring || core;
-      }
-    }
-    return false;
-  }
-
-  bool _inFinderArea(int row, int col) =>
-      (row < 8 && col < 8) || (row < 8 && col > 12) || (row > 12 && col < 8);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cell = size.width / _cells;
-    final paint = Paint()..color = OrbitaTheme.text;
-    for (var row = 0; row < _cells; row++) {
-      for (var col = 0; col < _cells; col++) {
-        final filled = _inFinderArea(row, col)
-            ? _isFinder(row, col)
-            : (row * 7 + col * 13 + row * col) % 3 == 0;
-        if (filled) {
-          canvas.drawRect(
-            Rect.fromLTWH(col * cell, row * cell, cell, cell),
-            paint,
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _FakeQrPainter oldDelegate) => false;
 }

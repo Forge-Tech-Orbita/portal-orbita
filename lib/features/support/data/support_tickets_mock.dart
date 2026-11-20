@@ -1,30 +1,36 @@
 import 'support_ticket.dart';
 
 const supportTicketCategories = [
+  'Documentos e declarações',
   'Matrícula',
-  'Documentos',
-  'Atualização cadastral',
   'Financeiro',
+  'Acesso e login',
   'Outros',
 ];
 
+/// Próximo número sequencial dos protocolos simulados (#2026-NNNN).
+const firstNewTicketNumber = 418;
+
+String ticketProtocol(int number) =>
+    '#2026-${number.toString().padLeft(4, '0')}';
+
 const demoSupportTickets = [
   SupportTicket(
-    protocol: 'ORB-1002',
-    category: 'Documentos',
-    subject: 'Declaração de matrícula para estágio',
-    description: 'Preciso da declaração assinada para entregar na empresa.',
-    requester: 'Lucas Andrade Pires',
-    openedAt: '17/11/2026 14:32',
+    protocol: '#2026-0412',
+    category: 'Documentos e declarações',
+    subject: 'Histórico escolar',
+    description: 'Preciso do histórico escolar atualizado para o estágio.',
+    requester: 'Marina Duarte Costa',
+    openedAt: '12/11',
     status: SupportTicketStatus.inProgress,
   ),
-  SupportTicket(
-    protocol: 'ORB-1001',
-    category: 'Matrícula',
-    subject: 'Trancamento de disciplina optativa',
-    description: 'Gostaria de trancar a disciplina de Computação Gráfica.',
-    requester: 'Beatriz Nogueira Lima',
-    openedAt: '12/11/2026 09:05',
-    status: SupportTicketStatus.resolved,
+];
+
+const supportFaqs = [
+  ('Como emito a 2ª via do boleto?', 'Acesse Financeiro → Boleto (2ª via).'),
+  (
+    'Como solicito o histórico escolar?',
+    'Abra um chamado na Central de Suporte.',
   ),
+  ('Onde vejo minha frequência?', 'Acesse Notas → toque na disciplina.'),
 ];

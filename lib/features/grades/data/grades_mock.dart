@@ -1,25 +1,29 @@
 import 'grade.dart';
 
+/// CRA e aprovações históricas importados do sistema acadêmico.
+const historicalGpa = 8.7;
+const historicalApproved = 18;
+
 const demoGrades = [
   Grade(
     subject: 'Arquitetura de Software',
     code: 'ESW-304',
-    firstStage: GradeStage.first(exam: 6, ted: 2.5),
+    firstStage: GradeStage.first(exam: 6, ted: 2.6),
     secondStage: GradeStage.second(
       exam: 5.5,
       ted: 2.5,
       integratedAssessment: 1,
     ),
-    frequency: 96,
-    status: GradeStatus.completed,
+    frequency: 94,
+    status: GradeStatus.inProgress,
   ),
   Grade(
     subject: 'Inteligência Artificial',
     code: 'ESW-412',
     firstStage: GradeStage.first(exam: 5, ted: 2),
     secondStage: GradeStage.second(exam: 5, ted: 2, integratedAssessment: 1),
-    frequency: 91,
-    status: GradeStatus.completed,
+    frequency: 92,
+    status: GradeStatus.inProgress,
   ),
   Grade(
     subject: 'Banco de Dados II',
@@ -30,23 +34,15 @@ const demoGrades = [
       ted: 2,
       integratedAssessment: 0.5,
     ),
-    frequency: 88,
-    status: GradeStatus.completed,
+    frequency: 86,
+    status: GradeStatus.inProgress,
   ),
   Grade(
     subject: 'Engenharia de Requisitos',
     code: 'ESW-355',
-    firstStage: GradeStage.first(exam: 6.5, ted: 2.5),
+    firstStage: GradeStage.first(exam: 6.5, ted: 2.6),
     secondStage: GradeStage.second(exam: 6, ted: 2.5, integratedAssessment: 1),
-    frequency: 98,
-    status: GradeStatus.completed,
-  ),
-  Grade(
-    subject: 'Cálculo Numérico',
-    code: 'MAT-210',
-    firstStage: GradeStage.first(exam: 4, ted: 1.5),
-    secondStage: GradeStage.second(),
-    frequency: 82,
+    frequency: 92,
     status: GradeStatus.inProgress,
   ),
 ];

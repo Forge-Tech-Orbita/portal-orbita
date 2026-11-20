@@ -15,7 +15,10 @@ class Notice {
     required this.category,
     required this.body,
     required this.dateText,
+    this.shortTitle,
     this.summary,
+    this.eventDetails,
+    this.author,
   });
 
   final String id;
@@ -23,5 +26,14 @@ class Notice {
   final NoticeCategory category;
   final String body;
   final String dateText;
+
+  /// Título curto usado no mural recente do Início.
+  final String? shortTitle;
   final String? summary;
+
+  /// Data, horário e local quando o aviso é um evento com presença.
+  final String? eventDetails;
+  final String? author;
+
+  bool get isEvent => eventDetails != null;
 }

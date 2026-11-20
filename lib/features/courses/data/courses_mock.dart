@@ -29,11 +29,4 @@ const demoCourses = [
     progress: 82,
     room: 'Sala 212',
   ),
-  Course(
-    subject: 'Cálculo Numérico',
-    professor: 'Prof. E. Villas',
-    credits: 3,
-    progress: 55,
-    room: 'Sala 108',
-  ),
 ];

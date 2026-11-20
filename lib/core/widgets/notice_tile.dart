@@ -1,57 +1,73 @@
 import 'package:flutter/material.dart';
 
 import '../models/notice.dart';
-import '../theme/orbita_theme.dart';
+import 'status_tag.dart';
+
+TagTone noticeTone(NoticeCategory category) => switch (category) {
+  NoticeCategory.academic => TagTone.info,
+  NoticeCategory.events => TagTone.danger,
+  NoticeCategory.financial => TagTone.warning,
+};
 
 class NoticeTile extends StatelessWidget {
   const NoticeTile({super.key, required this.notice, this.compact = false});
 
   final Notice notice;
+
+  /// Versão em card com título curto e resumo, usada no Início.
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final color = switch (notice.category) {
-      NoticeCategory.academic => OrbitaTheme.primary,
-      NoticeCategory.events => OrbitaTheme.terracotta,
-      NoticeCategory.financial => OrbitaTheme.amber,
-    };
-    final tag = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        notice.category.label,
-        style: textTheme.labelSmall?.copyWith(color: OrbitaTheme.text),
-      ),
+    final tag = StatusTag(
+      label: notice.category.label,
+      tone: noticeTone(notice.category),
     );
+
+    if (compact) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notice.shortTitle ?? notice.title,
+                      style: textTheme.bodyLarge,
+                    ),
+                    Text(
+                      notice.summary ?? notice.body,
+                      style: textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              tag,
+            ],
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: compact
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                tag,
-                const SizedBox(width: 10),
-                Expanded(child: Text(notice.summary ?? notice.body)),
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(notice.title, style: textTheme.titleSmall),
-                const SizedBox(height: 4),
-                tag,
-                const SizedBox(height: 8),
-                Text(notice.body),
-                const SizedBox(height: 4),
-                Text(notice.dateText, style: textTheme.bodySmall),
-              ],
-            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(notice.title, style: textTheme.titleSmall),
+          const SizedBox(height: 4),
+          tag,
+          const SizedBox(height: 6),
+          Text(notice.body),
+          const SizedBox(height: 4),
+          Text(notice.dateText, style: textTheme.bodySmall),
+        ],
+      ),
     );
   }
 }

@@ -1,36 +1,43 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/widgets/page_heading.dart';
 import '../data/schedule.dart';
 import '../data/schedule_mock.dart';
 
 class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key});
+  const ScheduleScreen({super.key, this.now});
+
+  /// Data de referência, substituível em testes.
+  final DateTime? now;
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  ScheduleDay _currentDay = ScheduleDay.forDate(DateTime.now());
+  late final DateTime _today = widget.now ?? DateTime.now();
+  late ScheduleDay _currentDay = ScheduleDay.forDate(_today);
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final lessons = demoSchedule[_currentDay]!;
+    final todayLabel =
+        '${ScheduleDay.forDate(_today).lowercase}, '
+        '${_today.day.toString().padLeft(2, '0')}/'
+        '${_today.month.toString().padLeft(2, '0')}';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('HORÁRIO SEMANAL', style: textTheme.labelMedium),
-          Text('Suas aulas', style: textTheme.headlineSmall),
-          const SizedBox(height: 16),
+          const PageHeading(overline: 'Horário semanal', title: 'Suas aulas'),
+          const SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              spacing: 8,
+              spacing: 6,
               children: [
                 for (final day in ScheduleDay.values)
                   ChoiceChip(
@@ -42,7 +49,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 6),
+          Text(
+            'Abre no dia de hoje ($todayLabel). '
+            'Grade da turma $scheduleGroup, $scheduleTerm.',
+            style: textTheme.bodySmall,
+          ),
+          const SizedBox(height: 12),
           if (lessons.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 48),
@@ -58,33 +71,40 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               ),
             ),
           for (final lesson in lessons)
-            Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              color: OrbitaTheme.surface,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 12,
-                  children: [
-                    Column(
-                      children: [
-                        Text(lesson.time, style: textTheme.labelLarge),
-                        const SizedBox(height: 8),
-                        Icon(Icons.circle, size: 10, color: lesson.color),
-                      ],
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 14,
+                    children: [
+                      Column(
                         children: [
-                          Text(lesson.subject, style: textTheme.titleSmall),
-                          Text(lesson.room),
-                          Text(lesson.professor),
+                          Text(lesson.time, style: textTheme.labelLarge),
+                          const SizedBox(height: 6),
+                          ExcludeSemantics(
+                            child: Icon(
+                              Icons.circle,
+                              size: 8,
+                              color: lesson.color,
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(lesson.subject, style: textTheme.bodyLarge),
+                            Text(lesson.room),
+                            Text(lesson.professor),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

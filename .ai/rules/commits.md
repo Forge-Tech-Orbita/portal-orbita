@@ -19,6 +19,14 @@ Use Conventional Commits com resumo em português e verbo no **infinitivo**:
 
 Exemplos: `fix(grades): corrigir overflow do indicador de CRA` e `docs(agents): refinar regras de consulta dos agentes`.
 
+## Conteúdo de commits e PRs
+
+- Descreva a entrega: objetivo, mudanças efetivas e validações relevantes, sem transcrever a conversa ou decisões operacionais do agente.
+- Não publique detalhes de arquivos temporários que nunca foram versionados, credenciais, contas de teste, sessões de ferramentas ou justificativas sobre identificadores públicos que não ajudem a revisar a entrega.
+- Não narre conflitos e etapas locais de integração; registre apenas adaptações que afetem o resultado final ou a compatibilidade. Consolide as validações, sem separar antes/depois da integração salvo diferença relevante; não apresente uma validação antiga como executada no estado final.
+- Registre avisos não bloqueantes preexistentes e pendências operacionais em `.plan/local/<integrante>/<nome>/index.md`, ignorado pelo Git, para acompanhamento posterior. Não os inclua no PR por padrão.
+- Informe no PR falhas de gates, validações necessárias não realizadas, regressões introduzidas, riscos de segurança/dados, incompatibilidades e mudanças de contrato ou padrão que afetem revisão, uso ou entrega. A concisão não autoriza ocultar riscos relevantes nem afirmar validação inexistente.
+
 ## Aprovação obrigatória
 
 1. Revise `git diff`, `git diff --cached` e os arquivos não rastreados; confira alterações preexistentes.

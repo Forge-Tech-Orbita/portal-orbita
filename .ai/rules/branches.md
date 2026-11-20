@@ -14,22 +14,23 @@ paths: ["**"]
 
 ## Nomenclatura
 
-Use `<tipo>/<numero-issue>-<descricao-em-kebab-case>`, em português, minúsculo, sem acentos e com verbo no infinitivo. Peça a issue quando faltar.
+Use `<tipo>/<descricao-em-kebab-case>`, em português, minúsculo, sem acentos e com verbo no infinitivo. Novas branches não usam números.
 
 - Tipos: `feature`, `chore`, `fix`, `refactor` ou `docs`, conforme o escopo.
-- Exemplo de formato: `fix/7-corrigir-overflow-do-perfil`; o número não indica uma issue confirmada.
+- Exemplo de formato: `fix/corrigir-overflow-do-perfil`.
+- As tarefas são organizadas no Kanban da equipe; não invente números nem exija uma issue do GitHub para criar a branch. Referencie a tarefa no PR quando houver um identificador ou link disponível.
 - Preserve a branch já indicada pelo usuário; não renomeie branches existentes para adequá-las à convenção.
 
 ## Fluxo seguro
 
 1. Execute `git status --short --branch`. Preserve alterações existentes; se impedirem troca/atualização, combine a preservação antes de prosseguir. Não faça stash, reset ou checkout destrutivo automaticamente.
-2. Confirme remote, issue e base. Não presuma `main` nem use referências locais antigas como prova da base atual.
+2. Confirme remote, escopo da tarefa e base. Não presuma `main` nem use referências locais antigas como prova da base atual.
 3. Se já estiver na branch correta indicada pelo usuário, continue nela. Caso a criação esteja autorizada, execute separadamente:
 
 ```text
 git switch development
 git pull --ff-only origin development
-git switch -c <tipo>/<issue>-<descricao>
+git switch -c <tipo>/<descricao>
 ```
 
 4. Pare se o fast-forward falhar; não contorne divergências com rebase, merge, force push ou reset sem autorização. Não atualize branches durante uma tarefa somente de leitura.

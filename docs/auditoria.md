@@ -33,10 +33,10 @@ Verificar se o código integrado ao `development` compila, passa nos testes auto
 
 | Perfil | Conta | O que foi verificado | Resultado | Diferença do protótipo |
 | --- | --- | --- | --- | --- |
-| Aluno | `2023104567` | _[preencher]_ | | |
-| Professor | `P2019042` | _[preencher]_ | | |
-| Coordenação | `C2015007` | _[preencher]_ | | |
-| Administrador | rota `/admin` | _[preencher]_ | | |
+| Aluno | `2023104567` | Telas: Início, Horário (abre na sexta, 20/11), Notas, Cursos, Mais, Financeiro, Biblioteca, Materiais, Mural, Suporte e Meu perfil. Ações: pagamento por Pix (QR e "Copiar código Pix") e por boleto ("Copiar código de barras" exibe "Código de barras copiado!"); filtro "Exatas" na Biblioteca ("Nenhum empréstimo para esta busca."); "Abrir PDF" avisa que o arquivo é demonstrativo; confirmação de presença no evento do Mural ("Presença confirmada"); troca entre os 4 temas no Perfil (Vintage, Básico, Forge Tech escuro e UniSapiens), aplicada ao app inteiro | Funcionou sem travamentos nem faixas de overflow. Pendente: teste com janela estreita (tamanho de celular) | Achados A4, A5, A6 e A7 |
+| Professor | `P2019042` | Abas Início (próxima aula, alertas), Frequência (turmas ESW-412-N/430-N/412-M, filtro "Em risco (3)"), Materiais (filtros por turma e "Novo material") e Avisos (formulário de comunicado e enviados) | Funcionou sem travamentos nem faixas de overflow. Turmas não foi aberta na gravação | — |
+| Coordenação | `C2015007` | Login com "AUTENTICANDO..."; abas Turmas (filtros Todas/6º período/Em risco, médias e frequências), Publicar (Evento/Comunicado, "Publicados") e Novo material (PDF ou link, público "Curso inteiro") | Funcionou. O botão voltar mostra a dica "Back" | Achado A7 |
+| Administrador | rota `/#/admin` | _[pendente]_ | | |
 
 ## 5. Achados
 
@@ -56,6 +56,33 @@ Verificar se o código integrado ao `development` compila, passa nos testes auto
 
 - **Evidência:** `flutter analyze` com Flutter 3.50.1 aponta 87 ocorrências, todas `info` (contagem com `grep -cE`: 0 error, 0 warning, 87 info). As exibidas são `info • 'package:flutter/material.dart' is deprecated [...] Use package:material_ui/material_ui.dart instead` (`deprecated_member_use`), na linha 1 de arquivos de `lib/` e `test/`.
 - **Impacto:** _[sua análise: é erro ou aviso? Impede o app de compilar hoje? E no futuro?]_
+- **Recomendação:** _[sua recomendação]_
+
+### A4 — Separador decimal inconsistente
+
+- **Evidência:** o CRA aparece como `8.7` (ponto) no Início e no anel da tela de Notas, enquanto as médias das disciplinas aparecem como `8,8`, `7,5`, `6,75`, `9,3` e a "Média do semestre: 8,09" (vírgula). A frequência no Início aparece como `91%`.
+- **Impacto:** _[sua análise]_
+- **Recomendação:** _[sua recomendação]_
+
+### A5 — Contagem de dias uma unidade acima da diferença de datas
+
+- **Evidência:** com a data do sistema em 20/11/2026, a Biblioteca mostra "devolver até 21/11 · 2 dias", "01/12 · 12 dias" e "07/12 · 18 dias", e o Financeiro mostra "Vence em 10/12/2026 · faltam 21 dias". Pela diferença de calendário seriam 1, 11, 17 e 20 dias.
+- **A confirmar:** se a regra é contar o dia de hoje (contagem inclusiva) ou se é erro de cálculo. Verificar no código (`daysLeft` e equivalentes) e no protótipo.
+- **Impacto:** _[sua análise]_
+- **Recomendação:** _[sua recomendação]_
+
+### A6 — Layout esticado em tela larga
+
+- **Evidência:** no Chrome com janela larga, os cards ocupam toda a largura (por exemplo, a "Próxima aula" com o horário no meio da tela e os botões do Financeiro com mais de 1.000 px cada). O protótipo foi desenhado para celular.
+- **A confirmar:** se a versão Web precisa de largura máxima. Testar também com a janela estreita (tamanho de celular).
+- **Impacto:** _[sua análise]_
+- **Recomendação:** _[sua recomendação]_
+
+### A7 — Dica do botão voltar em inglês
+
+- **Evidência:** ao passar o mouse no botão voltar (Central de suporte e Novo material da coordenação), aparece a dica "Back", em inglês, enquanto o restante do app está em português.
+- **A confirmar:** se o app configura a localização pt-BR do Flutter (`localizationsDelegates` e `supportedLocales` no `MaterialApp`).
+- **Impacto:** _[sua análise]_
 - **Recomendação:** _[sua recomendação]_
 
 ## 6. Conclusão do auditor

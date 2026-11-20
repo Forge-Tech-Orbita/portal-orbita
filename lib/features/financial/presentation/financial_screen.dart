@@ -3,9 +3,19 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/orbita_theme.dart';
 import '../../../core/widgets/decorative_barcode.dart';
 import '../data/financial_mock.dart';
+import 'widgets/invoice_payment_sheet.dart';
 
 class FinancialScreen extends StatelessWidget {
   const FinancialScreen({super.key});
+
+  void _openPaymentSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => const InvoicePaymentSheet(invoice: demoInvoice),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,14 +94,7 @@ class FinancialScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       FilledButton(
-                        onPressed: () => ScaffoldMessenger.of(context)
-                            .showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Recurso demonstrativo, sem integração',
-                                ),
-                              ),
-                            ),
+                        onPressed: () => _openPaymentSheet(context),
                         child: const Text('Gerar 2ª via'),
                       ),
                     ],

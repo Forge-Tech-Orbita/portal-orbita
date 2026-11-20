@@ -4,6 +4,7 @@ import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/constants/app_routes.dart';
 import 'package:portal_orbita/core/theme/orbita_theme.dart';
 import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
+import 'package:portal_orbita/features/coordination/presentation/coordination_shell.dart';
 import 'package:portal_orbita/features/courses/presentation/courses_screen.dart';
 import 'package:portal_orbita/features/grades/presentation/grades_screen.dart';
 import 'package:portal_orbita/features/home/presentation/home_screen.dart';
@@ -63,6 +64,7 @@ void main() {
   for (final (registration, shell, route) in [
     ('2023104567', MainNavigationScreen, AppRoutes.main),
     ('P2019042', ProfessorShell, AppRoutes.professor),
+    ('C2015007', CoordinationShell, AppRoutes.coordination),
   ]) {
     testWidgets('matrícula $registration abre a casca do perfil', (
       tester,

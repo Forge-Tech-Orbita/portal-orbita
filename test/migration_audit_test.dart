@@ -25,6 +25,7 @@ const _secondaryRoutes = [
   (AppRoutes.newTicket, 'Cancelar'),
   (AppRoutes.profile, 'Encerrar sessão'),
   (AppRoutes.professorNewMaterial, 'Publicar material'),
+  (AppRoutes.coordinationNewMaterial, 'Publicar material'),
 ];
 
 void main() {

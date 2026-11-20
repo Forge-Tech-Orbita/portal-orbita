@@ -4,6 +4,8 @@ import 'core/constants/app_routes.dart';
 import 'core/models/app_notification.dart';
 import 'core/theme/orbita_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
+import 'features/coordination/data/coordination_mock.dart';
+import 'features/coordination/presentation/coordination_shell.dart';
 import 'features/financial/presentation/financial_screen.dart';
 import 'features/financial/presentation/payment_screen.dart';
 import 'features/library/presentation/catalog_screen.dart';
@@ -70,6 +72,12 @@ class MainApp extends StatelessWidget {
                   audiences: [teachingClass.code],
                 ),
             ],
+          ),
+          AppRoutes.coordination => const CoordinationShell(),
+          AppRoutes.coordinationNewMaterial => const NewMaterialScreen(
+            audienceLabel: 'Para quem',
+            author: 'Coordenação',
+            audienceOptions: coordinationAudiences,
           ),
           _ => const Scaffold(
             body: SafeArea(child: Center(child: Text('Rota não encontrada'))),

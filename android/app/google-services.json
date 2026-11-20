@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "591651377504",
+    "project_id": "portal-orbita",
+    "storage_bucket": "portal-orbita.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591651377504:android:56e0731f55d669de914e05",
+        "android_client_info": {
+          "package_name": "com.forgetech.plataformaorbita"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNiL0Igb7sCk3RESeBTSc2jSyvzuWYm6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

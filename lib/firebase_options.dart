@@ -21,10 +21,7 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for ios - '
@@ -58,6 +55,14 @@ class DefaultFirebaseOptions {
     messagingSenderId: '591651377504',
     projectId: 'portal-orbita',
     authDomain: 'portal-orbita.firebaseapp.com',
+    storageBucket: 'portal-orbita.firebasestorage.app',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyCNiL0Igb7sCk3RESeBTSc2jSyvzuWYm6Q',
+    appId: '1:591651377504:android:56e0731f55d669de914e05',
+    messagingSenderId: '591651377504',
+    projectId: 'portal-orbita',
     storageBucket: 'portal-orbita.firebasestorage.app',
   );
 }

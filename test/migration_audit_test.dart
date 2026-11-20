@@ -185,7 +185,7 @@ void main() {
           ('Financeiro', 'Agosto/2026'),
           ('Biblioteca', '18 dias'),
           ('Mural de avisos', '16/11/2026'),
-          ('Suporte', 'Acesse Notas → detalhes da disciplina.'),
+          ('Suporte', 'Acesse Notas → toque na disciplina.'),
           ('Meu perfil', 'Encerrar sessão'),
         ]) {
           final option = find.text(label);

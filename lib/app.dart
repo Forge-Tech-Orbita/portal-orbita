@@ -13,7 +13,10 @@ import 'features/navigation/presentation/main_navigation_screen.dart';
 import 'features/notices/presentation/notices_screen.dart';
 import 'features/notifications/presentation/notifications_screen.dart';
 import 'features/profile/presentation/profile_screen.dart';
+import 'features/support/data/support_ticket.dart';
+import 'features/support/presentation/new_ticket_screen.dart';
 import 'features/support/presentation/support_screen.dart';
+import 'features/support/presentation/ticket_sent_screen.dart';
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -49,6 +52,9 @@ class MainApp extends StatelessWidget {
                 : null,
           ),
           AppRoutes.support => const SupportScreen(),
+          AppRoutes.newTicket => const NewTicketScreen(),
+          AppRoutes.ticketSent when arguments is SupportTicket =>
+            TicketSentScreen(ticket: arguments),
           AppRoutes.profile => const ProfileScreen(),
           _ => const Scaffold(
             body: SafeArea(child: Center(child: Text('Rota não encontrada'))),

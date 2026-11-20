@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/courses_mock.dart';
 
 class CoursesScreen extends StatelessWidget {
@@ -9,6 +9,7 @@ class CoursesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -21,7 +22,7 @@ class CoursesScreen extends StatelessWidget {
           for (final course in demoCourses)
             Card(
               margin: const EdgeInsets.only(bottom: 12),
-              color: OrbitaTheme.surface,
+              color: colors.surface,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -46,7 +47,7 @@ class CoursesScreen extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: OrbitaTheme.primary.withValues(alpha: 0.14),
+                            color: colors.primary.withValues(alpha: 0.14),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -59,7 +60,7 @@ class CoursesScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     LinearProgressIndicator(
                       value: course.progress / 100,
-                      color: OrbitaTheme.terracotta,
+                      color: colors.secondary,
                       semanticsLabel:
                           'Progresso do semestre em ${course.subject}',
                     ),

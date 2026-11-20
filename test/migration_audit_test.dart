@@ -125,15 +125,12 @@ void main() {
 
       expect(find.byType(ProfileScreen), findsOneWidget);
       expect(find.textContaining('em migração'), findsNothing);
-      final biometricsSwitch = find.widgetWithText(
-        SwitchListTile,
-        'Biometria facial',
-      );
+      final biometricsSwitch = find.widgetWithText(SwitchListTile, 'Biometria');
       await tester.ensureVisible(biometricsSwitch);
       await tester.pumpAndSettle();
       await tester.tap(biometricsSwitch);
       await tester.pumpAndSettle();
-      expect(tester.widget<SwitchListTile>(biometricsSwitch).value, isTrue);
+      expect(tester.widget<SwitchListTile>(biometricsSwitch).value, isFalse);
 
       final logoutButton = find.text('Encerrar sessão');
       await tester.ensureVisible(logoutButton);

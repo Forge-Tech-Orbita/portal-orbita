@@ -114,9 +114,11 @@ class _GradeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = OrbitaColors.of(context);
     final average = grade.average;
-    final color = grade.status == GradeStatus.approved
-        ? colors.success
-        : colors.secondary;
+    final color = switch (grade.status) {
+      GradeStatus.approved => colors.success,
+      GradeStatus.failed => colors.alert,
+      GradeStatus.inProgress || GradeStatus.completed => colors.secondary,
+    };
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

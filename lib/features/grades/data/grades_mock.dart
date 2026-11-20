@@ -11,7 +11,7 @@ const demoGrades = [
       integratedAssessment: 1,
     ),
     frequency: 96,
-    status: GradeStatus.completed,
+    status: GradeStatus.approved,
   ),
   Grade(
     subject: 'Inteligência Artificial',
@@ -19,7 +19,7 @@ const demoGrades = [
     firstStage: GradeStage.first(exam: 5, ted: 2),
     secondStage: GradeStage.second(exam: 5, ted: 2, integratedAssessment: 1),
     frequency: 91,
-    status: GradeStatus.completed,
+    status: GradeStatus.approved,
   ),
   Grade(
     subject: 'Banco de Dados II',
@@ -31,7 +31,7 @@ const demoGrades = [
       integratedAssessment: 0.5,
     ),
     frequency: 88,
-    status: GradeStatus.completed,
+    status: GradeStatus.approved,
   ),
   Grade(
     subject: 'Engenharia de Requisitos',
@@ -39,7 +39,7 @@ const demoGrades = [
     firstStage: GradeStage.first(exam: 6.5, ted: 2.5),
     secondStage: GradeStage.second(exam: 6, ted: 2.5, integratedAssessment: 1),
     frequency: 98,
-    status: GradeStatus.completed,
+    status: GradeStatus.approved,
   ),
   Grade(
     subject: 'Cálculo Numérico',

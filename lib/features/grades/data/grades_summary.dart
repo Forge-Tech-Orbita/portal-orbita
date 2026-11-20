@@ -15,10 +15,13 @@ import 'grade.dart';
       graded++;
     }
     switch (grade.status) {
-      case GradeStatus.completed:
+      case GradeStatus.approved:
         approved++;
       case GradeStatus.inProgress:
         inProgress++;
+      case GradeStatus.completed:
+      case GradeStatus.failed:
+        break;
     }
   }
 

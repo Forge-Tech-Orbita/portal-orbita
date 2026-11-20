@@ -80,7 +80,7 @@ void main() {
           8.5,
           9.0,
           96,
-          GradeStatus.completed,
+          GradeStatus.approved,
         ),
         (
           'Inteligência Artificial',
@@ -88,16 +88,16 @@ void main() {
           7.0,
           8.0,
           91,
-          GradeStatus.completed,
+          GradeStatus.approved,
         ),
-        ('Banco de Dados II', 'ESW-298', 6.5, 7.0, 88, GradeStatus.completed),
+        ('Banco de Dados II', 'ESW-298', 6.5, 7.0, 88, GradeStatus.approved),
         (
           'Engenharia de Requisitos',
           'ESW-355',
           9.0,
           9.5,
           98,
-          GradeStatus.completed,
+          GradeStatus.approved,
         ),
         ('Cálculo Numérico', 'MAT-210', 5.5, null, 82, GradeStatus.inProgress),
       ],
@@ -131,7 +131,7 @@ void main() {
       firstStage: GradeStage.first(exam: 6, ted: 2),
       secondStage: GradeStage.second(exam: 0, ted: 0, integratedAssessment: 0),
       frequency: 100,
-      status: GradeStatus.completed,
+      status: GradeStatus.approved,
     );
     expect(grade.average, 4);
   });
@@ -212,6 +212,47 @@ void main() {
       findsNothing,
     );
     expect(find.byType(Card), findsOneWidget);
+  });
+
+  testWidgets('concluídas incluem disciplinas sem aprovação', (tester) async {
+    const grades = [
+      Grade(
+        subject: 'Resultado não informado',
+        code: 'TEST-1',
+        firstStage: GradeStage.first(exam: 7, ted: 3),
+        secondStage: GradeStage.second(
+          exam: 6,
+          ted: 3,
+          integratedAssessment: 1,
+        ),
+        frequency: 100,
+        status: GradeStatus.completed,
+      ),
+      Grade(
+        subject: 'Disciplina reprovada',
+        code: 'TEST-2',
+        firstStage: GradeStage.first(exam: 0, ted: 0),
+        secondStage: GradeStage.second(
+          exam: 0,
+          ted: 0,
+          integratedAssessment: 0,
+        ),
+        frequency: 100,
+        status: GradeStatus.failed,
+      ),
+    ];
+    expect(summarizeGrades(grades), (average: 5.0, approved: 0, inProgress: 0));
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: GradesScreen(grades: grades)),
+      ),
+    );
+    await selectFilter(tester, 'Concluídas');
+    expect(find.byType(Card), findsNWidgets(2));
+    expect(find.text('Concluído'), findsOneWidget);
+    expect(find.text('Reprovado'), findsOneWidget);
+    expect(find.text('Aprovado'), findsNothing);
   });
 
   for (final (filter, codes) in [
@@ -295,11 +336,12 @@ void main() {
     final card = await expandGrade(tester, 'Cálculo Numérico');
 
     for (final text in [
-      'Cursando',
+      'Pendente',
       'Subtotal: 5.5 de 10',
       'AV2: Não informada',
       'TED: Não informada',
       'Avaliação Integrada: Não informada',
+      'Subtotal pendente. Falta lançar: AV2, TED, Avaliação Integrada.',
       'Nota final: Pendente',
       'Frequência: 82% · Situação: Em andamento',
     ]) {
@@ -320,6 +362,32 @@ void main() {
     expect(find.bySemanticsLabel('AV2: Não informada'), findsOneWidget);
     expect(find.bySemanticsLabel('AV1: 4.0 de 7'), findsOneWidget);
     expect(find.descendant(of: card, matching: find.text('0.0')), findsNothing);
+  });
+
+  testWidgets('pendência da etapa distingue zero de nota ausente', (
+    tester,
+  ) async {
+    const grade = Grade(
+      subject: 'Disciplina de teste',
+      code: 'TEST',
+      firstStage: GradeStage.first(exam: 0, ted: 0),
+      secondStage: GradeStage.second(exam: 0, ted: 0),
+      frequency: 100,
+      status: GradeStatus.inProgress,
+    );
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: GradesScreen(grades: [grade])),
+      ),
+    );
+    await expandGrade(tester, grade.subject);
+
+    expect(find.bySemanticsLabel('AV2: 0.0 de 6'), findsOneWidget);
+    expect(find.text('Subtotal: 0.0 de 10'), findsOneWidget);
+    expect(
+      find.text('Subtotal pendente. Falta lançar: Avaliação Integrada.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets(

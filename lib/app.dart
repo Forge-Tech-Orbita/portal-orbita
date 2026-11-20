@@ -5,6 +5,7 @@ import 'core/models/app_notification.dart';
 import 'core/theme/orbita_theme.dart';
 import 'features/admin/presentation/admin_login_screen.dart';
 import 'features/admin/presentation/admin_mfa_screen.dart';
+import 'features/admin/presentation/admin_shell.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/coordination/data/coordination_mock.dart';
 import 'features/coordination/presentation/coordination_shell.dart';
@@ -83,6 +84,7 @@ class MainApp extends StatelessWidget {
           ),
           AppRoutes.adminLogin => const AdminLoginScreen(),
           AppRoutes.adminMfa => const AdminMfaScreen(),
+          AppRoutes.admin => const AdminShell(),
           _ => const Scaffold(
             body: SafeArea(child: Center(child: Text('Rota não encontrada'))),
           ),

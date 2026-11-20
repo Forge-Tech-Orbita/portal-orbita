@@ -5,6 +5,7 @@ import 'package:portal_orbita/core/constants/app_routes.dart';
 import 'package:portal_orbita/features/admin/data/admin.dart';
 import 'package:portal_orbita/features/admin/presentation/admin_login_screen.dart';
 import 'package:portal_orbita/features/admin/presentation/admin_mfa_screen.dart';
+import 'package:portal_orbita/features/admin/presentation/admin_shell.dart';
 import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
 
 import 'helpers.dart';
@@ -113,12 +114,7 @@ void main() {
     await tester.enterText(find.byKey(const Key('mfa-code')), '482913');
     await tapVisible(tester, find.text('Verificar e entrar'));
     await wait900(tester);
-    expect(
-      ModalRoute.of(tester.element(find.text('Rota não encontrada')))!
-          .settings
-          .name,
-      AppRoutes.admin,
-    );
+    expect(find.byType(AdminShell), findsOneWidget);
     final navigator = tester.state<NavigatorState>(find.byType(Navigator));
     expect(navigator.canPop(), isFalse);
   });

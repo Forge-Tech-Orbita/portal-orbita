@@ -4,14 +4,19 @@ import 'core/constants/app_routes.dart';
 import 'core/models/app_notification.dart';
 import 'core/theme/orbita_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
+import 'features/coordination/data/coordination_mock.dart';
+import 'features/coordination/presentation/coordination_shell.dart';
 import 'features/financial/presentation/financial_screen.dart';
 import 'features/financial/presentation/payment_screen.dart';
 import 'features/library/presentation/catalog_screen.dart';
 import 'features/library/presentation/library_screen.dart';
 import 'features/materials/presentation/materials_screen.dart';
+import 'features/materials/presentation/new_material_screen.dart';
 import 'features/navigation/presentation/main_navigation_screen.dart';
 import 'features/notices/presentation/notices_screen.dart';
 import 'features/notifications/presentation/notifications_screen.dart';
+import 'features/professor/data/professor_mock.dart';
+import 'features/professor/presentation/professor_shell.dart';
 import 'features/profile/presentation/profile_screen.dart';
 import 'features/support/data/support_ticket.dart';
 import 'features/support/presentation/new_ticket_screen.dart';
@@ -56,6 +61,24 @@ class MainApp extends StatelessWidget {
           AppRoutes.ticketSent when arguments is SupportTicket =>
             TicketSentScreen(ticket: arguments),
           AppRoutes.profile => const ProfileScreen(),
+          AppRoutes.professor => const ProfessorShell(),
+          AppRoutes.professorNewMaterial => NewMaterialScreen(
+            audienceLabel: 'Para qual turma',
+            author: professorName,
+            audienceOptions: [
+              for (final teachingClass in teachingClasses)
+                (
+                  label: '${teachingClass.code} · ${teachingClass.subject}',
+                  audiences: [teachingClass.code],
+                ),
+            ],
+          ),
+          AppRoutes.coordination => const CoordinationShell(),
+          AppRoutes.coordinationNewMaterial => const NewMaterialScreen(
+            audienceLabel: 'Para quem',
+            author: 'Coordenação',
+            audienceOptions: coordinationAudiences,
+          ),
           _ => const Scaffold(
             body: SafeArea(child: Center(child: Text('Rota não encontrada'))),
           ),

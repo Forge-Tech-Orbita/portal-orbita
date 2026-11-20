@@ -3,9 +3,10 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/student_id_card.dart';
 import 'widgets/edit_personal_data_sheet.dart';
+import 'widgets/theme_selector.dart';
 
 typedef PickProfilePhoto = Future<XFile?> Function(ImageSource source);
 
@@ -59,9 +60,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             if (_photo != null)
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.delete_outline,
-                  color: OrbitaTheme.alert,
+                  color: OrbitaColors.of(context).alert,
                 ),
                 title: const Text('Remover foto'),
                 onTap: () => Navigator.of(context).pop(_PhotoAction.remove),
@@ -123,6 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Meu perfil')),
@@ -149,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 8),
               Card(
                 margin: EdgeInsets.zero,
-                color: OrbitaTheme.surface,
+                color: colors.surface,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -176,7 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(icon, size: 18, color: OrbitaTheme.primary),
+                              Icon(icon, size: 18, color: colors.primary),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Wrap(
@@ -209,6 +211,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: const Text('Corrigir nome ou CPF com o suporte'),
               ),
               const SizedBox(height: 16),
+              const ThemeSelector(),
+              const SizedBox(height: 16),
               Text(
                 'Preferências demonstrativas · efeito apenas visual nesta tela',
                 style: textTheme.bodySmall,
@@ -216,13 +220,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 8),
               Card(
                 margin: EdgeInsets.zero,
-                color: OrbitaTheme.surface,
+                color: colors.surface,
                 child: Column(
                   children: [
                     SwitchListTile(
-                      secondary: const Icon(
+                      secondary: Icon(
                         Icons.notifications_outlined,
-                        color: OrbitaTheme.primary,
+                        color: colors.primary,
                       ),
                       title: const Text('Notificações push'),
                       value: _pushNotifications,
@@ -230,18 +234,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           setState(() => _pushNotifications = value),
                     ),
                     SwitchListTile(
-                      secondary: const Icon(
+                      secondary: Icon(
                         Icons.dark_mode_outlined,
-                        color: OrbitaTheme.primary,
+                        color: colors.primary,
                       ),
                       title: const Text('Modo escuro'),
                       value: _darkMode,
                       onChanged: (value) => setState(() => _darkMode = value),
                     ),
                     SwitchListTile(
-                      secondary: const Icon(
+                      secondary: Icon(
                         Icons.person_outline,
-                        color: OrbitaTheme.primary,
+                        color: colors.primary,
                       ),
                       title: const Text('Biometria facial'),
                       value: _facialBiometrics,
@@ -257,8 +261,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil(AppRoutes.login, (_) => false),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: OrbitaTheme.alert,
-                  side: const BorderSide(color: OrbitaTheme.alert),
+                  foregroundColor: colors.alert,
+                  side: BorderSide(color: colors.alert),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 icon: const Icon(Icons.logout),

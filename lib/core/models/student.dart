@@ -10,6 +10,10 @@ class Student {
     required this.maskedCpf,
     required this.email,
     required this.maskedPhone,
+    required this.phone,
+    required this.personalEmail,
+    required this.postalCode,
+    required this.address,
   });
 
   final String name;
@@ -22,4 +26,8 @@ class Student {
   final String maskedCpf;
   final String email;
   final String maskedPhone;
+  final String phone;
+  final String personalEmail;
+  final String postalCode;
+  final String address;
 }

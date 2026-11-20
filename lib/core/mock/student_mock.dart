@@ -10,5 +10,9 @@ const demoStudent = Student(
   validUntil: '12/2027',
   maskedCpf: '•••.•••.•••-45',
   email: 'marina.costa@orbita.edu',
-  maskedPhone: '(11) 9•••-4521',
+  maskedPhone: '(11) 9••••-4521',
+  phone: '(11) 98765-4521',
+  personalEmail: 'marina.duarte@email.com',
+  postalCode: '01310-100',
+  address: 'Av. Paulista, 1000 · apto 52',
 );

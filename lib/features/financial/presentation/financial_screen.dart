@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
-import '../../../core/widgets/decorative_barcode.dart';
+import '../../../core/constants/app_routes.dart';
+import '../../../core/widgets/info_banner.dart';
 import '../data/financial_mock.dart';
+import 'payment_screen.dart';
 
 class FinancialScreen extends StatelessWidget {
   const FinancialScreen({super.key});
+
+  void _openPayment(BuildContext context, PaymentMethod method) {
+    Navigator.of(context).pushNamed(AppRoutes.payment, arguments: method);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,51 +20,29 @@ class FinancialScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Financeiro')),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Dados demonstrativos · sem integração financeira',
+                'Dados demonstrativos · pagamento simulado',
                 style: textTheme.bodySmall,
               ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: OrbitaTheme.amber.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.warning_amber_outlined,
-                      color: OrbitaTheme.amber,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Fatura em aberto', style: textTheme.titleSmall),
-                          Text('Vencimento em ${demoInvoice.dueDate}'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 12),
+              InfoBanner(
+                title: 'Fatura em aberto',
+                message:
+                    'Vence em ${demoInvoice.dueDate} · faltam ${demoInvoice.daysLeft} dias',
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Card(
-                margin: EdgeInsets.zero,
-                color: OrbitaTheme.surface,
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(demoInvoice.label, style: textTheme.labelLarge),
-                      const SizedBox(height: 12),
+                      Text(demoInvoice.label, style: textTheme.labelMedium),
+                      const SizedBox(height: 10),
                       for (final (label, value) in [
                         ('Valor', demoInvoice.amount),
                         ('Vencimento', demoInvoice.dueDate),
@@ -67,59 +50,56 @@ class FinancialScreen extends StatelessWidget {
                       ])
                         Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: Wrap(
-                            alignment: WrapAlignment.spaceBetween,
-                            spacing: 12,
-                            runSpacing: 4,
-                            children: [Text(label), Text(value)],
-                          ),
+                          child: _AmountRow(label: label, value: value),
                         ),
+                      const Divider(height: 8),
                       const SizedBox(height: 8),
-                      const Center(child: DecorativeBarcode(count: 46)),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Código decorativo · sem valor bancário',
-                        style: textTheme.bodySmall,
-                        textAlign: TextAlign.center,
+                      _AmountRow(
+                        label: 'Total até o vencimento',
+                        value: demoInvoice.netAmount,
+                        bold: true,
                       ),
-                      const SizedBox(height: 16),
-                      FilledButton(
-                        onPressed: () => ScaffoldMessenger.of(context)
-                            .showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Recurso demonstrativo, sem integração',
-                                ),
-                              ),
+                      const SizedBox(height: 14),
+                      Row(
+                        spacing: 8,
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () =>
+                                  _openPayment(context, PaymentMethod.boleto),
+                              icon: const Icon(Icons.receipt_long_outlined),
+                              label: const Text('Boleto (2ª via)'),
                             ),
-                        child: const Text('Gerar 2ª via'),
+                          ),
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: () =>
+                                  _openPayment(context, PaymentMethod.pix),
+                              icon: const Icon(Icons.qr_code_2),
+                              label: const Text('Pagar com Pix'),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Text('Histórico de pagamentos', style: textTheme.titleMedium),
               const SizedBox(height: 8),
               Card(
-                margin: EdgeInsets.zero,
-                color: OrbitaTheme.surface,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       for (final payment in demoPayments)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: Wrap(
-                            alignment: WrapAlignment.spaceBetween,
-                            spacing: 12,
-                            runSpacing: 4,
-                            children: [
-                              Text(payment.month),
-                              Text('Pago · ${payment.amount}'),
-                            ],
+                          child: _AmountRow(
+                            label: payment.month,
+                            value: 'Pago · ${payment.amount}',
                           ),
                         ),
                     ],
@@ -130,6 +110,33 @@ class FinancialScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AmountRow extends StatelessWidget {
+  const _AmountRow({
+    required this.label,
+    required this.value,
+    this.bold = false,
+  });
+
+  final String label;
+  final String value;
+  final bool bold;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = bold ? Theme.of(context).textTheme.titleSmall : null;
+
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      spacing: 12,
+      runSpacing: 4,
+      children: [
+        Text(label, style: style),
+        Text(value, style: style),
+      ],
     );
   }
 }

@@ -1,110 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portal_orbita/app.dart';
+import 'package:portal_orbita/core/widgets/info_card.dart';
+import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
+import 'package:portal_orbita/features/financial/presentation/financial_screen.dart';
+import 'package:portal_orbita/features/library/presentation/library_screen.dart';
+import 'package:portal_orbita/features/materials/presentation/materials_screen.dart';
 import 'package:portal_orbita/features/more/presentation/more_screen.dart';
+import 'package:portal_orbita/features/notices/presentation/notices_screen.dart';
+import 'package:portal_orbita/features/profile/presentation/profile_screen.dart';
+import 'package:portal_orbita/features/support/presentation/support_screen.dart';
 
-Future<void> openMore(WidgetTester tester) async {
-  await tester.pumpWidget(const MainApp());
-  await tester.ensureVisible(find.text('ENTRAR NO PORTAL'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('ENTRAR NO PORTAL'));
-  await tester.pump();
-  await tester.pump(const Duration(milliseconds: 900));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Mais'));
-  await tester.pumpAndSettle();
-}
+import 'helpers.dart';
 
 void main() {
-  testWidgets('menu mostra somente as seis opções e descrições do legado', (
+  testWidgets('menu mostra as sete opções do protótipo na ordem', (
     tester,
   ) async {
-    await openMore(tester);
-    expect(find.text('NAVEGAÇÃO'), findsOneWidget);
-    expect(find.text('Mais opções'), findsOneWidget);
-    expect(find.byType(OutlinedButton), findsNWidgets(6));
-    for (final (label, description) in [
-      ('Financeiro', 'Boletos e pagamentos'),
-      ('Biblioteca', 'Empréstimos e acervo'),
-      ('Mural', 'Avisos e comunicados'),
-      ('Perfil', 'Dados e configurações'),
-      ('Suporte', 'Central de ajuda'),
-      ('Sair', 'Encerrar sessão'),
-    ]) {
-      final button = find.widgetWithText(OutlinedButton, label);
-      await tester.ensureVisible(button);
-      await tester.pumpAndSettle();
-      expect(
-        find.descendant(of: button, matching: find.text(description)),
-        findsOneWidget,
-      );
-      expect(button.hitTestable(), findsOneWidget);
-    }
-    expect(find.textContaining('em migração'), findsNothing);
-  });
+    await pumpScreen(tester, const Scaffold(body: MoreScreen()));
 
-  for (final size in [
-    const Size(360, 800),
-    const Size(390, 844),
-    const Size(360, 640),
-  ]) {
-    testWidgets(
-      'grade mantém duas colunas e seis botões alcançáveis em $size',
-      (tester) async {
-        tester.view.devicePixelRatio = 1;
-        tester.view.physicalSize = size;
-        addTearDown(tester.view.resetDevicePixelRatio);
-        addTearDown(tester.view.resetPhysicalSize);
-        await openMore(tester);
-        final buttons = find.descendant(
-          of: find.byType(MoreScreen),
-          matching: find.byType(OutlinedButton),
-        );
-        expect(buttons, findsNWidgets(6));
-        for (var index = 0; index < 6; index += 2) {
-          final left = buttons.at(index);
-          final right = buttons.at(index + 1);
-          expect(tester.getTopLeft(left).dy, tester.getTopLeft(right).dy);
-          expect(
-            tester.getTopLeft(right).dx,
-            greaterThan(tester.getTopRight(left).dx),
-          );
-          await tester.ensureVisible(left);
-          await tester.pumpAndSettle();
-          expect(left.hitTestable(), findsOneWidget);
-          expect(right.hitTestable(), findsOneWidget);
-        }
-        expect(find.byType(BottomNavigationBar), findsOneWidget);
-        expect(tester.takeException(), isNull);
-      },
-    );
-  }
-
-  testWidgets(
-    'textos ampliados continuam roláveis sem altura fixa ou overflow',
-    (tester) async {
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(360, 640);
-      tester.platformDispatcher.textScaleFactorTestValue = 2;
-      addTearDown(tester.view.resetDevicePixelRatio);
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      await openMore(tester);
-
-      for (final label in [
+    expect(find.text('ATALHOS'), findsOneWidget);
+    expect(
+      tester.widgetList<InfoCard>(find.byType(InfoCard)).map((c) => c.title),
+      [
         'Financeiro',
         'Biblioteca',
-        'Mural',
-        'Perfil',
+        'Materiais das disciplinas',
+        'Mural de avisos',
         'Suporte',
+        'Meu perfil',
         'Sair',
-      ]) {
-        final button = find.widgetWithText(OutlinedButton, label);
-        await tester.ensureVisible(button);
-        await tester.pumpAndSettle();
-        expect(button.hitTestable(), findsOneWidget);
-      }
+      ],
+    );
+    expect(find.text('Encerrar sessão neste aparelho'), findsOneWidget);
+  });
+
+  for (final (label, screen) in [
+    ('Financeiro', FinancialScreen),
+    ('Biblioteca', LibraryScreen),
+    ('Materiais das disciplinas', MaterialsScreen),
+    ('Mural de avisos', NoticesScreen),
+    ('Suporte', SupportScreen),
+    ('Meu perfil', ProfileScreen),
+  ]) {
+    testWidgets('$label abre como rota secundária', (tester) async {
+      await loginAs(tester);
+      await openFromMore(tester, label);
+      expect(find.byType(screen), findsOneWidget);
+      expect(find.byType(BottomNavigationBar), findsNothing);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.byType(MoreScreen), findsOneWidget);
+    });
+  }
+
+  testWidgets('Sair limpa a pilha e volta ao login', (tester) async {
+    await loginAs(tester);
+    await openFromMore(tester, 'Sair');
+    expect(find.byType(LoginScreen), findsOneWidget);
+    final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+    expect(await navigator.maybePop(), isFalse);
+  });
+
+  for (final size in testViewports) {
+    testWidgets('opções alcançáveis com texto ampliado em $size', (
+      tester,
+    ) async {
+      useViewport(tester, size, textScale: 2);
+      await pumpScreen(tester, const Scaffold(body: MoreScreen()));
+      await tester.ensureVisible(find.text('Sair'));
+      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-    },
-  );
+    });
+  }
 }

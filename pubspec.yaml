@@ -1,5 +1,5 @@
 name: portal_orbita
-description: "A new Flutter project."
+description: "Portal acadêmico do estudante em Flutter."
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -14,6 +14,7 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

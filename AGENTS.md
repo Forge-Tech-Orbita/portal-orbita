@@ -10,7 +10,7 @@
 
 ## Projeto e fontes principais
 
-Aplicação Flutter/Dart para Android, iOS e Web, com fixtures locais, sem backend, autenticação real ou persistência. `lib/main.dart` inicia `MainApp` em `lib/app.dart`.
+Aplicação Flutter/Dart para Android, iOS e Web, com fixtures locais, sem autenticação real ou persistência. O Firebase, em configuração por outra frente da equipe, só é inicializado na Web; `firebase_auth` e `cloud_firestore` estão declarados, mas não são usados em `lib/`. `lib/main.dart` inicia `MainApp` em `lib/app.dart`.
 
 | Assunto | Fonte |
 | --- | --- |
@@ -21,7 +21,7 @@ Aplicação Flutter/Dart para Android, iOS e Web, com fixtures locais, sem backe
 | Branches e PRs | [.ai/rules/branches.md](.ai/rules/branches.md) |
 | Mensagens e aprovação de commit | [.ai/rules/commits.md](.ai/rules/commits.md) |
 
-Reutilize `lib/core/` e `lib/features/<feature>/`, `OrbitaTheme`, `AppRoutes` e widgets existentes. Preserve estado local, navegação e limites demonstrativos; não adicione pacotes, camadas ou pastas raiz em `lib/` sem aprovação. Não edite artefatos gerados manualmente.
+Reutilize `lib/core/` e `lib/features/<feature>/`, `OrbitaColors.of(context)`/`OrbitaTheme`, `AppRoutes` e widgets existentes. Preserve estado local, navegação e limites demonstrativos; não adicione pacotes, camadas ou pastas raiz em `lib/` sem aprovação. Não edite artefatos gerados manualmente.
 
 ## Execução e validação
 

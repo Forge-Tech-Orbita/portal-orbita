@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -57,9 +57,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Semantics(
                         label: 'Símbolo orbital do Instituto Órbita',
                         image: true,
-                        child: const CustomPaint(
-                          size: Size.square(64),
-                          painter: _OrbitMarkPainter(),
+                        child: CustomPaint(
+                          size: const Size.square(64),
+                          painter: _OrbitMarkPainter(OrbitaColors.of(context)),
                         ),
                       ),
                     ),
@@ -139,23 +139,25 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class _OrbitMarkPainter extends CustomPainter {
-  const _OrbitMarkPainter();
+  const _OrbitMarkPainter(this.colors);
+
+  final OrbitaColors colors;
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.translate(size.width / 2, size.height / 2);
-    final paint = Paint()..color = OrbitaTheme.surface;
+    final paint = Paint()..color = colors.surface;
     canvas.drawCircle(Offset.zero, 30, paint);
     paint
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.3
-      ..color = OrbitaTheme.border;
+      ..color = colors.border;
     canvas.drawCircle(Offset.zero, 30, paint);
 
     for (final (angle, color) in [
-      (0.0, OrbitaTheme.text),
-      (math.pi / 3, OrbitaTheme.terracotta),
-      (2 * math.pi / 3, OrbitaTheme.amber),
+      (0.0, colors.text),
+      (math.pi / 3, colors.secondary),
+      (2 * math.pi / 3, colors.warning),
     ]) {
       canvas.save();
       canvas.rotate(angle);
@@ -169,10 +171,11 @@ class _OrbitMarkPainter extends CustomPainter {
 
     paint
       ..style = PaintingStyle.fill
-      ..color = OrbitaTheme.text;
+      ..color = colors.text;
     canvas.drawCircle(Offset.zero, 5.5, paint);
   }
 
   @override
-  bool shouldRepaint(covariant _OrbitMarkPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _OrbitMarkPainter oldDelegate) =>
+      oldDelegate.colors != colors;
 }

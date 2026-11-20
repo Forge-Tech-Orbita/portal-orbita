@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'core/constants/app_routes.dart';
+import 'core/models/app_notification.dart';
 import 'core/theme/orbita_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/financial/presentation/financial_screen.dart';
 import 'features/library/presentation/library_screen.dart';
 import 'features/navigation/presentation/main_navigation_screen.dart';
 import 'features/notices/presentation/notices_screen.dart';
+import 'features/notifications/presentation/notifications_screen.dart';
 import 'features/profile/presentation/profile_screen.dart';
 import 'features/support/presentation/support_screen.dart';
 
@@ -20,12 +22,18 @@ class MainApp extends StatelessWidget {
       theme: OrbitaTheme.data,
       initialRoute: AppRoutes.login,
       onGenerateRoute: (settings) {
+        final arguments = settings.arguments;
         final screen = switch (settings.name) {
           AppRoutes.login => const LoginScreen(),
           AppRoutes.main => const MainNavigationScreen(),
           AppRoutes.financial => const FinancialScreen(),
           AppRoutes.library => const LibraryScreen(),
           AppRoutes.notices => const NoticesScreen(),
+          AppRoutes.notifications => NotificationsScreen(
+            notifications: arguments is ValueNotifier<List<AppNotification>>
+                ? arguments
+                : null,
+          ),
           AppRoutes.support => const SupportScreen(),
           AppRoutes.profile => const ProfileScreen(),
           _ => const Scaffold(

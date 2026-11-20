@@ -77,6 +77,21 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     alert: OrbitaTheme.alert,
   );
 
+  /// Tema escuro com as cores da logo da equipe Forge Tech.
+  static const forgeTech = OrbitaColors(
+    brightness: Brightness.dark,
+    background: Color(0xFF0F151A),
+    surface: Color(0xFF172229),
+    border: Color(0xFF2A3B45),
+    text: Color(0xFFEAF2F3),
+    primary: Color(0xFF0AF0F5),
+    onPrimary: Color(0xFF0F151A),
+    secondary: Color(0xFF3CC6CF),
+    success: Color(0xFF5FD38D),
+    warning: Color(0xFFF2C14E),
+    alert: Color(0xFFFF7A6E),
+  );
+
   @override
   OrbitaColors copyWith({
     Brightness? brightness,

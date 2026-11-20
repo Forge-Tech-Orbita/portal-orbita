@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/schedule.dart';
 import '../data/schedule_mock.dart';
 
@@ -17,6 +17,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
     final lessons = demoSchedule[_currentDay]!;
 
     return SingleChildScrollView(
@@ -60,7 +61,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           for (final lesson in lessons)
             Card(
               margin: const EdgeInsets.only(bottom: 12),
-              color: OrbitaTheme.surface,
+              color: colors.surface,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -71,7 +72,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       children: [
                         Text(lesson.time, style: textTheme.labelLarge),
                         const SizedBox(height: 8),
-                        Icon(Icons.circle, size: 10, color: lesson.color),
+                        Icon(
+                          Icons.circle,
+                          size: 10,
+                          // Cor vintage da fixture traduzida para o tema.
+                          color: colors.resolve(lesson.color),
+                        ),
                       ],
                     ),
                     Expanded(

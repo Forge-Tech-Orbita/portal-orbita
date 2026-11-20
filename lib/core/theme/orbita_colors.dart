@@ -127,6 +127,17 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     );
   }
 
+  /// Converte uma cor da paleta vintage (usada nas fixtures, como o
+  /// horário) na cor equivalente desta paleta.
+  Color resolve(Color vintageColor) {
+    if (vintageColor == OrbitaTheme.primary) return primary;
+    if (vintageColor == OrbitaTheme.terracotta) return secondary;
+    if (vintageColor == OrbitaTheme.green) return success;
+    if (vintageColor == OrbitaTheme.amber) return warning;
+    if (vintageColor == OrbitaTheme.alert) return alert;
+    return vintageColor;
+  }
+
   @override
   OrbitaColors copyWith({
     Brightness? brightness,

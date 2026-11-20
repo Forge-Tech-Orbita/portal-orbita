@@ -37,6 +37,20 @@ void main() {
     }
   });
 
+  test('cores vintage das fixtures são traduzidas para o tema ativo', () {
+    const forgeTech = OrbitaColors.forgeTech;
+
+    expect(forgeTech.resolve(OrbitaTheme.primary), forgeTech.primary);
+    expect(forgeTech.resolve(OrbitaTheme.terracotta), forgeTech.secondary);
+    expect(forgeTech.resolve(OrbitaTheme.green), forgeTech.success);
+    expect(forgeTech.resolve(OrbitaTheme.amber), forgeTech.warning);
+    expect(forgeTech.resolve(OrbitaTheme.alert), forgeTech.alert);
+    expect(
+      OrbitaColors.vintage.resolve(OrbitaTheme.primary),
+      OrbitaTheme.primary,
+    );
+  });
+
   test('controlador troca o tema e avisa o app', () {
     final controller = OrbitaThemeController();
     addTearDown(controller.dispose);

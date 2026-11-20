@@ -24,6 +24,7 @@ const _secondaryRoutes = [
   (AppRoutes.support, 'Acesse Notas → toque na disciplina.'),
   (AppRoutes.newTicket, 'Cancelar'),
   (AppRoutes.profile, 'Encerrar sessão'),
+  (AppRoutes.professorNewMaterial, 'Publicar material'),
 ];
 
 void main() {

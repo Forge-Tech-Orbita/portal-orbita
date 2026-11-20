@@ -6,6 +6,7 @@ import 'core/theme/orbita_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/financial/presentation/financial_screen.dart';
 import 'features/financial/presentation/payment_screen.dart';
+import 'features/library/presentation/catalog_screen.dart';
 import 'features/library/presentation/library_screen.dart';
 import 'features/materials/presentation/materials_screen.dart';
 import 'features/navigation/presentation/main_navigation_screen.dart';
@@ -35,6 +36,11 @@ class MainApp extends StatelessWidget {
                 : PaymentMethod.pix,
           ),
           AppRoutes.library => const LibraryScreen(),
+          AppRoutes.catalog => CatalogScreen(
+            initial: arguments is CatalogQuery
+                ? arguments
+                : const CatalogQuery(),
+          ),
           AppRoutes.materials => const MaterialsScreen(),
           AppRoutes.notices => const NoticesScreen(),
           AppRoutes.notifications => NotificationsScreen(

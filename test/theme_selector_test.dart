@@ -1,30 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/theme/orbita_colors.dart';
 import 'package:portal_orbita/core/theme/orbita_theme.dart';
 import 'package:portal_orbita/core/theme/orbita_theme_controller.dart';
 import 'package:portal_orbita/features/navigation/presentation/main_navigation_screen.dart';
 import 'package:portal_orbita/features/profile/presentation/profile_screen.dart';
 
-Future<void> openProfile(WidgetTester tester) async {
-  await tester.pumpWidget(const MainApp());
-  await tester.ensureVisible(find.text('ENTRAR NO PORTAL'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('ENTRAR NO PORTAL'));
-  await tester.pump();
-  await tester.pump(const Duration(milliseconds: 900));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Mais'));
-  await tester.pumpAndSettle();
-  await tapVisible(tester, find.widgetWithText(OutlinedButton, 'Perfil'));
-}
+import 'helpers.dart';
 
-Future<void> tapVisible(WidgetTester tester, Finder finder) async {
-  await tester.ensureVisible(finder);
-  await tester.pumpAndSettle();
-  await tester.tap(finder);
-  await tester.pumpAndSettle();
+Future<void> openProfile(WidgetTester tester) async {
+  await loginAs(tester);
+  await openFromMore(tester, 'Meu perfil');
 }
 
 Finder themeTile(String label) => find.widgetWithText(ListTile, label);
@@ -39,7 +25,7 @@ void main() {
   ) async {
     await openProfile(tester);
 
-    expect(find.text('Tema do aplicativo'), findsOneWidget);
+    expect(find.text('TEMA DO APLICATIVO'), findsOneWidget);
     for (final option in OrbitaThemeOption.values) {
       expect(themeTile(option.label), findsOneWidget);
     }
@@ -117,11 +103,9 @@ void main() {
   testWidgets('perfil fora do app não mostra o seletor de tema', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      MaterialApp(theme: OrbitaTheme.data, home: const ProfileScreen()),
-    );
+    await pumpScreen(tester, const ProfileScreen(isWeb: false));
 
-    expect(find.text('Tema do aplicativo'), findsNothing);
+    expect(find.text('TEMA DO APLICATIVO'), findsNothing);
     expect(find.text('Meu perfil'), findsOneWidget);
   });
 }

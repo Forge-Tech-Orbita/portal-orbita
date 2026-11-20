@@ -9,22 +9,22 @@ class GpaRingProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final colors = OrbitaColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
 
     return Semantics(
-      label: 'Média do semestre',
+      label: 'CRA',
       value: '${value.toStringAsFixed(1)} de 10',
       child: ExcludeSemantics(
         child: SizedBox.square(
-          dimension: 96,
+          dimension: MediaQuery.textScalerOf(context).scale(84),
           child: Stack(
             alignment: Alignment.center,
             children: [
               SizedBox.expand(
                 child: CircularProgressIndicator(
                   value: value / 10,
-                  strokeWidth: 8,
+                  strokeWidth: 7,
                   backgroundColor: colors.border,
                   color: colors.primary,
                 ),
@@ -36,7 +36,7 @@ class GpaRingProgress extends StatelessWidget {
                     value.toStringAsFixed(1),
                     style: textTheme.headlineSmall,
                   ),
-                  Text('Média', style: textTheme.bodySmall),
+                  Text('CRA', style: textTheme.bodySmall),
                 ],
               ),
             ],

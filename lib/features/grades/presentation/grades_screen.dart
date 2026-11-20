@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_colors.dart';
+import '../../../core/widgets/page_heading.dart';
+import '../../../core/widgets/status_tag.dart';
 import '../data/grade.dart';
 import '../data/grades_mock.dart';
 import '../data/grades_summary.dart';
@@ -37,7 +38,9 @@ class _GradesScreenState extends State<GradesScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final (:average, :approved, :inProgress) = summarizeGrades(widget.grades);
+    final (:average, :approved, :inProgress, :pending) = summarizeGrades(
+      widget.grades,
+    );
     final grades = widget.grades.where(
       (grade) => _filter.includes(grade.status),
     );
@@ -47,33 +50,45 @@ class _GradesScreenState extends State<GradesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('DESEMPENHO ACADÊMICO', style: textTheme.labelMedium),
-          Text('Notas & frequência', style: textTheme.headlineSmall),
-          const SizedBox(height: 16),
-          Text('Resumo demonstrativo', style: textTheme.labelSmall),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          const PageHeading(
+            overline: 'Desempenho acadêmico',
+            title: 'Notas & frequência',
+            subtitle:
+                'Notas importadas do sistema acadêmico · resumo calculado',
+          ),
+          const SizedBox(height: 12),
+          Row(
             children: [
-              if (average != null)
-                GpaRingProgress(value: average)
-              else
-                const Text('Média do semestre indisponível'),
-              for (final (label, count) in [
-                ('Aprovadas', approved),
-                ('Cursando', inProgress),
-              ])
-                Column(
+              const GpaRingProgress(value: historicalGpa),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  spacing: 6,
                   children: [
-                    Text('$count', style: textTheme.headlineSmall),
-                    Text(label, style: textTheme.labelMedium),
+                    for (final (label, count) in [
+                      ('Aprovadas (histórico)', historicalApproved + approved),
+                      ('Cursando', inProgress),
+                      ('Pendentes', pending),
+                    ])
+                      Row(
+                        children: [
+                          Expanded(child: Text(label)),
+                          Text('$count', style: textTheme.titleSmall),
+                        ],
+                      ),
                   ],
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
+          if (average != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Média do semestre: ${formatGrade(average)}',
+              style: textTheme.bodySmall,
+            ),
+          ],
+          const SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -81,14 +96,18 @@ class _GradesScreenState extends State<GradesScreen> {
               children: [
                 for (final filter in _GradeFilter.values)
                   ChoiceChip(
-                    label: Text(filter.label),
+                    label: Text(
+                      filter == _GradeFilter.inProgress
+                          ? '${filter.label} ($inProgress)'
+                          : filter.label,
+                    ),
                     selected: filter == _filter,
                     onSelected: (_) => setState(() => _filter = filter),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           if (grades.isEmpty)
             Text(switch (_filter) {
               _GradeFilter.all => 'Nenhuma disciplina neste semestre.',
@@ -98,7 +117,13 @@ class _GradesScreenState extends State<GradesScreen> {
                 'Nenhuma disciplina concluída neste semestre.',
             }, style: textTheme.bodyMedium),
           for (final grade in grades)
-            _GradeCard(key: ValueKey((_filter, grade.code)), grade: grade),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _GradeCard(
+                key: ValueKey((_filter, grade.code)),
+                grade: grade,
+              ),
+            ),
         ],
       ),
     );
@@ -112,57 +137,105 @@ class _GradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = OrbitaColors.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final average = grade.average;
-    final color = switch (grade.status) {
-      GradeStatus.approved => colors.success,
-      GradeStatus.failed => colors.alert,
-      GradeStatus.inProgress || GradeStatus.completed => colors.secondary,
+    final gradeTag = switch (average) {
+      null => const StatusTag(label: 'Pendente', tone: TagTone.neutral),
+      < 7 => StatusTag(
+        label: '${formatGrade(average)} · abaixo de 7',
+        tone: TagTone.warning,
+      ),
+      _ => StatusTag(label: formatGrade(average), tone: TagTone.success),
     };
+    final first = grade.firstStage.total;
+    final second = grade.secondStage.total;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      color: colors.surface,
-      child: ExpansionTile(
-        title: Text(grade.subject),
-        subtitle: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text(grade.code), Text(grade.status.label)],
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            average?.toStringAsFixed(1) ?? 'Pendente',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              children: [
-                _StageDetails(number: 1, stage: grade.firstStage),
-                const SizedBox(height: 16),
-                _StageDetails(number: 2, stage: grade.secondStage),
-                const SizedBox(height: 12),
-                Text(
-                  'Nota final: ${average == null ? 'Pendente' : '${average.toStringAsFixed(1)} de 10'}',
-                  style: Theme.of(context).textTheme.titleSmall,
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
+          title: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(grade.subject, style: textTheme.bodyLarge),
+                    Text(grade.code, style: textTheme.bodySmall),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Frequência: ${grade.frequency}% · Situação: ${grade.status.label}',
-                  style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    StatusTag(
+                      label: grade.status.label,
+                      tone: switch (grade.status) {
+                        GradeStatus.approved => TagTone.success,
+                        GradeStatus.failed => TagTone.danger,
+                        GradeStatus.completed => TagTone.neutral,
+                        GradeStatus.inProgress => TagTone.info,
+                      },
+                    ),
+                    gradeTag,
+                  ],
                 ),
-              ],
+              ),
+            ],
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      for (final (label, value) in [
+                        ('AV1', first == null ? '—' : formatGrade(first)),
+                        ('AV2', second == null ? '—' : formatGrade(second)),
+                        ('Média', average == null ? '—' : formatGrade(average)),
+                        ('Freq.', '${grade.frequency}%'),
+                      ])
+                        Expanded(
+                          child: Semantics(
+                            label: '$label: $value',
+                            excludeSemantics: true,
+                            child: Column(
+                              children: [
+                                Text(label, style: textTheme.bodySmall),
+                                Text(value, style: textTheme.titleSmall),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  _StageDetails(number: 1, stage: grade.firstStage),
+                  const SizedBox(height: 16),
+                  _StageDetails(number: 2, stage: grade.secondStage),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Nota final: ${average == null ? 'Pendente' : '${average.toStringAsFixed(1)} de 10'}',
+                    style: textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Frequência: ${grade.frequency}% · Situação: ${grade.status.label}',
+                    style: textTheme.bodySmall,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

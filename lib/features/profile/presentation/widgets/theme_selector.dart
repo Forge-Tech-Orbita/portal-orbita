@@ -19,8 +19,8 @@ class ThemeSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Tema do aplicativo', style: textTheme.titleMedium),
-        const SizedBox(height: 8),
+        Text('TEMA DO APLICATIVO', style: textTheme.labelMedium),
+        const SizedBox(height: 6),
         Card(
           margin: EdgeInsets.zero,
           color: colors.surface,

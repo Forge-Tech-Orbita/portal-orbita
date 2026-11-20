@@ -1,44 +1,42 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/orbita_colors.dart';
+typedef HomeNextClass = ({
+  String subject,
+  String details,
+  String when,
+  String? startsIn,
+});
 
 class NextClassCard extends StatelessWidget {
-  const NextClassCard({
-    super.key,
-    required this.subject,
-    required this.details,
-    required this.time,
-    required this.startsIn,
-  });
+  const NextClassCard({super.key, required this.nextClass});
 
-  final String subject;
-  final String details;
-  final String time;
-  final String startsIn;
+  final HomeNextClass nextClass;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final colors = OrbitaColors.of(context);
+    final startsIn = nextClass.startsIn;
 
     return Card(
-      margin: EdgeInsets.zero,
-      color: colors.surface,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Próxima aula · demonstração', style: textTheme.labelSmall),
-            const SizedBox(height: 8),
+            Text(
+              'Próxima aula · calculada pela grade',
+              style: textTheme.bodySmall,
+            ),
+            const SizedBox(height: 4),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(subject, style: textTheme.titleSmall),
-                      Text(details, style: textTheme.bodySmall),
+                      Text(nextClass.subject, style: textTheme.titleSmall),
+                      Text(nextClass.details, style: textTheme.bodySmall),
                     ],
                   ),
                 ),
@@ -47,8 +45,17 @@ class NextClassCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(startsIn),
-                      Text(time, style: textTheme.bodySmall),
+                      Text(
+                        nextClass.when,
+                        textAlign: TextAlign.end,
+                        style: textTheme.titleSmall,
+                      ),
+                      if (startsIn != null)
+                        Text(
+                          startsIn,
+                          textAlign: TextAlign.end,
+                          style: textTheme.bodySmall,
+                        ),
                     ],
                   ),
                 ),

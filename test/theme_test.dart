@@ -14,6 +14,8 @@ void main() {
     expect(theme.colorScheme.primary, OrbitaTheme.primary);
     expect(theme.colorScheme.secondary, OrbitaTheme.terracotta);
     expect(theme.colorScheme.surface, OrbitaTheme.surface);
+    expect(theme.cardTheme.color, OrbitaTheme.surface);
+    expect(theme.cardTheme.elevation, 0);
   });
 
   test('cada tema gera um ThemeData com a própria paleta', () {

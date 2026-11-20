@@ -1,6 +1,6 @@
 enum SupportTicketStatus {
   open('Aberto'),
-  inProgress('Em atendimento'),
+  inProgress('Em análise'),
   resolved('Resolvido');
 
   const SupportTicketStatus(this.label);

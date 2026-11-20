@@ -15,6 +15,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     required this.surface,
     required this.border,
     required this.text,
+    required this.muted,
     required this.primary,
     required this.onPrimary,
     required this.secondary,
@@ -37,6 +38,9 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
 
   /// Cor principal dos textos.
   final Color text;
+
+  /// Textos secundários, legendas e ícones discretos.
+  final Color muted;
 
   /// Cor de destaque principal (botões, ícones e seleção).
   final Color primary;
@@ -69,6 +73,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     surface: OrbitaTheme.surface,
     border: OrbitaTheme.border,
     text: OrbitaTheme.text,
+    muted: OrbitaTheme.muted,
     primary: OrbitaTheme.primary,
     onPrimary: OrbitaTheme.surface,
     secondary: OrbitaTheme.terracotta,
@@ -84,6 +89,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     surface: Color(0xFF172229),
     border: Color(0xFF2A3B45),
     text: Color(0xFFEAF2F3),
+    muted: Color(0xFF9FB4BA),
     primary: Color(0xFF0AF0F5),
     onPrimary: Color(0xFF0F151A),
     secondary: Color(0xFF3CC6CF),
@@ -99,6 +105,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     surface: Color(0xFFFFFFFF),
     border: Color(0xFFE3D6EE),
     text: Color(0xFF2A1840),
+    muted: Color(0xFF6B5A7E),
     primary: Color(0xFF5B2A86),
     onPrimary: Color(0xFFFFFFFF),
     secondary: Color(0xFFC2540A),
@@ -117,6 +124,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
       surface: const Color(0xFFFFFFFF),
       border: const Color(0xFFDADDE2),
       text: text,
+      muted: const Color(0xFF5F6670),
       primary: color.color,
       onPrimary: const Color(0xFFFFFFFF),
       // Variação mais escura da cor escolhida, para não repetir o destaque.
@@ -130,6 +138,11 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
   /// Converte uma cor da paleta vintage (usada nas fixtures, como o
   /// horário) na cor equivalente desta paleta.
   Color resolve(Color vintageColor) {
+    if (vintageColor == OrbitaTheme.background) return background;
+    if (vintageColor == OrbitaTheme.surface) return surface;
+    if (vintageColor == OrbitaTheme.border) return border;
+    if (vintageColor == OrbitaTheme.text) return text;
+    if (vintageColor == OrbitaTheme.muted) return muted;
     if (vintageColor == OrbitaTheme.primary) return primary;
     if (vintageColor == OrbitaTheme.terracotta) return secondary;
     if (vintageColor == OrbitaTheme.green) return success;
@@ -145,6 +158,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
     Color? surface,
     Color? border,
     Color? text,
+    Color? muted,
     Color? primary,
     Color? onPrimary,
     Color? secondary,
@@ -158,6 +172,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
       surface: surface ?? this.surface,
       border: border ?? this.border,
       text: text ?? this.text,
+      muted: muted ?? this.muted,
       primary: primary ?? this.primary,
       onPrimary: onPrimary ?? this.onPrimary,
       secondary: secondary ?? this.secondary,
@@ -177,6 +192,7 @@ class OrbitaColors extends ThemeExtension<OrbitaColors> {
       surface: Color.lerp(surface, other.surface, t)!,
       border: Color.lerp(border, other.border, t)!,
       text: Color.lerp(text, other.text, t)!,
+      muted: Color.lerp(muted, other.muted, t)!,
       primary: Color.lerp(primary, other.primary, t)!,
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
       secondary: Color.lerp(secondary, other.secondary, t)!,

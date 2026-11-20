@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portal_orbita/core/theme/orbita_colors.dart';
 import 'package:portal_orbita/core/theme/orbita_theme.dart';
+import 'package:portal_orbita/core/theme/orbita_theme_controller.dart';
 
 void main() {
   test('tema vintage padrão mantém as cores originais', () {
@@ -34,5 +35,37 @@ void main() {
       expect(basic.colorScheme.primary, color.color);
       expect(basic.colorScheme.surface, const Color(0xFFFFFFFF));
     }
+  });
+
+  test('controlador troca o tema e avisa o app', () {
+    final controller = OrbitaThemeController();
+    addTearDown(controller.dispose);
+    var notifications = 0;
+    controller.addListener(() => notifications++);
+
+    expect(controller.option, OrbitaThemeOption.vintage);
+    expect(controller.colors, same(OrbitaColors.vintage));
+
+    controller.select(OrbitaThemeOption.vintage);
+    expect(notifications, 0);
+
+    controller.select(OrbitaThemeOption.forgeTech);
+    expect(controller.colors, same(OrbitaColors.forgeTech));
+    expect(controller.themeData.brightness, Brightness.dark);
+    expect(notifications, 1);
+
+    controller.selectBasicColor(BasicThemeColor.purple);
+    expect(controller.option, OrbitaThemeOption.basic);
+    expect(controller.basicColor, BasicThemeColor.purple);
+    expect(controller.colors.primary, BasicThemeColor.purple.color);
+    expect(notifications, 2);
+
+    // A cor do básico fica guardada mesmo ao trocar de tema.
+    controller.select(OrbitaThemeOption.uniSapiens);
+    expect(controller.basicColor, BasicThemeColor.purple);
+    expect(
+      controller.paletteFor(OrbitaThemeOption.basic).primary,
+      BasicThemeColor.purple.color,
+    );
   });
 }

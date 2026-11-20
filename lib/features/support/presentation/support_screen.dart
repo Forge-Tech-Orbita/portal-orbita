@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/mock/student_mock.dart';
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/support_ticket.dart';
 import '../data/support_tickets_mock.dart';
 import 'widgets/new_ticket_sheet.dart';
@@ -113,6 +113,7 @@ class _AttendanceTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -126,7 +127,7 @@ class _AttendanceTab extends StatelessWidget {
           const SizedBox(height: 16),
           Card(
             margin: EdgeInsets.zero,
-            color: OrbitaTheme.surface,
+            color: colors.surface,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -151,7 +152,7 @@ class _AttendanceTab extends StatelessWidget {
           const SizedBox(height: 8),
           Card(
             margin: EdgeInsets.zero,
-            color: OrbitaTheme.surface,
+            color: colors.surface,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -225,25 +226,23 @@ class _TicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
     final (icon, color) = switch (ticket.status) {
       SupportTicketStatus.open => (
         Icons.mark_email_unread_outlined,
-        OrbitaTheme.amber,
+        colors.warning,
       ),
-      SupportTicketStatus.inProgress => (
-        Icons.support_agent,
-        OrbitaTheme.primary,
-      ),
+      SupportTicketStatus.inProgress => (Icons.support_agent, colors.primary),
       SupportTicketStatus.resolved => (
         Icons.check_circle_outline,
-        OrbitaTheme.green,
+        colors.success,
       ),
     };
     final next = ticket.status.next;
 
     return Card(
       margin: EdgeInsets.zero,
-      color: OrbitaTheme.surface,
+      color: colors.surface,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

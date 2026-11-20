@@ -174,7 +174,7 @@ class _StageDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 8,
       children: [
-        Text('${number}ª etapa', style: textTheme.titleSmall),
+        Text('$numberª etapa', style: textTheme.titleSmall),
         _AssessmentRow(
           label: 'AV$number',
           value: stage.exam,

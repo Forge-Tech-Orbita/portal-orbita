@@ -295,11 +295,12 @@ void main() {
     final card = await expandGrade(tester, 'Cálculo Numérico');
 
     for (final text in [
-      'Cursando',
+      'Pendente',
       'Subtotal: 5.5 de 10',
       'AV2: Não informada',
       'TED: Não informada',
       'Avaliação Integrada: Não informada',
+      'Subtotal pendente. Falta lançar: AV2, TED, Avaliação Integrada.',
       'Nota final: Pendente',
       'Frequência: 82% · Situação: Em andamento',
     ]) {
@@ -320,6 +321,32 @@ void main() {
     expect(find.bySemanticsLabel('AV2: Não informada'), findsOneWidget);
     expect(find.bySemanticsLabel('AV1: 4.0 de 7'), findsOneWidget);
     expect(find.descendant(of: card, matching: find.text('0.0')), findsNothing);
+  });
+
+  testWidgets('pendência da etapa distingue zero de nota ausente', (
+    tester,
+  ) async {
+    const grade = Grade(
+      subject: 'Disciplina de teste',
+      code: 'TEST',
+      firstStage: GradeStage.first(exam: 0, ted: 0),
+      secondStage: GradeStage.second(exam: 0, ted: 0),
+      frequency: 100,
+      status: GradeStatus.inProgress,
+    );
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: GradesScreen(grades: [grade])),
+      ),
+    );
+    await expandGrade(tester, grade.subject);
+
+    expect(find.bySemanticsLabel('AV2: 0.0 de 6'), findsOneWidget);
+    expect(find.text('Subtotal: 0.0 de 10'), findsOneWidget);
+    expect(
+      find.text('Subtotal pendente. Falta lançar: Avaliação Integrada.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets(

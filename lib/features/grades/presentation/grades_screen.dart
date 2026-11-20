@@ -129,7 +129,7 @@ class _GradeCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            average?.toStringAsFixed(1) ?? 'Cursando',
+            average?.toStringAsFixed(1) ?? 'Pendente',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -170,29 +170,35 @@ class _StageDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final total = stage.total;
+    final assessments = [
+      (label: 'AV$number', value: stage.exam, maximum: stage.examMax),
+      (label: 'TED', value: stage.ted, maximum: GradeStage.tedMax),
+      if (stage.includesIntegrated)
+        (
+          label: 'Avaliação Integrada',
+          value: stage.integratedAssessment,
+          maximum: GradeStage.integratedMax,
+        ),
+    ];
+    final pending = assessments
+        .where((assessment) => assessment.value == null)
+        .map((assessment) => assessment.label)
+        .join(', ');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 8,
       children: [
         Text('$numberª etapa', style: textTheme.titleSmall),
-        _AssessmentRow(
-          label: 'AV$number',
-          value: stage.exam,
-          maximum: stage.examMax,
-        ),
-        _AssessmentRow(
-          label: 'TED',
-          value: stage.ted,
-          maximum: GradeStage.tedMax,
-        ),
-        if (stage.includesIntegrated)
+        for (final assessment in assessments)
           _AssessmentRow(
-            label: 'Avaliação Integrada',
-            value: stage.integratedAssessment,
-            maximum: GradeStage.integratedMax,
+            label: assessment.label,
+            value: assessment.value,
+            maximum: assessment.maximum,
           ),
         Text(
-          'Subtotal: ${total == null ? 'Pendente' : '${total.toStringAsFixed(1)} de 10'}',
+          total == null
+              ? 'Subtotal pendente. Falta lançar: $pending.'
+              : 'Subtotal: ${total.toStringAsFixed(1)} de 10',
           style: textTheme.labelLarge,
         ),
       ],

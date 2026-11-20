@@ -1,5 +1,5 @@
 enum GradeStatus {
-  inProgress('Em andamento'),
+  inProgress('Cursando'),
   completed('Aprovado');
 
   const GradeStatus(this.label);
@@ -80,4 +80,11 @@ class Grade {
     if (first == null || second == null) return null;
     return (first + second) / 2;
   }
+}
+
+/// Formata nota com vírgula: uma casa decimal, ou duas quando necessário.
+String formatGrade(double value) {
+  final hundredths = (value * 100).round();
+  final digits = hundredths % 10 == 0 ? 1 : 2;
+  return (hundredths / 100).toStringAsFixed(digits).replaceAll('.', ',');
 }

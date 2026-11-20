@@ -48,27 +48,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Sem aulas em Sábado'), findsOneWidget);
 
-      // 3. Notas: filtra Cursando e expande Cálculo Numérico
+      // 3. Notas: filtra Cursando e expande Banco de Dados II
       await tester.tap(find.text('Notas'));
       await tester.pumpAndSettle();
       expect(find.byType(GradesScreen), findsOneWidget);
       expect(find.textContaining('em migração'), findsNothing);
-      final inProgressFilter = find.widgetWithText(ChoiceChip, 'Cursando');
+      final inProgressFilter = find.widgetWithText(ChoiceChip, 'Cursando (4)');
       await tester.ensureVisible(inProgressFilter);
       await tester.pumpAndSettle();
       await tester.tap(inProgressFilter);
       await tester.pumpAndSettle();
-      final gradeCard = find.widgetWithText(Card, 'Cálculo Numérico');
+      final gradeCard = find.widgetWithText(Card, 'Banco de Dados II');
       await tester.ensureVisible(gradeCard);
       await tester.pumpAndSettle();
       await tester.tap(
-        find.descendant(of: gradeCard, matching: find.text('Cálculo Numérico')),
+        find.descendant(
+          of: gradeCard,
+          matching: find.text('Banco de Dados II'),
+        ),
       );
       await tester.pumpAndSettle();
-      expect(
-        find.text('Frequência: 82% · Situação: Em andamento'),
-        findsOneWidget,
-      );
+      expect(find.text('Frequência: 86% · Situação: Cursando'), findsOneWidget);
 
       // 4. Cursos (Minhas disciplinas)
       await tester.tap(find.text('Cursos'));
@@ -112,10 +112,7 @@ void main() {
 
       await tester.tap(find.text('Notas'));
       await tester.pumpAndSettle();
-      expect(
-        find.text('Frequência: 82% · Situação: Em andamento'),
-        findsOneWidget,
-      );
+      expect(find.text('Frequência: 86% · Situação: Cursando'), findsOneWidget);
 
       // 7. Volta para Mais → Perfil → altera switch local → Encerrar sessão
       await tester.tap(find.text('Mais'));

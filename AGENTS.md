@@ -21,7 +21,7 @@ Aplicação Flutter/Dart para Android, iOS e Web, com fixtures locais, sem auten
 | Branches e PRs | [.ai/rules/branches.md](.ai/rules/branches.md) |
 | Mensagens e aprovação de commit | [.ai/rules/commits.md](.ai/rules/commits.md) |
 
-Reutilize `lib/core/` e `lib/features/<feature>/`, `OrbitaTheme`, `AppRoutes` e widgets existentes. Preserve estado local, navegação e limites demonstrativos; não adicione pacotes, camadas ou pastas raiz em `lib/` sem aprovação. Não edite artefatos gerados manualmente.
+Reutilize `lib/core/` e `lib/features/<feature>/`, `OrbitaColors.of(context)`/`OrbitaTheme`, `AppRoutes` e widgets existentes. Preserve estado local, navegação e limites demonstrativos; não adicione pacotes, camadas ou pastas raiz em `lib/` sem aprovação. Não edite artefatos gerados manualmente.
 
 ## Execução e validação
 

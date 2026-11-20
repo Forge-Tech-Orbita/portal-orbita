@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/theme/orbita_colors.dart';
 import '../data/loans_mock.dart';
 
 class LibraryScreen extends StatelessWidget {
@@ -9,6 +9,7 @@ class LibraryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = OrbitaColors.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Biblioteca')),
@@ -55,16 +56,16 @@ class LibraryScreen extends StatelessWidget {
               for (final loan in demoLoans)
                 Card(
                   margin: const EdgeInsets.only(bottom: 12),
-                  color: OrbitaTheme.surface,
+                  color: colors.surface,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.menu_book_outlined,
                           size: 32,
-                          color: OrbitaTheme.terracotta,
+                          color: colors.secondary,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -89,9 +90,7 @@ class LibraryScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color:
-                                  (loan.dueSoon
-                                          ? OrbitaTheme.alert
-                                          : OrbitaTheme.primary)
+                                  (loan.dueSoon ? colors.alert : colors.primary)
                                       .withValues(alpha: 0.14),
                               borderRadius: BorderRadius.circular(6),
                             ),
@@ -99,8 +98,8 @@ class LibraryScreen extends StatelessWidget {
                               '${loan.daysRemaining} dias',
                               style: textTheme.labelMedium?.copyWith(
                                 color: loan.dueSoon
-                                    ? OrbitaTheme.alert
-                                    : OrbitaTheme.text,
+                                    ? colors.alert
+                                    : colors.text,
                               ),
                             ),
                           ),

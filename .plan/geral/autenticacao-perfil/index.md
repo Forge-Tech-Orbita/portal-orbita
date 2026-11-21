@@ -19,6 +19,7 @@ Base: `development` em `45631ab`. Branch: `feature/integrar-autenticacao-e-perfi
 | D5 | Sem consulta de notas, publicação de regras, criação remota de contas ou commit nesta etapa | Aprovado |
 | D6 | Na S02, provisionar catálogo, três contas e perfis em `portal-orbita`, preservando identificadores existentes e senhas privadas | Aprovado |
 | D7 | Na S02, comparar novamente as regras, sem publicar; filtrar cursos ativos na tela | Aprovado |
+| D8 | Na S03, publicar somente as regras do commit `f548409` se a base remota permanecer sem mudanças inesperadas; preparar Android/Web, sem push | Aprovado |
 
 ## Sessões planejadas
 ### S01: autenticação e perfil
@@ -45,8 +46,9 @@ Ver [provisionamento.md](provisionamento.md). Não há senhas nem UIDs reais nes
 ## Acompanhamento
 | Sessão | Status | Branch | Validações / Pendências |
 | --- | --- | --- | --- |
-| S01 | Implementado com validação remota pendente | `feature/integrar-autenticacao-e-perfil` | Gates locais aprovados; publicação das regras e conferência manual pendentes |
-| S02 | Implementado com validação remota pendente | `feature/integrar-autenticacao-e-perfil` | Catálogo, contas e perfis conferidos; filtro de ativos e gates locais aprovados; sem publicação de regras |
+| S01 | Implementado; validação solicitada concluída na S03 | `feature/integrar-autenticacao-e-perfil` | Gates locais aprovados; execução manual registrada na S03 |
+| S02 | Provisionado; validação solicitada concluída na S03 | `feature/integrar-autenticacao-e-perfil` | Catálogo, contas, perfis e gates locais conferidos; publicação registrada na S03 |
+| S03 | Concluído para os cenários solicitados | `feature/integrar-autenticacao-e-perfil` | Regras conferidas, testes manuais aprovados pelo responsável e vínculos confirmados pelo MCP |
 
 ### S02: provisionar demonstração e filtrar cursos ativos
 - **Objetivo:** provisionar os dados fictícios autorizados, comparar regras e não oferecer cursos inativos.
@@ -66,3 +68,25 @@ Ver [provisionamento.md](provisionamento.md). Não há senhas nem UIDs reais nes
 - **Verificações locais:** formatação, análise sem diagnósticos, 209 testes Flutter, 5 testes de regras nos emuladores, builds Android debug/Web e diff (incluindo arquivos novos) aprovados. A consulta de ativos e o isolamento entre instituições foram exercitados nos emuladores; cursos inativos continuam legíveis pelo titular, mas não aparecem no resultado filtrado. Widget tests cobrem inativos, catálogo vazio/indisponível, logout durante carregamento e seleção com texto 2×.
 - **Pendências / bloqueios:** publicação das regras não autorizada; fluxo remoto Android/Web bloqueado na leitura do perfil até publicação. Conferência visual mobile e ponta a ponta não realizadas.
 - **Commit proposto:** `fix(auth): filtrar cursos ativos no primeiro acesso`.
+
+### S03: publicar regras e preparar validação Android/Web
+- **Objetivo:** publicar apenas as regras aprovadas e preparar a conferência das três contas nas duas plataformas.
+- **Responsável:** agente para deploy e preparação; responsável pelo projeto para entrada privada das senhas e validação visual.
+- **Escopo / arquivos:** regras de `f548409`, configuração separada existente `firebase.emulators.json`, execução do app sem mudanças em Dart e registro neste plano/roteiro.
+- **Fora do escopo:** push, outros serviços, alteração de configurações, redefinição de curso e coleta de senhas.
+- **Decisões necessárias:** D8 aprovada; interromper antes de substituir regras se houver divergência inesperada.
+- **Passos:** reler regras publicadas, comparar base e commit, validar, publicar somente `firestore:rules`, reler e conferir conteúdo, iniciar Android/Web e executar a matriz do roteiro.
+- **Validação técnica:** sintaxe pelo MCP, 5 testes de regras nos emuladores, releitura remota, início no S200 e resposta HTTP do servidor Web.
+- **Validação manual:** primeiras escolhas de Sapiens SI/ADM no Android e Horizonte SI na Web; depois as mesmas contas nas duas plataformas, sem redefinir vínculo. Conferir identidade, catálogo permitido, persistência, logout/troca de conta e senha incorreta.
+- **Critério de conclusão:** conteúdo remoto correspondente ao commit, demais serviços/configurações preservados e evidência real por cenário; não confundir app iniciado com login validado.
+
+#### Execução da S03 — 2026-11-21
+- **Publicado:** nova leitura confirmou base anterior sem alterações inesperadas. `firestore.rules` local igual ao commit `f548409`; sintaxe validada pelo MCP e 5 testes de emuladores aprovados novamente. Deploy com `npx -y firebase-tools@latest deploy --project portal-orbita --config firebase.emulators.json --only firestore:rules --non-interactive`, saída 0.
+- **Verificado após deploy:** regras relidas pelo MCP e comparadas com as 38 linhas do arquivo aprovado, com correspondência após normalizar quebras de linha. Sem alteração em `firebase.json` ou configuração de outros serviços; sem push.
+- **Baseline dos perfis:** os três perfis ainda tinham `cursoId: null` antes da validação manual.
+- **Android:** `flutter run --no-pub --no-resident -d S200000000000014107`, saída 0; compilado, instalado e iniciado no S200 com Android 14.
+- **Web:** alvo Chrome falhou após três tentativas de conexão ao depurador. `flutter doctor --verbose` confirmou pré-requisitos Android/Web; sem troca de SDK, dependências ou limpeza. Fallback `flutter run --no-pub -d web-server --web-hostname 127.0.0.1 --web-port 7357` iniciado; HTTP 200 e abertura da URL solicitada ao navegador do sistema.
+- **Critérios manuais — relato do responsável:** confirmou que todos os cenários solicitados passaram seguindo a matriz: primeiras escolhas de Sapiens SI/ADM no Android e Horizonte SI na Web; depois as três contas em ambas as plataformas, com identidade/catálogo corretos, curso persistido após sair/entrar, limpeza de dados na troca de conta e rejeição de senha incorreta. O agente não inspecionou visualmente essas interações nem recebeu senhas.
+- **Verificação após testes — MCP:** os três perfis mantêm instituição e matrícula esperadas; vínculos confirmados em Sapiens `202600001` → `si`, Sapiens `202600002` → `adm` e Horizonte `202600001` → `si`. Nenhum curso foi redefinido administrativamente.
+- **Pendências / limites:** nenhuma nos cenários solicitados, conforme relato e releitura acima. Cenários complementares do roteiro não foram declarados manualmente executados; não houve push ou novo commit.
+- **Commit proposto:** `docs(auth): registrar publicação e validação do acesso`.

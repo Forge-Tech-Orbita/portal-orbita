@@ -64,8 +64,8 @@ O primeiro acesso vincula cada conta ao curso final da tabela. Para repetir o te
 - Nenhuma conta ou documento existente foi alterado. Não houve publicação de regras.
 
 ## 4. Regras e testes locais
-`firestore.rules` é uma proposta local: o arquivo gerado `firebase.json` não foi alterado nem há deploy nesta entrega.
-As regras atuais do servidor não permitem obter o perfil; o login será bloqueado na etapa de perfil enquanto a proposta não for revisada e publicada com autorização.
+As regras de `firestore.rules` do commit `f548409` foram publicadas em `portal-orbita` em 2026-11-21, após autorização e nova comparação com a base revisada, sem divergências inesperadas. A releitura pelo MCP confirmou correspondência do conteúdo publicado com o arquivo local, normalizando apenas quebras de linha.
+O deploy usou `--config firebase.emulators.json --only firestore:rules --project portal-orbita`; o arquivo gerado `firebase.json` e as configurações dos demais serviços foram preservados. Não houve push.
 
 Requisitos dos testes de regras: Node com `node:test`/`fetch`, Java 21+, Firebase CLI e emuladores Auth/Firestore. Instalação/download de ferramentas exige autorização própria.
 
@@ -78,6 +78,20 @@ Antes de publicar futuramente, confira novamente as regras atuais no Console e r
 O catálogo permite leitura de cursos inativos da própria instituição. A tela consulta apenas `ativo == true`, restringe os IDs ao catálogo fechado e não usa fallback local quando a consulta falha; as regras continuam bloqueando o vínculo com curso inativo.
 
 ## 5. Conferência após provisionamento e publicação autorizada
+Distribuição da primeira escolha para validar as duas plataformas sem redefinir vínculos:
+
+| Conta | Primeiro acesso / escolha | Curso |
+| --- | --- | --- |
+| Sapiens `202600001` | Android | Sistemas de Informação |
+| Sapiens `202600002` | Android | Administração |
+| Horizonte `202600001` | Web | Sistemas de Informação |
+
+Depois, conferir as três contas em ambas as plataformas. Antes da primeira escolha, conferir SI e Administração disponíveis em Sapiens e somente SI em Horizonte. Testar senha incorreta, persistência do curso após sair/entrar e limpeza de identidade/estado na troca de conta. Não redefinir `cursoId` para repetir a seleção.
+
+Preparação em 2026-11-21: app iniciado no S200 (`S200000000000014107`); Web servido em `http://127.0.0.1:7357` pelo alvo `web-server`, com HTTP 200. A abertura automática via alvo Chrome falhou na conexão com o depurador; o fallback não alterou SDKs, dependências ou o app.
+
+Validação em 2026-11-21: o responsável confirmou aprovação de todos os cenários solicitados, seguindo a distribuição de primeiras escolhas acima e conferindo as três contas nas duas plataformas: identidade, catálogo por instituição, persistência do curso, logout/troca de conta e rejeição de senha incorreta. As senhas permaneceram privadas. Após esse relato, o agente releu os três perfis pelo MCP e confirmou instituição/matrícula e vínculos `si`, `adm` e `si`, respectivamente. Não houve redefinição de curso. Os demais cenários de borda abaixo continuam como roteiro complementar; não devem ser considerados manualmente executados sem registro específico.
+
 1. Inst-demo + `202600001`: nome e instituição Sapiens, seleção inicial de SI.
 2. Inst-demo + `202600002`: seleção inicial de Administração.
 3. Horizonte + `202600001`: perfil diferente da primeira conta, somente SI disponível.

@@ -15,20 +15,37 @@ Temas do aplicativo, escolhidos no Perfil: Vintage (padrão), Básico com cor de
 
 ## Contas de demonstração
 
-O acesso é simulado e não confere senha (qualquer senha não vazia).
+O aluno usa Firebase Authentication com instituição, matrícula numérica e senha.
+Somente contas previamente provisionadas com perfil válido em `students/{uid}` podem entrar.
+O curso é escolhido uma única vez, caso ainda não esteja definido.
+Instituição e matrícula permanecem independentes do UID.
+
+O [roteiro de provisionamento](.plan/geral/autenticacao-perfil/provisionamento.md)
+descreve três contas fictícias, os documentos e a proposta local de regras.
+As regras precisam de revisão e publicação autorizada antes de validar o fluxo no projeto remoto.
 
 | Perfil | Onde entrar | Identificação |
 | --- | --- | --- |
-| Aluno | Login inicial | Matrícula `2023104567` |
-| Professor | Login inicial | Matrícula `P2019042` |
-| Coordenação | Login inicial | Matrícula `C2015007` |
+| Aluno | Login inicial | Instituição + matrícula + senha da conta provisionada |
+| Professor | Botão “Demonstração: Professor” | Protótipo sem autenticação |
+| Coordenação | Botão “Demonstração: Coordenação” | Protótipo sem autenticação |
 | Administrador | Rota `/admin` (na Web: `/#/admin`) | E-mail `adm.nome@orbita.edu` e qualquer código de 6 dígitos |
 
-Outras matrículas mostram erro de credencial e, após 5 tentativas, bloqueio temporário.
+Não há cadastro público nem acesso do aluno por biometria simulada.
+O portal administrativo e sua verificação em duas etapas continuam demonstrativos;
+não são autenticação ou autorização reais.
 
 ## Status do projeto
 
-A versão atual é demonstrativa e utiliza dados locais, sem persistência. A integração com o Firebase está em andamento: por enquanto ele é inicializado apenas na Web, ainda sem uso de autenticação ou Firestore pelas telas. Login, biometria e MFA são simulados; pagamentos, chamados, reservas, materiais, comunicados, dados pessoais, foto, tema escolhido e preferências ainda não têm integração real nem persistência. Abrir PDF ou link de material e anexar arquivos informam que dependem da integração.
+Firebase é inicializado em Android e Web. O acesso do aluno usa autenticação real,
+perfil no Firestore e vínculo inicial de curso. Logout remove a sessão e os dados
+do aluno em memória. As demais plataformas não têm configuração Firebase.
+
+Notas e demais dados acadêmicos ainda são demonstrativos: não há consulta de notas
+ao Firestore. Pagamentos, chamados, reservas, materiais, comunicados, edição de dados
+pessoais, foto, tema escolhido e preferências continuam locais, sem persistência.
+Professor, coordenação e portal administrativo são protótipos separados. Abrir PDF
+ou link de material e anexar arquivos informam que dependem da integração.
 
 ## Pré-requisitos
 
@@ -54,3 +71,11 @@ git diff --check
 ```
 
 Para compilar a versão Web, use `flutter build web --no-pub`.
+
+Para testar as regras sem acesso ao projeto remoto:
+
+```bash
+firebase emulators:exec --project demo-portal-orbita --config firebase.emulators.json --only auth,firestore "node --test test/firestore_rules_test.cjs"
+```
+
+Requisitos: Firebase CLI, Node com `node:test`/`fetch`, Java 21+ e emuladores locais.

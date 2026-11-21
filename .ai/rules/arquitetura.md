@@ -8,8 +8,10 @@ paths: ["lib/**", "pubspec.yaml", "pubspec.lock", "android/**", "ios/**", "web/*
 
 | Caminho | Responsabilidade |
 | --- | --- |
-| `lib/main.dart`, `lib/app.dart` | Inicialização do Firebase (somente Web), `MainApp`, `MaterialApp`, tema e rotas |
-| `lib/firebase_options.dart`, `firebase.json` | Configuração gerada pelo FlutterFire CLI, apenas para Web; não edite manualmente |
+| `lib/main.dart`, `lib/app.dart` | Inicialização Firebase em Android/Web, `MainApp`, sessão, tema e rotas |
+| `lib/firebase_options.dart`, `firebase.json`, `android/app/google-services.json` | Configuração gerada pelo FlutterFire CLI para Android/Web; não edite manualmente |
+| `lib/features/auth/data/`, `lib/core/models/student_profile.dart` | Autenticação Firebase, perfil por UID e invalidação de respostas antigas |
+| `lib/core/constants/institution_catalog.dart` | Instituições/cursos fictícios e conversão central de matrícula para e-mail técnico |
 | `lib/core/constants/app_routes.dart` | Constantes `AppRoutes` |
 | `lib/core/theme/orbita_theme.dart` | Cores do tema vintage e montagem do `ThemeData` |
 | `lib/core/theme/orbita_colors.dart` | `OrbitaColors` (extensão de tema) e paletas Vintage, Básico, Forge Tech e UniSapiens |
@@ -27,19 +29,19 @@ paths: ["lib/**", "pubspec.yaml", "pubspec.lock", "android/**", "ios/**", "web/*
 - Registre rotas em `AppRoutes` e associe-as em `lib/app.dart`. Preserve `MaterialPageRoute<void>`, `RouteSettings` e fallback `Rota não encontrada`.
 - Cada perfil tem uma casca com `IndexedStack`: aluno em `MainNavigationScreen` (Início, Horário, Notas, Cursos e Mais), professor em `ProfessorShell`, coordenação em `CoordinationShell` e portal administrativo em `AdminShell`. Troque o índice com `setState`, preservando estado e rolagem, sem empilhar rotas.
 - Telas secundárias usam `Navigator.pushNamed`, `Scaffold`/`AppBar` próprios e não exibem barra inferior.
-- Login/logout limpam a pilha com `pushNamedAndRemoveUntil(..., (_) => false)`. O perfil é escolhido pela matrícula em `core/mock/demo_accounts.dart`; o portal administrativo tem rotas próprias (`/admin`, `/admin/mfa`, `/admin/panel`) e não aceita contas acadêmicas. Confira `test/navigation_test.dart`, `test/profile_test.dart` e `test/admin_test.dart` ao alterar esse contrato.
-- Estado mutável é local em `StatefulWidget`/`setState`. A única exceção é o tema escolhido: `MainApp` mantém um `OrbitaThemeController` e o expõe por `OrbitaThemeScope`. Não introduza outro estado global, guards ou deep links fora do escopo aprovado.
+- O aluno exige sessão Firebase e perfil válido; curso nulo leva à escolha única. Mudanças de sessão recriam a pilha de navegação e limpam estado/tema do aluno. Professor/coordenação têm entradas explicitamente demonstrativas. O portal administrativo tem rotas próprias (`/admin`, `/admin/mfa`, `/admin/panel`) e continua simulado. Confira os testes de login, navegação, perfil e admin ao alterar esse contrato.
+- Estado mutável é local em `StatefulWidget`/`setState`. `MainApp` mantém o tema em `OrbitaThemeScope` e a sessão em `AcademicSessionScope`, ambos com ciclo de vida e descarte definidos. Não introduza outro estado global, guards ou deep links fora do escopo aprovado.
 
 ## Dados e limites demonstrativos
 
-- O app usa fixtures locais, sem autenticação real ou persistência. O Firebase é inicializado só na Web (`kIsWeb`); `firebase_auth` e `cloud_firestore` estão declarados no manifest, mas nenhuma tela os usa. Android/iOS não têm configuração Firebase. A integração está em andamento na frente da issue 6 (`chore/6-configurar-firebase`); não altere a configuração Firebase nem esses pacotes fora dela sem alinhar com o responsável. Não crie integrações por antecipação; uso desses serviços, novos pacotes, SDK/lockfile e novas camadas exigem aprovação.
+- Firebase Auth e Firestore são usados somente para acesso do aluno e perfil `students/{uid}` em Android/Web; iOS não está configurado. Instituição/matrícula são independentes do UID; curso só pode ser escolhido quando nulo. As regras locais em `firestore.rules` exigem revisão e publicação autorizada para uso remoto. Notas e demais dados acadêmicos continuam fixtures; não crie consultas ou escritas por antecipação. Novos serviços, pacotes, SDK/lockfile e camadas exigem aprovação.
 - Preserve login/biometria simulados de 900 ms, métricas fixas, barras decorativas e feedback via `SnackBar`. A busca da Biblioteca filtra empréstimos e acervo localmente. Switches de Perfil não persistem. A troca de tema é feita pelo seletor de tema do Perfil, mantida apenas em memória (volta ao vintage ao reiniciar).
 - Valores financeiros são strings para exibição, não cálculo ou cobrança real.
 - `Grade.average` só calcula com AV2 informada; status acadêmico vem da fixture, não da média. `ScheduleDay.forDate` mapeia domingo para sábado. Não altere essas decisões silenciosamente.
 
 ## Plataformas
 
-- `android/` usa Gradle Kotlin DSL. Application ID de template e assinatura debug de release devem ser substituídos antes de distribuição de produção.
+- `android/` usa Gradle Kotlin DSL e application ID `com.forgetech.plataformaorbita`. A assinatura debug de release deve ser substituída antes de distribuição de produção.
 - `ios/Runner/` contém a inicialização nativa Flutter; preserve o registro de plugins.
 - `web/index.html` carrega `flutter_bootstrap.js`; não implemente telas acadêmicas no bootstrap HTML.
 - Altere arquivos nativos/bootstrap somente quando o pedido exigir e valide com a ferramenta da plataforma; análise Dart não os cobre. Não gere novas plataformas automaticamente.

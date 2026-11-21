@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
+import '../../../core/models/student.dart';
 import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/labeled_field.dart';
 
@@ -76,7 +77,14 @@ String formatPostalCode(String value) {
 enum _PhotoAction { gallery, camera, remove }
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key, required this.initial, this.pickPhoto});
+  const EditProfileScreen({
+    super.key,
+    required this.initial,
+    this.pickPhoto,
+    this.student = demoStudent,
+  });
+
+  final Student student;
 
   final PersonalData initial;
 
@@ -248,7 +256,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 LabeledField(
                   label: 'Nome',
                   child: TextFormField(
-                    initialValue: demoStudent.name,
+                    initialValue: widget.student.name,
                     enabled: false,
                   ),
                 ),

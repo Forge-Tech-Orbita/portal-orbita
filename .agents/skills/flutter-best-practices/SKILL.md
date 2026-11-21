@@ -25,9 +25,9 @@ Leia `AGENTS.md`, `.ai/rules/arquitetura.md`, `.ai/rules/qualidade.md`, `.ai/rul
 
 ## Firebase/Firestore — limite atual
 
-`firebase_core`, `firebase_auth` e `cloud_firestore` estão em `pubspec.yaml`, mas `lib/main.dart` só chama `Firebase.initializeApp` na Web (`lib/firebase_options.dart`, gerado, só tem configuração Web). Nenhuma tela usa Auth ou Firestore. A integração está em andamento em outra frente da equipe (issue 6); não altere essa configuração fora dela. Não crie integração, repositório vazio, configuração Android/iOS ou regras de segurança por antecipação.
+O estado de Firebase, autenticação e perfil está documentado em `.ai/rules/arquitetura.md`. Preserve o UID autenticado, a validação do perfil e o isolamento entre instituições; não substitua erros ou ausência de sessão por fixtures. Regras locais não comprovam publicação nem validação no projeto remoto.
 
-Se uma tarefa futura autorizar a integração, pergunte primeiro sobre serviços, ambientes, autenticação e contratos de dados. Só então planeje loading/erro, validação na fronteira, autorização no backend e descarte de listeners, sem embutir segredos ou alegar segurança por esconder a UI. Esses cuidados são condicionais, não arquitetura já existente.
+Novas integrações exigem contrato e escopo aprovados. Preserve loading/erro, validação na fronteira, autorização nas regras, descarte de listeners e invalidação de respostas de sessões anteriores. Não embuta segredos nem alegue segurança por esconder a UI.
 
 ## Critérios de parada e resultado
 

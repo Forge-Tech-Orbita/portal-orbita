@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/account_avatar.dart';
+
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/info_card.dart';
@@ -74,8 +76,7 @@ class MoreScreen extends StatelessWidget {
                 showChevron: route != AppRoutes.login,
                 onTap: () {
                   if (route == AppRoutes.login) {
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(route, (_) => false);
+                    signOut(context);
                   } else {
                     Navigator.of(context).pushNamed(route);
                   }

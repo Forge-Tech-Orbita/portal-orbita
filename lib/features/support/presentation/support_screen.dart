@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
+import '../../auth/data/academic_session.dart';
 import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/status_tag.dart';
 import '../data/support_ticket.dart';
@@ -36,7 +37,9 @@ class _SupportScreenState extends State<SupportScreen> {
       category: data.category,
       subject: data.subject,
       description: data.description,
-      requester: demoStudent.name,
+      requester:
+          AcademicSessionScope.maybeOf(context)?.profile?.name ??
+          demoStudent.name,
       openedAt: _formatDateTime(DateTime.now()),
     );
     setState(() => _tickets.insert(0, ticket));

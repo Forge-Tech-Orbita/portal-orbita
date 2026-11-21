@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/notices_mock.dart';
 import '../../../core/mock/student_mock.dart';
+import '../../auth/data/academic_session.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/widgets/metric_tile.dart';
 import '../../../core/widgets/notice_tile.dart';
@@ -22,6 +23,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final student =
+        AcademicSessionScope.maybeOf(context)?.profile?.student ?? demoStudent;
     final nextClass = this.nextClass;
 
     return SingleChildScrollView(
@@ -39,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                       greetingForHour(DateTime.now().hour),
                       style: textTheme.bodySmall,
                     ),
-                    Text(demoStudent.shortName, style: textTheme.titleLarge),
+                    Text(student.shortName, style: textTheme.titleLarge),
                   ],
                 ),
               ),
@@ -66,7 +69,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const StudentIdCard(student: demoStudent),
+          StudentIdCard(student: student),
           const SizedBox(height: 12),
           const Row(
             spacing: 8,

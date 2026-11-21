@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/constants/app_routes.dart';
 import 'package:portal_orbita/features/admin/data/admin.dart';
 import 'package:portal_orbita/features/admin/presentation/admin_login_screen.dart';
@@ -12,7 +11,7 @@ import 'helpers.dart';
 
 Future<void> openAdminRoute(WidgetTester tester, String route) async {
   await tester.pumpWidget(const SizedBox());
-  await tester.pumpWidget(const MainApp());
+  await pumpTestApp(tester);
   Navigator.of(tester.element(find.byType(LoginScreen))).pushNamed(route);
   await tester.pumpAndSettle();
 }

@@ -31,7 +31,7 @@ class StudentIdCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'INSTITUTO ÓRBITA',
+                    student.institution,
                     style: textTheme.labelMedium?.copyWith(color: colors.text),
                   ),
                 ),

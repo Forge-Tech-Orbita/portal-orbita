@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+    function validIdentity(data) {
+      return data.instituicaoId in ['inst-demo', 'inst-horizonte']
+        && data.matricula is string
+        && data.matricula.matches('^[0-9]{1,20}$')
+        && request.auth.token.email ==
+          data.instituicaoId + '.' + data.matricula + '@auth.orbita.example';
+    }
+    match /students/{uid} {
+      allow get: if owner(uid) && validIdentity(resource.data);
+      allow update: if owner(uid) && validIdentity(resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cursoId'])
+        && resource.data.cursoId == null
+        && request.resource.data.cursoId is string
+        && (
+          (resource.data.instituicaoId == 'inst-demo'
+            && request.resource.data.cursoId in ['si', 'adm'])
+          || (resource.data.instituicaoId == 'inst-horizonte'
+            && request.resource.data.cursoId == 'si')
+        )
+        && get(/databases/$(database)/documents/institutions/$(resource.data.instituicaoId)/courses/$(request.resource.data.cursoId)).data.ativo == true;
+      match /grades/{gradeId} {
+        // Preservar o get existente das contas A/B; list e escrita continuam negados.
+        allow get: if owner(uid);
+      }
+    }
+    match /institutions/{institutionId}/courses/{courseId} {
+      allow read: if request.auth != null
+        && validIdentity(get(/databases/$(database)/documents/students/$(request.auth.uid)).data)
+        && get(/databases/$(database)/documents/students/$(request.auth.uid)).data.instituicaoId == institutionId;
+    }
+  }
+}

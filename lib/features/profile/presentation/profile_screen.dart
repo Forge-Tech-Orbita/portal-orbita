@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/mock/student_mock.dart';
+import '../../auth/data/academic_session.dart';
+import '../../../core/widgets/account_avatar.dart';
 import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/student_id_card.dart';
 import 'edit_profile_screen.dart';
@@ -25,25 +27,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var _pushNotifications = true;
   late var _biometrics = !widget.isWeb;
   // shortcut: dados e foto ficam só no estado da tela, sem persistência.
-  PersonalData _data = (
-    phone: demoStudent.phone,
-    personalEmail: demoStudent.personalEmail,
-    postalCode: demoStudent.postalCode,
-    address: demoStudent.address,
-    photo: null,
-  );
+  PersonalData? _localData;
+  String? _dataUid;
+
+  PersonalData get _data => _localData!;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final profile = AcademicSessionScope.maybeOf(context)?.profile;
+    if (_localData == null || _dataUid != profile?.uid) {
+      _dataUid = profile?.uid;
+      final student = profile?.student ?? demoStudent;
+      _localData = (
+        phone: student.phone,
+        personalEmail: student.personalEmail,
+        postalCode: student.postalCode,
+        address: student.address,
+        photo: null,
+      );
+    }
+  }
 
   Future<void> _edit() async {
+    final student =
+        AcademicSessionScope.maybeOf(context)?.profile?.student ?? demoStudent;
     final data = await Navigator.of(context).push<PersonalData>(
       MaterialPageRoute(
         settings: const RouteSettings(name: AppRoutes.editProfile),
-        builder: (_) =>
-            EditProfileScreen(initial: _data, pickPhoto: widget.pickPhoto),
+        builder: (_) => EditProfileScreen(
+          initial: _data,
+          pickPhoto: widget.pickPhoto,
+          student: student,
+        ),
       ),
     );
     if (!mounted || data == null) return;
 
-    setState(() => _data = data);
+    setState(() => _localData = data);
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -53,6 +74,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final session = AcademicSessionScope.maybeOf(context);
+    final profile = session?.profile;
+    final student = profile?.student ?? demoStudent;
     final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
 
@@ -67,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text('CONTA', style: textTheme.labelMedium),
               const SizedBox(height: 6),
               StudentIdCard(
-                student: demoStudent,
+                student: student,
                 compact: true,
                 photo: _data.photo,
               ),
@@ -79,16 +103,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       for (final (icon, label, value) in [
-                        (Icons.badge_outlined, 'CPF', demoStudent.maskedCpf),
+                        (Icons.badge_outlined, 'CPF', student.maskedCpf),
                         (
                           Icons.near_me_outlined,
                           'E-mail institucional',
-                          demoStudent.email,
+                          student.email,
                         ),
                         (
                           Icons.person_outline,
                           'Telefone',
-                          maskPhone(_data.phone),
+                          _data.phone.isEmpty
+                              ? 'Não informado'
+                              : maskPhone(_data.phone),
                         ),
                       ])
                         Padding(
@@ -113,6 +139,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 10),
+              if (profile != null) ...[
+                Text(
+                  '${student.institution} · ${profile.semester} · ${student.period}',
+                ),
+                Text('Curso: ${student.course} · vínculo não editável'),
+                const Text(
+                  'Dados pessoais, foto e preferências são locais; não são salvos no banco.',
+                ),
+              ],
               OutlinedButton.icon(
                 onPressed: _edit,
                 icon: const Icon(Icons.edit_outlined, size: 18),
@@ -147,9 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const ThemeSelector(),
               const SizedBox(height: 16),
               OutlinedButton.icon(
-                onPressed: () =>
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(AppRoutes.login, (_) => false),
+                onPressed: () => signOut(context),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: colors.secondary,
                   side: BorderSide(color: colors.secondary),

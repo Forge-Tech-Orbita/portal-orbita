@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/constants/app_routes.dart';
 import 'package:portal_orbita/core/theme/orbita_theme.dart';
 import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
@@ -19,7 +18,7 @@ void main() {
   testWidgets('inicia no Login sem barra inferior e com tema claro', (
     tester,
   ) async {
-    await tester.pumpWidget(const MainApp());
+    await pumpTestApp(tester);
 
     expect(find.byType(LoginScreen), findsOneWidget);
     expect(find.byType(BottomNavigationBar), findsNothing);
@@ -73,14 +72,14 @@ void main() {
       expect(find.byType(shell), findsOneWidget);
       expect(currentRouteName(tester, shell), route);
       final navigator = tester.state<NavigatorState>(find.byType(Navigator));
-      expect(navigator.canPop(), isFalse);
+      expect(navigator.canPop(), registration != '2023104567');
     });
   }
 
   testWidgets('rota desconhecida exibe fallback sem abrir sessão', (
     tester,
   ) async {
-    await tester.pumpWidget(const MainApp());
+    await pumpTestApp(tester);
     final context = tester.element(find.byType(LoginScreen));
     Navigator.of(context).pushNamed('/inexistente');
     await tester.pumpAndSettle();
@@ -101,8 +100,8 @@ void main() {
   testWidgets('chamado enviado sem chamado nos argumentos cai no fallback', (
     tester,
   ) async {
-    await tester.pumpWidget(const MainApp());
-    Navigator.of(tester.element(find.byType(LoginScreen)))
+    await loginAs(tester);
+    Navigator.of(tester.element(find.byType(MainNavigationScreen)))
         .pushNamed(AppRoutes.ticketSent);
     await tester.pumpAndSettle();
     expect(find.text('Rota não encontrada'), findsOneWidget);

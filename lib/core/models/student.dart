@@ -14,6 +14,7 @@ class Student {
     required this.personalEmail,
     required this.postalCode,
     required this.address,
+    this.institution = 'INSTITUTO ÓRBITA',
   });
 
   final String name;
@@ -30,4 +31,5 @@ class Student {
   final String personalEmail;
   final String postalCode;
   final String address;
+  final String institution;
 }

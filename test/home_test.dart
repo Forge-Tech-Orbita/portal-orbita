@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portal_orbita/core/mock/notices_mock.dart';
-import 'package:portal_orbita/core/mock/student_mock.dart';
 import 'package:portal_orbita/core/widgets/metric_tile.dart';
 import 'package:portal_orbita/core/widgets/notice_tile.dart';
 import 'package:portal_orbita/core/widgets/page_heading.dart';
@@ -36,10 +35,13 @@ void main() {
   ) async {
     await loginAs(tester);
 
-    expect(find.text(demoStudent.shortName), findsOneWidget);
+    expect(find.text('Aluno Demonstração'), findsWidgets);
     expect(
-      tester.widget<StudentIdCard>(find.byType(StudentIdCard)).student,
-      same(demoStudent),
+      tester
+          .widget<StudentIdCard>(find.byType(StudentIdCard))
+          .student
+          .registration,
+      '202600001',
     );
     for (final (value, label) in [
       ('8.7', 'CRA geral'),

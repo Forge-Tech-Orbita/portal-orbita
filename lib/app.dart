@@ -7,6 +7,9 @@ import 'features/admin/presentation/admin_login_screen.dart';
 import 'features/admin/presentation/admin_mfa_screen.dart';
 import 'features/admin/presentation/admin_shell.dart';
 import 'features/auth/presentation/login_screen.dart';
+import 'features/auth/data/academic_session.dart';
+import 'features/auth/data/auth_repository.dart';
+import 'features/profile/presentation/course_selection_screen.dart';
 import 'features/coordination/data/coordination_mock.dart';
 import 'features/coordination/presentation/coordination_shell.dart';
 import 'features/financial/presentation/financial_screen.dart';
@@ -27,42 +30,98 @@ import 'features/support/presentation/support_screen.dart';
 import 'features/support/presentation/ticket_sent_screen.dart';
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+  const MainApp({super.key, this.authRepository});
+
+  final AuthRepository? authRepository;
 
   @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
-  final _themeController = OrbitaThemeController();
+  var _themeController = OrbitaThemeController();
+  late final _session = AcademicSession(
+    widget.authRepository ?? FirebaseAuthRepository(),
+  );
+  String? _themeUid;
+
+  @override
+  void initState() {
+    super.initState();
+    _session.addListener(_resetUserTheme);
+  }
+
+  void _resetUserTheme() {
+    final uid = _session.profile?.uid;
+    if (uid == _themeUid) return;
+    _themeUid = uid;
+    final previous = _themeController;
+    setState(() => _themeController = OrbitaThemeController());
+    previous.dispose();
+  }
 
   @override
   void dispose() {
+    _session.removeListener(_resetUserTheme);
     _themeController.dispose();
+    _session.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     // O app inteiro é reconstruído com o novo tema quando a escolha muda.
-    return OrbitaThemeScope(
-      controller: _themeController,
-      child: ListenableBuilder(
-        listenable: _themeController,
-        builder: (context, _) => MaterialApp(
-          title: 'Portal Órbita',
-          theme: _themeController.themeData,
-          initialRoute: AppRoutes.login,
-          onGenerateRoute: _onGenerateRoute,
+    return AcademicSessionScope(
+      session: _session,
+      child: OrbitaThemeScope(
+        controller: _themeController,
+        child: ListenableBuilder(
+          listenable: Listenable.merge([_themeController, _session]),
+          builder: (context, _) => MaterialApp(
+            key: ValueKey(_session.navigationEpoch),
+            title: 'Portal Órbita',
+            theme: _themeController.themeData,
+            initialRoute:
+                _session.profile?.courseId != null && !_session.loading
+                ? AppRoutes.main
+                : AppRoutes.login,
+            onGenerateRoute: _onGenerateRoute,
+            onGenerateInitialRoutes: (route) => [
+              _onGenerateRoute(RouteSettings(name: route)),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  static Route<void> _onGenerateRoute(RouteSettings settings) {
+  Route<void> _onGenerateRoute(RouteSettings settings) {
     final arguments = settings.arguments;
+    final sessionReady =
+        _session.profile?.courseId != null && !_session.loading;
+    final protectedRoute = {
+      AppRoutes.main,
+      AppRoutes.financial,
+      AppRoutes.payment,
+      AppRoutes.library,
+      AppRoutes.catalog,
+      AppRoutes.materials,
+      AppRoutes.notices,
+      AppRoutes.notifications,
+      AppRoutes.support,
+      AppRoutes.newTicket,
+      AppRoutes.ticketSent,
+      AppRoutes.profile,
+      AppRoutes.editProfile,
+    }.contains(settings.name);
+    if (protectedRoute && !sessionReady) {
+      return MaterialPageRoute<void>(
+        settings: settings,
+        builder: (_) => _entry(),
+      );
+    }
     final screen = switch (settings.name) {
-      AppRoutes.login => const LoginScreen(),
+      AppRoutes.login => _entry(),
       AppRoutes.main => const MainNavigationScreen(),
       AppRoutes.financial => const FinancialScreen(),
       AppRoutes.payment => PaymentScreen(
@@ -114,5 +173,16 @@ class _MainAppState extends State<MainApp> {
     };
 
     return MaterialPageRoute<void>(settings: settings, builder: (_) => screen);
+  }
+
+  Widget _entry() {
+    if (_session.loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (_session.profile == null) return const LoginScreen();
+    if (_session.profile!.courseId == null) {
+      return const CourseSelectionScreen();
+    }
+    return const MainNavigationScreen();
   }
 }

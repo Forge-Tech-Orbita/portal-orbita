@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../constants/app_routes.dart';
+import '../../features/auth/data/academic_session.dart';
 import '../theme/orbita_colors.dart';
 
 /// Encerra a sessão acadêmica e limpa a pilha de navegação.
-void signOut(BuildContext context, {String route = AppRoutes.login}) {
+Future<void> signOut(
+  BuildContext context, {
+  String route = AppRoutes.login,
+}) async {
+  final session = AcademicSessionScope.maybeOf(context);
+  if (session != null &&
+      (session.hasAccount || session.loading || session.error != null)) {
+    await session.signOut();
+    if (!context.mounted || session.error != null) return;
+  }
   Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);
 }
 

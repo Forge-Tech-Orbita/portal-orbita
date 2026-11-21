@@ -2,6 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/theme/orbita_theme.dart';
+import 'package:portal_orbita/core/models/student_profile.dart';
+
+import 'fake_auth_repository.dart';
+
+Future<FakeAuthRepository> pumpTestApp(
+  WidgetTester tester, {
+  FakeAuthRepository? repository,
+}) async {
+  final auth = repository ?? FakeAuthRepository();
+  addTearDown(auth.dispose);
+  await tester.pumpWidget(MainApp(authRepository: auth));
+  await tester.pumpAndSettle();
+  return auth;
+}
 
 const testViewports = [Size(360, 800), Size(390, 844), Size(360, 640)];
 
@@ -21,10 +35,32 @@ Future<void> pumpScreen(WidgetTester tester, Widget screen) {
 
 /// Abre o app e entra com a matrícula informada (padrão: aluna).
 Future<void> loginAs(WidgetTester tester, [String? registration]) async {
-  await tester.pumpWidget(const MainApp());
-  if (registration != null) {
-    await tester.enterText(find.byType(TextFormField).first, registration);
+  final auth = await pumpTestApp(tester);
+  if (registration == 'P2019042' || registration == 'C2015007') {
+    final button = find.text(
+      registration == 'P2019042'
+          ? 'Demonstração: Professor'
+          : 'Demonstração: Coordenação',
+    );
+    await tapVisible(tester, button);
+    return;
   }
+  if (registration != null) {
+    auth.profile = StudentProfile(
+      uid: auth.profile.uid,
+      name: auth.profile.name,
+      registration: registration,
+      institutionId: 'inst-demo',
+      courseId: 'si',
+      semester: '2026-2',
+      period: 4,
+    );
+  }
+  await tester.enterText(
+    find.byType(TextFormField).first,
+    auth.profile.registration,
+  );
+  await tester.enterText(find.byType(TextFormField).last, 'test-only');
   final enter = find.text('ENTRAR NO PORTAL');
   await tester.ensureVisible(enter);
   await tester.pumpAndSettle();

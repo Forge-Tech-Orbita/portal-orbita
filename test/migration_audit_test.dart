@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/constants/app_routes.dart';
 import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
 import 'package:portal_orbita/features/financial/presentation/payment_screen.dart';
@@ -90,7 +89,7 @@ void main() {
       tester,
     ) async {
       useViewport(tester, size, textScale: 1.5);
-      await tester.pumpWidget(const MainApp());
+      await loginAs(tester);
       final navigator = tester.state<NavigatorState>(find.byType(Navigator));
 
       for (final (route, lastText) in _secondaryRoutes) {

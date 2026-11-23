@@ -97,6 +97,14 @@ void main() {
     expect(otherDay.startsIn, isNull);
   });
 
+  test('nextClassFrom preserva retorno null para grade vazia', () {
+    expect(nextClassFrom({}, thursday), isNull);
+    expect(
+      nextClassFrom({for (final day in ScheduleDay.values) day: []}, thursday),
+      isNull,
+    );
+  });
+
   testWidgets('abre no dia de hoje e troca de dia pelos chips', (tester) async {
     await pumpScreen(tester, Scaffold(body: ScheduleScreen(now: thursday)));
 

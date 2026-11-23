@@ -15,6 +15,12 @@ void main() {
     expect(ScheduleDay.forDate(DateTime(2026, 11, 16)), ScheduleDay.monday);
   });
 
+  test('weekdayName retorna o nome correto do dia da semana', () {
+    expect(weekdayName(DateTime(2026, 11, 29)), 'domingo');
+    expect(weekdayName(DateTime(2026, 11, 25)), 'quarta');
+    expect(weekdayName(DateTime(2026, 11, 28)), 'sábado');
+  });
+
   test('quinta tem Arquitetura às 19:00 e Requisitos às 21:00', () {
     final lessons = demoSchedule[ScheduleDay.thursday]!;
     expect(lessons.map((lesson) => (lesson.time, lesson.subject)), [
@@ -66,6 +72,40 @@ void main() {
     await tapVisible(tester, find.widgetWithText(ChoiceChip, 'SEG'));
     expect(find.text('Inteligência Artificial'), findsOneWidget);
     expect(find.text('Banco de Dados II'), findsOneWidget);
+  });
+
+  testWidgets('domingo exibe legenda de domingo e seleciona sábado', (
+    tester,
+  ) async {
+    final sunday = DateTime(2026, 11, 29, 10, 0);
+    await pumpScreen(tester, Scaffold(body: ScheduleScreen(now: sunday)));
+
+    expect(
+      find.textContaining('Abre no dia de hoje (domingo, 29/11)'),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'SÁB'))
+          .selected,
+      isTrue,
+    );
+  });
+
+  testWidgets('dia comum exibe o nome do dia na legenda', (tester) async {
+    final wednesday = DateTime(2026, 11, 25, 10, 0);
+    await pumpScreen(tester, Scaffold(body: ScheduleScreen(now: wednesday)));
+
+    expect(
+      find.textContaining('Abre no dia de hoje (quarta, 25/11)'),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'QUA'))
+          .selected,
+      isTrue,
+    );
   });
 
   for (final size in testViewports) {

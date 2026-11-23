@@ -16,6 +16,15 @@ void main() {
     expect(LibraryCategory.exact.includes(LibraryCategory.computing), isFalse);
   });
 
+  test('busca ignora acentos em maiúsculas e minúsculas', () {
+    expect(matchesQuery('calculo', ['Cálculo · Volume 1']), isTrue);
+    expect(matchesQuery('CÁLCULO', ['calculo']), isTrue);
+    expect(matchesQuery('jose', ['José']), isTrue);
+    expect(matchesQuery('JOSÉ', ['jose']), isTrue);
+    expect(matchesQuery('redes', ['Redes de Computadores']), isTrue);
+    expect(matchesQuery('computação', ['Computacao']), isTrue);
+  });
+
   testWidgets('biblioteca mostra três empréstimos com prazo de devolução', (
     tester,
   ) async {
@@ -48,6 +57,17 @@ void main() {
     await tester.enterText(find.byType(TextField), '');
     await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Exatas'));
     expect(find.text('Nenhum empréstimo para esta busca.'), findsOneWidget);
+  });
+
+  testWidgets('busca no acervo ignora acentos na pesquisa', (tester) async {
+    await pumpScreen(
+      tester,
+      const CatalogScreen(
+        initial: CatalogQuery(query: 'calculo', category: LibraryCategory.all),
+      ),
+    );
+    expect(find.text('Cálculo · Volume 1'), findsOneWidget);
+    expect(find.text('J. Stewart · 8ª ed.'), findsOneWidget);
   });
 
   testWidgets('concluir a busca abre o acervo com a consulta', (tester) async {
@@ -96,6 +116,76 @@ void main() {
     expect(find.text('${demoCatalog.length} resultados no acervo'), findsOne);
   });
 
+  testWidgets(
+    'busca sem resultado no acervo mostra mensagem amigavel e acao limpar busca',
+    (tester) async {
+      await pumpScreen(
+        tester,
+        const CatalogScreen(
+          initial: CatalogQuery(
+            query: 'termo-inexistente',
+            category: LibraryCategory.all,
+          ),
+        ),
+      );
+
+      expect(
+        find.text(
+          'Nenhum livro encontrado para "termo-inexistente" no acervo.',
+        ),
+        findsOneWidget,
+      );
+      final clearButton = find.widgetWithText(OutlinedButton, 'Limpar busca');
+      expect(clearButton, findsOneWidget);
+
+      await tester.tap(clearButton);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Card), findsNWidgets(demoCatalog.length));
+      expect(find.text('termo-inexistente'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'limpar busca preserva a categoria selecionada e exibe mensagem com categoria ativa',
+    (tester) async {
+      await pumpScreen(
+        tester,
+        const CatalogScreen(
+          initial: CatalogQuery(
+            query: 'inexistente',
+            category: LibraryCategory.computing,
+          ),
+        ),
+      );
+
+      expect(
+        find.text(
+          'Nenhum livro encontrado para "inexistente" na categoria Computação.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Computação'))
+            .selected,
+        isTrue,
+      );
+
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Limpar busca'));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Computação'))
+            .selected,
+        isTrue,
+      );
+      expect(find.textContaining('em Computação'), findsOneWidget);
+      expect(find.text('Redes de Computadores'), findsOneWidget);
+    },
+  );
+
   for (final size in testViewports) {
     testWidgets('telas da biblioteca sem overflow em $size', (tester) async {
       useViewport(tester, size, textScale: 2);
@@ -110,4 +200,25 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets(
+    'estado vazio do acervo sem overflow em tela estreita com texto 2x',
+    (tester) async {
+      useViewport(tester, const Size(360, 640), textScale: 2);
+      await pumpScreen(
+        tester,
+        const CatalogScreen(
+          initial: CatalogQuery(
+            query: 'Termo Muito Longo Para Busca No Acervo Que Ocupa Varias Linhas',
+            category: LibraryCategory.computing,
+          ),
+        ),
+      );
+      await tester.ensureVisible(
+        find.widgetWithText(OutlinedButton, 'Limpar busca'),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

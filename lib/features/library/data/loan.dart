@@ -68,9 +68,24 @@ class CatalogBook {
   );
 }
 
-/// Busca simples por título ou autor, sem diferenciar maiúsculas.
+/// Remove acentos e diacríticos comuns para comparação de texto.
+String removeDiacritics(String text) {
+  const withDiacritics = 'áàâãäéèêëíìîïóòôõöúùûüçñÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑ';
+  const withoutDiacritics = 'aaaaaeeeeiiiiooooouuuucnAAAAAEEEEIIIIOOOOOUUUUCN';
+  final buffer = StringBuffer();
+  for (final rune in text.runes) {
+    final char = String.fromCharCode(rune);
+    final index = withDiacritics.indexOf(char);
+    buffer.write(index >= 0 ? withoutDiacritics[index] : char);
+  }
+  return buffer.toString();
+}
+
+/// Busca simples por título ou autor, sem diferenciar maiúsculas ou acentos.
 bool matchesQuery(String query, Iterable<String> fields) {
-  final normalized = query.trim().toLowerCase();
+  final normalized = removeDiacritics(query.trim().toLowerCase());
   if (normalized.isEmpty) return true;
-  return fields.any((field) => field.toLowerCase().contains(normalized));
+  return fields.any(
+    (field) => removeDiacritics(field.toLowerCase()).contains(normalized),
+  );
 }

@@ -104,6 +104,43 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 style: textTheme.bodySmall,
               ),
               const SizedBox(height: 8),
+              if (results.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.search_off_outlined,
+                          size: 48,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          query.isNotEmpty
+                              ? (_category == LibraryCategory.all
+                                    ? 'Nenhum livro encontrado para "$query" no acervo.'
+                                    : 'Nenhum livro encontrado para "$query" na categoria ${_category.label}.')
+                              : 'Nenhum livro encontrado na categoria ${_category.label}.',
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodyMedium,
+                        ),
+                        if (query.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              _search.clear();
+                              setState(() {});
+                            },
+                            icon: const Icon(Icons.clear, size: 18),
+                            label: const Text('Limpar busca'),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
               for (final (index, book) in results)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),

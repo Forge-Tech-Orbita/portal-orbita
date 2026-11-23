@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/mock/academic_demo.dart';
 import '../../../core/mock/notifications_mock.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/widgets/orbita_bottom_nav.dart';
 import '../../auth/data/academic_session.dart';
 import '../../grades/data/grades_repository.dart';
+import '../../courses/data/courses_mock.dart';
 import '../../courses/presentation/courses_screen.dart';
 import '../../grades/presentation/grades_screen.dart';
 import '../../home/presentation/home_screen.dart';
@@ -49,6 +51,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = AcademicSessionScope.maybeOf(context)?.profile;
+    final demo = academicDemoFor(profile);
     return Scaffold(
       body: SafeArea(
         child: IndexedStack(
@@ -58,9 +62,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             const ScheduleScreen(),
             GradesScreen(
               repository: widget.gradesRepository,
-              profile: AcademicSessionScope.maybeOf(context)?.profile,
+              profile: profile,
             ),
-            const CoursesScreen(),
+            CoursesScreen(
+              courses: coursesFor(demo),
+              semester: profile?.semester,
+            ),
             const MoreScreen(),
           ],
         ),

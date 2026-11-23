@@ -1,7 +1,7 @@
 # Notas integradas e apresentação mobile
 
 ## Contexto
-Preparar o fluxo aluno autenticado → perfil → curso → notas → logout para apresentação no Android e no navegador do celular, seguido de preview Vercel e eventual promoção para `production`.
+Preparar o fluxo aluno autenticado → perfil → curso → notas → logout para apresentação no Android e no navegador do celular. Destino atualizado em 2026-11-23: primeira publicação Vercel de produção, após promoção por PR para `production`, sem deploy nesta preparação.
 
 Base remota conferida em 2026-11-22: `origin/development` em `8876c1a`, merge do PR [#21](https://github.com/Forge-Tech-Orbita/portal-orbita/pull/21). PR integrado em 2026-11-21; nenhuma ação de merge pendente para autenticação/perfil. `origin/production` está em `5160faa`, ancestral de `development`, com diferença de 103 commits. A promoção exige revisar o conjunto da entrega, não apenas notas.
 
@@ -33,8 +33,8 @@ O levantamento inicial foi somente documental. A S01 foi autorizada em 2026-11-2
 | D1 | Usar os documentos, consulta e validação descritos abaixo, sem migrar notas antigas | S01 | Aprovado em 2026-11-22; S01 autorizada |
 | D2 | Omitir CRA/históricos e métricas fixas sem fonte; manter somente resumo do semestre consultado | S01 | Diretriz do pedido; solução proposta abaixo |
 | D3 | Aprovar os dados fictícios e autorizar separadamente inspeção/cadastro remoto sem sobrescrita e publicação apenas das regras revisadas | S02 | Aprovado após S01; nove documentos e somente regras do Firestore |
-| D4 | Confirmar projeto/equipe Vercel, acesso, exposição pública do preview e método de build | S03 | Pendente; recomendar primeiro preview estático compilado localmente |
-| D5 | Aprovar promoção do conjunto `development` → `production` após validação e revisão | S04 | Ainda não autorizado |
+| D4 | Confirmar destino Vercel e método de build | S03 | Hobby existente `ricardopmartinsgtpvh-1353`, projeto pretendido `portal-orbita`; primeira publicação assumida como produção. Sem criação/vínculo ou deploy nesta preparação |
+| D5 | Preparar promoção do conjunto `development` → `production` após revisão completa | S04 | PR autorizado em 2026-11-23; merge e deploy não autorizados. Regenerar build do commit integrado em `production` |
 
 ## Contrato de documentos proposto
 Manter a coleção existente `students/{uid}/grades/{gradeId}`. Um documento por disciplina/oferta no semestre e curso; ID determinístico `<semestreLetivo>_<cursoId>_<code>`, com componentes validados, sem barras. Não reutilizar/migrar IDs antigos.
@@ -137,21 +137,25 @@ Procedimento futuro, somente após D3:
 7. Testar vazio/erro/mau formato em fake/emulador; não apagar dados remotos nem corromper contas de apresentação para simular falhas.
 
 ## Preparação Vercel
-### Primeiro preview recomendado
+### Build estático e primeira publicação
 - Aplicação estática, sem backend Vercel e sem credenciais administrativas Firebase.
 - Compilar localmente o commit validado com Flutter fixo (`3.47.7`, Dart `3.13.5` nesta conferência): `flutter build web --no-pub --base-href /`. Dependências precisam estar resolvidas antes.
-- Saída: `build/web`, ignorada pelo Git. Publicar somente esse artefato como preview Vercel após autorização, nunca a raiz com arquivos locais/planos privados.
+- Saída: `build/web`, ignorada pelo Git. A primeira publicação será de produção, no Hobby existente, projeto `portal-orbita`, somente após integração por PR e autorização própria de deploy. Nunca enviar a raiz com arquivos locais/planos privados.
 - Para upload estático, usar preset Other e nenhum build remoto adicional. Não presumir Flutter instalado na Vercel.
+- Na preparação da S03, foi gerado também pacote [Build Output API v3](https://vercel.com/docs/build-output-api/configuration), com `.vercel/output/static` contendo apenas o build e `config.json` de artefato estático. A publicação futura desse pacote deve usar `--prebuilt`, sem upload da raiz do repositório ou dos demais arquivos locais.
 - Manter URLs com fragmento no primeiro preview: refresh solicita `/`, sem precisar de rewrite geral. A aba Notas não possui deep link; atualizar pode retornar à Home após restaurar sessão. Isso é aceitável se aprovado e explicado, não preservação da aba garantida.
 - Se URLs sem `#` forem exigidas depois, aprovar mudança de estratégia e fallback SPA que preserve arquivos estáticos; testar refresh e entrada direta com os guards antes de publicar.
 - Ajustar `web/index.html` e `web/manifest.json` para nome/descrição corretos. Não prometer instalação/offline como PWA sem validação específica.
 - Validar HTTPS, assets/fontes/CanvasKit, rede Firebase, restauração de sessão e logout no domínio real. Conferir domínios autorizados/restrições de chave no Firebase sem flexibilizar regras por suposição; email/senha não exige introduzir OAuth.
 - Não configurar cache imutável geral para HTML/bootstrap; conferir atualização de versão sem exigir limpeza manual do navegador.
+- **Primeiro deploy:** a [documentação da CLI](https://vercel.com/docs/cli/deploy#prod) informa que o primeiro deploy de projeto novo é de produção mesmo sem `--prod`; esse ambiente foi assumido pelo responsável. Isso não autoriza publicar agora. Não criar/vincular projeto, alterar Production Branch ou ativar integração Git nesta preparação.
+- **Origem obrigatória do artefato final:** após integrar S03 em `development` e promover por PR para `production`, obter o SHA remoto de `production`, conferir árvore limpa e regenerar `flutter build web --release --no-pub --base-href /` desse commit. Revalidar gates, pacote e hashes; registrar SHA, versões Flutter/Dart e recibo do artefato. O pacote anterior da S03 é apenas evidência local e **não deve ser publicado**.
+- Antes da publicação futura, confirmar projeto/equipe, domínio, políticas do Hobby e restrições Firebase sem flexibilização automática. Publicar somente o pacote Build Output API v3 regenerado; a autorização de deploy continua separada. Por ser a primeira publicação, não existe artefato Vercel anterior para rollback: interromper a publicação ou retirar o deployment se necessário, sem reverter dados/regras automaticamente.
 
 ### Automação posterior, se escolhida
 Se o responsável preferir deploy por Git desde o começo, confirmar equipe/projeto Vercel, preparar `vercel.json` com saída `build/web` e script de build com SDK Flutter fixo/disponibilidade verificada, resolução de dependências e build release. Arquivos propostos nesse caso: `vercel.json`, `scripts/vercel-build.sh` e `.gitignore` para `.vercel/`. Não usar `latest` nem instalar SDK/pacotes nesta etapa.
 
-Configurar `production` como Production Branch, não `development`; branches de trabalho/development geram apenas previews. A promoção segue revisão e PR `development` → `production`; Git integration/deploy automático deve ser autorizado antes de ativar. Build remoto Linux e configurações do painel ainda não foram verificados.
+Para uma futura automação Git, propor `production` como Production Branch, não `development`; qualquer alteração exige autorização separada. A promoção segue revisão e PR `development` → `production`; Git integration/deploy automático deve ser autorizado antes de ativar. Nenhuma Production Branch foi alterada na S03. Build remoto Linux e configurações de um projeto no painel ainda não foram verificados.
 
 Referência: [configuração de projetos Vercel](https://vercel.com/docs/project-configuration).
 
@@ -204,9 +208,9 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 
 ### S03: preparar preview Vercel
 - **Responsável:** agente e responsável pelo projeto; D4 obrigatória.
-- **Escopo:** artefato estático validado, identidade Web, configuração mínima necessária e preview autorizado; sem promoção para produção.
+- **Escopo atualizado:** preparação local do artefato estático, identidade Web, configuração mínima e PR para `development`; sem publicação. A promoção por PR pertence à S04.
 - **Validação:** navegador real do celular, login/restauração, abas/retorno, refresh com/sem sessão, rota desconhecida, logout seguido de voltar/recarregar, assets, texto ampliado, erros de rede e atualização para novo build.
-- **Critério de conclusão:** URL de preview e commit/artefato identificados; responsável aprova fluxo e limites demonstrativos.
+- **Critério de preparação:** commit/PR e artefato de conferência identificados, destino aprovado e roteiro de regeneração do build final em `production`. URL publicada e aprovação visual são critérios posteriores à autorização própria de deploy.
 
 ### S04: promover versão estável
 - **Responsável:** responsável pelo projeto, com apoio do agente sob autorização.
@@ -220,8 +224,8 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 | Levantamento | Concluído | Branch existente de autenticação; sem troca | PR/branches, código, contrato proposto e Web | D1/D3 aprovadas; D4/D5 pendentes |
 | S01 | Implementada e commitada; validação técnica remota na S02 | `feature/integrar-notas-do-aluno` | Parser, consulta, estados, isolamento, apresentação e regras locais | 242 testes Flutter, 9 de regras, análise/formato e builds Android/Web aprovados |
 | S02 | Concluída tecnicamente; visual pendente | `feature/integrar-notas-do-aluno` | Nove documentos e regras do commit `1dd6d2d`; consultas reais com autenticação das três contas | 9 testes de regras; 3 logins; 15 leituras/consultas HTTP 200; 24 negativas HTTP 403; parser real aprovado |
-| S03 | Planejada | `chore/preparar-preview-web` (proposta) | — | Definir método/projeto Vercel |
-| S04 | Planejada | `development` → `production` | — | Revisão e autorização separadas |
+| S03 | Preparação local aprovada para commit/push/PR | `chore/preparar-preview-web` | Identidade Web, URLs com #, build release e pacote estático | Destino Hobby definido; sem deploy; visual pendente |
+| S04 | Preparação de PR autorizada | `development` → `production` | Revisar conjunto completo, não somente notas | Aguardar S03, revisão/aprovação e conferência visual; sem merge automático |
 
 ### Execução do levantamento — 2026-11-22
 - **Verificado:** status inicialmente limpo; fetch de referências remotas, sem alterar branches locais; PR #21 `MERGED`; `production` ancestral 103 commits atrás; conteúdo de HEAD igual a `origin/development`; nenhum PR aberto retornado pela consulta.
@@ -257,3 +261,24 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 - **Validação visual:** pendente, a cargo do responsável no navegador do celular antes da apresentação. Não iniciar Android nesta etapa; isso não bloqueia a preparação futura do preview Vercel. Não alegar validação visual a partir das consultas REST.
 - **Preparação:** artefatos Android debug e Flutter Web da S01 disponíveis; app não alterado nesta operação remota. Sem publicação Vercel, redefinição de curso, alteração de senha, push ou merge.
 - **Commit documental proposto:** `docs(grades): registrar provisionamento e validação técnica`.
+
+### Preparação da S03
+- **Compatibilidade:** [PR #23](https://github.com/Forge-Tech-Orbita/portal-orbita/pull/23) integrado pelo responsável em `development` (`26eb28a`), com árvore idêntica à base `f9389db` da S03. Preparação Web separada, sem alterar código Dart, regras ou dados das notas.
+- **Destino aprovado:** Hobby existente `ricardopmartinsgtpvh-1353`, projeto pretendido `portal-orbita`, com primeira publicação assumida como produção. Na inspeção de acesso ainda não havia projetos nesse escopo; nenhum projeto criado/vinculado ou deployment realizado nesta preparação.
+- **Identidade Web:** `web/index.html` passou a usar `lang="pt-BR"`, título e nome iOS `Portal Órbita`; `web/manifest.json` usa nome `Portal Órbita`, nome curto `Órbita` e a mesma descrição acadêmica de apresentação. Não alterados bootstrap, ícones, estratégia de rotas, SDK, dependências, Firebase ou `start_url`.
+- **Validação final:** formato sem alterações, análise sem diagnósticos, **242 testes Flutter aprovados novamente** e `flutter build web --release --no-pub --base-href /` aprovado em `build/web`. Nenhum Dart funcional foi alterado; não foi necessário novo build/início Android nem republicação de regras.
+- **Pacote local de conferência:** formato `.vercel/output/config.json` v3 e `.vercel/output/static`; 37 arquivos públicos conferidos byte a byte com o build, excluindo apenas `.last_build_id`. Sem fontes, diretórios privados, credenciais ou vínculo de projeto. Artefato não publicável: o build final deve ser regenerado do commit integrado em `production`.
+- **Rotas/cache:** URLs com fragmento preservadas, sem `usePathUrlStrategy`/rewrites SPA. Pacote configura revalidação de cache, sem `immutable`. Smoke HTTP local verificou `/`, `/#/login`, `/#/main` e cinco assets (incluindo WASM), com HTTP 200; o servidor recebeu `/` para os fragmentos, e `/main` sem fragmento retornou 404. Servidor temporário encerrado; isso não é teste visual do app ou da CDN Vercel.
+- **Antes de publicar:** integrar S03 em `development`, revisar/aprovar promoção para `production`, regenerar e validar o artefato do SHA final. Somente depois, mediante autorização de deploy, vincular/publicar o pacote no destino aprovado. Não usar `--prebuilt` diretamente em `build/web` sem o formato Build Output API. Nenhuma variável administrativa Firebase é necessária no frontend.
+- **Pendências:** revisão dos PRs, conferência completa no navegador do celular (login, perfil/curso, Home, notas, atualização, retorno, logout, troca de conta, assets e texto ampliado), regeneração do build final e autorização de publicação. Sem instalação/início Android, criação de projeto/deploy Vercel, mudança de Production Branch ou merge automático.
+- **Commit proposto:** `chore(web): preparar build estático para preview`.
+
+### Revisão da promoção S04 — 2026-11-23
+- **Referências:** `origin/production` em `5160faa`, ancestral de `origin/development` em `26eb28a` (PR #23 integrado). Comparação completa inventariada: 109 commits, 266 arquivos, 30.650 adições e 5.585 remoções, antes da S03. O PR de promoção deve ter origem em `development`, destino `production` e permanecer em rascunho até receber a S03 e nova conferência do diff.
+- **App e contratos:** revisados inicialização, rotas/guards, sessão e descarte de respostas, perfil, escolha única por transação, parser/consulta de notas, resumos, temas/widgets e módulos demonstrativos de aluno, professor, coordenação e admin. Escala prevista: apresentação com três contas fictícias, não operação acadêmica real. Notas não usam fixtures em falhas/vazio; dados remotos só nos repositórios Auth/Firestore. Escrita do cliente restrita ao primeiro vínculo de curso; sem migração ou exclusão de dados na promoção.
+- **Plataformas/dependências:** comparação inclui configuração Firebase Android/Web, identidade Android, permissões de foto iOS, Firebase e image_picker no manifest/lockfile (Flutter mínimo do lockfile `3.47.0`). iOS não tem Firebase configurado; assinatura Android release ainda usa debug e não autoriza distribuição nativa de produção. Remoções incluem o protótipo HTML legado e componentes/fixtures substituídos, não dados do banco.
+- **Ferramentas/documentação:** regras/planos, adaptadores, hook, MCP e skills importadas também entram na promoção; não fazem parte do artefato público Web. Não há workflow GitHub de deploy nem configuração Vercel versionados. Não ativar automação remota por inferência. A revisão do material de referência importado não equivale a executar seus exemplos ou certificar SDKs externos.
+- **Verificações atuais:** formato (125 arquivos), análise, **242 testes Flutter**, **9 testes Auth/Firestore em emuladores demo**, sintaxe e autoteste Bash do hook aprovados. Build Web release e smoke HTTP da S03 já aprovados para a mesma árvore funcional/metadata; não são o futuro build de `production`. Sem reexecução Android, consultas de produção ou publicação de regras nesta revisão.
+- **Pendência de gate da promoção:** `git diff --check origin/production origin/development` retorna **2**, por **90 espaços finais em 18 arquivos exclusivamente de `.opencode/skills`**, introduzidos no commit já integrado `3d63a4d`. Diff da aplicação e diff local S03 passam. Não limpar material importado fora do escopo; registrar a falha no PR de promoção e resolver antes de liberá-lo para integração, sem esconder o diagnóstico ou declarar o conjunto aprovado.
+- **Limites relevantes para publicação:** admin/MFA, professor e coordenação são protótipos acessíveis, não segurança administrativa real; não inserir dados reais ou conceder acesso remoto administrativo a esses módulos. Validação visual completa no celular e domínio final ainda pendente. Revalidação/hash routing não comprovam comportamento de CDN, HTTPS, restrições Firebase ou atualização real de navegador.
+- **Ordem de liberação:** revisar/integrar PR S03 em `development`; atualizar/revisar diff e gates do PR de promoção, resolver a pendência acima e concluir revisão humana/conversas; integrar `development` → `production` somente pelo responsável. Depois regenerar build/pacote do SHA de `production`, conferir recibo/assets e obter autorização separada de deploy no Hobby `portal-orbita`. Nenhum merge ou deploy automático.

@@ -83,6 +83,21 @@ git diff --check
 
 Para compilar a versão Web, use `flutter build web --no-pub`.
 
+### Preparação do preview Web
+
+```bash
+flutter build web --release --no-pub --base-href /
+```
+
+A saída estática fica em `build/web`; as URLs continuam com `#`, sem mudança
+para path routing. O [plano da S03](.plan/geral/notas-apresentacao-mobile/index.md)
+registra o pacote Build Output API v3 de conferência e o destino aprovado:
+Hobby existente, projeto `portal-orbita`, primeira publicação de produção.
+Após integrar a S03 em `development` e promover por PR para `production`,
+regenerar e validar o build do commit final de `production`; não publicar o pacote anterior.
+Nenhum deploy foi realizado ou autorizado nesta preparação. Não enviar a raiz do
+repositório ou arquivos privados: publicar somente o pacote final validado, sob autorização separada.
+
 Para testar as regras sem acesso ao projeto remoto:
 
 ```bash

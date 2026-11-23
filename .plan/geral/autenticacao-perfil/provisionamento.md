@@ -101,6 +101,6 @@ Validação em 2026-11-21: o responsável confirmou aprovação de todos os cen�
 7. Sair em Perfil/Mais: voltar ao login, limpar identidade e estado; voltar do sistema não reabre sessão.
 8. Trocar de conta durante carregamento: nenhuma resposta antiga pode exibir o perfil anterior.
 9. Demonstrativos de professor/coordenação: entrada separada, sem sessão Firebase e sem acesso às rotas do aluno.
-10. Notas, suporte, materiais e demais dados acadêmicos continuam demonstrativos. Dados pessoais/foto/preferências são locais, não persistidos.
+10. Notas usam dados fictícios provisionados no Firestore, consultados por UID/semestre/curso; a publicação e validação técnica estão no [plano de notas, S02](../notas-apresentacao-mobile/index.md). Suporte, materiais e demais módulos acadêmicos continuam demonstrativos. Dados pessoais/foto/preferências são locais, não persistidos.
 
 Ocultar cadastro na UI não bloqueia a API de criação de contas do provedor. Contas sem perfil não recebem acesso a perfis/cursos e só podem obter suas próprias notas, conforme a permissão anterior. Se for necessário proibir toda criação externa no Auth, definir um bloqueio no serviço de identidade em tarefa própria.

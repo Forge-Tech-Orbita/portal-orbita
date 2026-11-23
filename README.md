@@ -22,8 +22,8 @@ Instituição e matrícula permanecem independentes do UID.
 
 O [roteiro de provisionamento](.plan/geral/autenticacao-perfil/provisionamento.md)
 descreve três contas fictícias e a publicação das regras de autenticação/perfil.
-As novas regras locais de consulta de notas ainda precisam de revisão e publicação autorizada;
-não foram publicadas nesta entrega.
+As regras de consulta de notas do commit `1dd6d2d` foram publicadas na S02,
+preservando a leitura individual legada e os demais serviços.
 
 | Perfil | Onde entrar | Identificação |
 | --- | --- | --- |
@@ -45,8 +45,12 @@ do aluno em memória. As demais plataformas não têm configuração Firebase.
 Notas são consultadas somente para o UID autenticado, semestre e curso do perfil,
 em `students/{uid}/grades`, com carregamento, atualização, erro e ausência de notas
 sem fallback demonstrativo. O [plano de notas](.plan/geral/notas-apresentacao-mobile/index.md)
-define o contrato e o cadastro fictício futuro: ainda não houve provisionamento nem
-publicação das novas regras de consulta. CRA e métricas históricas sem fonte foram omitidos.
+define o contrato e registra o provisionamento fictício: nove documentos, três por conta,
+criados sem sobrescrita na S02. CRA e métricas históricas sem fonte foram omitidos.
+As três contas passaram em login real e consultas REST com tokens de aluno, com conferência
+dos documentos pelo parser do app e negativas de acesso. A validação visual no navegador
+do celular permanece pendente e não bloqueia a preparação do preview; os registros técnicos
+e visuais estão separados no plano.
 
 Os demais módulos acadêmicos permanecem demonstrativos, identificados na casca do aluno.
 Pagamentos, chamados, reservas, materiais, comunicados, edição de dados

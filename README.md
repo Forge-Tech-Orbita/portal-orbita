@@ -1,83 +1,51 @@
 # Portal Órbita
 
-Portal acadêmico desenvolvido em Flutter/Dart para reunir informações e serviços do estudante em uma única aplicação, com estrutura para Android, iOS e Web.
+Ambiente acadêmico simulado desenvolvido em Flutter/Dart, com acesso do aluno,
+perfil e notas integrados ao Firebase e demais funcionalidades demonstrativas.
+O projeto tem estrutura para Android, iOS e Web; Firebase está configurado somente
+em Android e Web.
 
 ## Demonstração publicada
 
 **Acesse:** https://portal-orbita-rho.vercel.app
 
-A demonstração usa dados fictícios. Solicite à equipe as contas de acesso do aluno;
-não há cadastro público e as senhas de acesso não são divulgadas aqui.
-
-O fluxo integrado inclui:
-
-- Autenticação do aluno com instituição, matrícula e senha via Firebase Authentication.
-- Perfil acadêmico no Firestore e escolha única do curso, quando ainda não vinculado.
-- Consulta de notas do próprio aluno por semestre e curso, sem substituir falhas ou ausência de notas por dados demonstrativos.
-- Logout com limpeza da sessão e dos dados do aluno em memória.
-
-A versão publicada corresponde ao commit `9d67d04`.
-O responsável pelo projeto confirmou o funcionamento no navegador do celular com
-as contas de demonstração; essa conferência visual/funcional foi realizada por ele,
-não pelo agente. Os resultados técnicos e o aceite estão no
-[plano da apresentação](.plan/geral/notas-apresentacao-mobile/index.md).
-
-## Funcionalidades
-
-Interface baseada no protótipo "Portal Órbita — Protótipo de interface", com quatro perfis.
-
-- **Aluno:** início com carteirinha, próxima aula demonstrativa e notificações; horário semanal; notas com AV1/AV2, TED e avaliação integrada consultadas no Firestore; disciplinas; financeiro com pagamento simulado por Pix ou boleto; biblioteca com busca e acervo (reserva e fila); materiais das disciplinas; mural com confirmação de presença; suporte com novo chamado e confirmação; perfil com edição de dados, foto e escolha do tema do aplicativo.
-- **Professor:** início, turmas, materiais (novo PDF ou link), frequência somente leitura e comunicados.
-- **Coordenação:** painel com indicadores agregados, turmas do curso, materiais e publicação de eventos e comunicados.
-- **Portal Administrativo (separado):** login próprio com verificação em duas etapas, painel, usuários, chamados, permissões com segunda aprovação e auditoria.
-
-Temas do aplicativo, escolhidos no Perfil: Vintage (padrão), Básico com cor de destaque selecionável, Forge Tech (escuro) e UniSapiens.
+A versão publicada foi validada no navegador do celular.
 
 ## Contas de demonstração
 
-O aluno usa Firebase Authentication com instituição, matrícula numérica e senha.
-Somente contas previamente provisionadas com perfil válido em `students/{uid}` podem entrar.
-Use a instituição, matrícula e senha fornecidas pela equipe, sem publicar credenciais.
-O curso é escolhido uma única vez, caso ainda não esteja definido.
-Instituição e matrícula permanecem independentes do UID.
+No login do aluno, selecione a instituição e informe a matrícula e a senha da conta.
 
-O [roteiro de provisionamento](.plan/geral/autenticacao-perfil/provisionamento.md)
-descreve três contas fictícias e a publicação das regras de autenticação/perfil.
-As regras de consulta de notas do commit `1dd6d2d` foram publicadas na S02,
-preservando a leitura individual legada e os demais serviços.
-
-| Perfil | Onde entrar | Identificação |
+| Instituição | Matrícula | Curso |
 | --- | --- | --- |
-| Aluno | Login inicial | Instituição + matrícula + senha da conta provisionada |
-| Professor | Botão “Demonstração: Professor” | Protótipo sem autenticação |
-| Coordenação | Botão “Demonstração: Coordenação” | Protótipo sem autenticação |
-| Administrador | Rota `/admin` (na Web: `/#/admin`) | Protótipo com login e verificação em duas etapas simulados |
+| Sapiens — Demonstração | `202600001` | Sistemas de Informação |
+| Sapiens — Demonstração | `202600002` | Administração |
+| Instituto Horizonte — Demonstração | `202600001` | Sistemas de Informação |
 
-Não há cadastro público nem acesso do aluno por biometria simulada.
-O portal administrativo e sua verificação em duas etapas continuam demonstrativos;
-não são autenticação ou autorização reais.
+Solicite à equipe a senha de acesso. As contas e os dados são fictícios, e não há cadastro público.
 
-## Status do projeto
+## Funcionalidades e limites
 
-Firebase é inicializado em Android e Web. O acesso do aluno usa autenticação real,
-perfil no Firestore e vínculo inicial de curso. Logout remove a sessão e os dados
-do aluno em memória. As demais plataformas não têm configuração Firebase.
+### Integradas ao Firebase
 
-Notas são consultadas somente para o UID autenticado, semestre e curso do perfil,
-em `students/{uid}/grades`, com carregamento, atualização, erro e ausência de notas
-sem fallback demonstrativo. O [plano de notas](.plan/geral/notas-apresentacao-mobile/index.md)
-define o contrato e registra o provisionamento fictício: nove documentos, três por conta,
-criados sem sobrescrita na S02. CRA e métricas históricas sem fonte foram omitidos.
-As três contas passaram em login real e consultas REST com tokens de aluno, com conferência
-dos documentos pelo parser do app e negativas de acesso. A conferência visual/funcional
-da versão publicada no navegador do celular foi confirmada pelo responsável pelo projeto;
-os registros técnicos do agente e o aceite manual do usuário estão separados no plano.
+- **Acesso do aluno:** autenticação real por instituição, matrícula e senha via Firebase Authentication, somente para contas provisionadas. Não há acesso por biometria simulada.
+- **Perfil e curso:** perfil acadêmico no Firestore e escolha única do curso, quando ainda não vinculado.
+- **Notas:** AV1/AV2, TED, avaliação integrada e frequência consultadas no Firestore somente para o aluno autenticado, semestre e curso do perfil. Há estados de carregamento, atualização, erro e ausência de notas, sem fallback para dados demonstrativos. CRA e métricas históricas sem fonte não são exibidos.
+- **Logout:** encerramento da sessão e limpeza dos dados do aluno em memória.
 
-Os demais módulos acadêmicos permanecem demonstrativos, identificados na casca do aluno.
-Pagamentos, chamados, reservas, materiais, comunicados, edição de dados
-pessoais, foto, tema escolhido e preferências continuam locais, sem persistência.
-Professor, coordenação e portal administrativo são protótipos separados. Abrir PDF
-ou link de material e anexar arquivos informam que dependem da integração.
+### Ainda simuladas
+
+- **Aluno:** próxima aula, horário, notificações, disciplinas, financeiro/Pix/boleto, biblioteca/reservas, materiais, mural e suporte. Esses módulos não consultam dados acadêmicos reais.
+- **Professor:** início, turmas, materiais, frequência somente leitura e comunicados.
+- **Coordenação:** painel com indicadores, turmas, materiais, eventos e comunicados.
+- **Portal administrativo:** login e verificação em duas etapas simulados, painel, usuários, chamados, permissões e auditoria. Não há autenticação ou autorização administrativa real.
+
+Professor e coordenação têm botões de demonstração no login, sem autenticação.
+O portal administrativo separado é acessado em `/#/admin` na Web.
+
+Edição de dados pessoais, foto, tema e preferências ficam apenas em memória, sem
+persistência. Os temas disponíveis no Perfil são Vintage (padrão), Básico com cor
+selecionável, Forge Tech (escuro) e UniSapiens. Abrir PDF/link de material e anexar
+arquivos dependem de integração futura.
 
 ## Pré-requisitos
 
@@ -124,9 +92,8 @@ executado na raiz do pacote estático conferido, não na raiz do repositório.
 Não enviar a raiz do repositório, fontes ou arquivos privados, nem reutilizar
 um pacote de outro commit.
 
-A primeira publicação usou o commit `9d67d04`, com HTTPS, raiz e 37 arquivos
-estáticos conferidos. O [plano da apresentação](.plan/geral/notas-apresentacao-mobile/index.md)
-registra a URL, o SHA completo e a validação no celular.
+O [plano da apresentação](.plan/geral/notas-apresentacao-mobile/index.md)
+registra a publicação e as validações.
 
 Para testar as regras sem acesso ao projeto remoto:
 

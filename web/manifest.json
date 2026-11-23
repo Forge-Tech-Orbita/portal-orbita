@@ -1,11 +1,11 @@
 {
-    "name": "portal_orbita",
-    "short_name": "portal_orbita",
+    "name": "Portal Órbita",
+    "short_name": "Órbita",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Portal acadêmico de apresentação: acesso do aluno, perfil e notas.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

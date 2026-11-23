@@ -16,6 +16,15 @@ void main() {
     expect(LibraryCategory.exact.includes(LibraryCategory.computing), isFalse);
   });
 
+  test('busca ignora acentos em maiúsculas e minúsculas', () {
+    expect(matchesQuery('calculo', ['Cálculo · Volume 1']), isTrue);
+    expect(matchesQuery('CÁLCULO', ['calculo']), isTrue);
+    expect(matchesQuery('jose', ['José']), isTrue);
+    expect(matchesQuery('JOSÉ', ['jose']), isTrue);
+    expect(matchesQuery('redes', ['Redes de Computadores']), isTrue);
+    expect(matchesQuery('computação', ['Computacao']), isTrue);
+  });
+
   testWidgets('biblioteca mostra três empréstimos com prazo de devolução', (
     tester,
   ) async {
@@ -48,6 +57,17 @@ void main() {
     await tester.enterText(find.byType(TextField), '');
     await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Exatas'));
     expect(find.text('Nenhum empréstimo para esta busca.'), findsOneWidget);
+  });
+
+  testWidgets('busca no acervo ignora acentos na pesquisa', (tester) async {
+    await pumpScreen(
+      tester,
+      const CatalogScreen(
+        initial: CatalogQuery(query: 'calculo', category: LibraryCategory.all),
+      ),
+    );
+    expect(find.text('Cálculo · Volume 1'), findsOneWidget);
+    expect(find.text('J. Stewart · 8ª ed.'), findsOneWidget);
   });
 
   testWidgets('concluir a busca abre o acervo com a consulta', (tester) async {

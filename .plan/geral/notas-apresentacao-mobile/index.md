@@ -3,6 +3,8 @@
 ## Contexto
 Preparar o fluxo aluno autenticado → perfil → curso → notas → logout para apresentação no Android e no navegador do celular. Destino atualizado em 2026-11-23: primeira publicação Vercel de produção, após promoção por PR para `production`, sem deploy nesta preparação.
 
+**Situação atual — 2026-11-23:** versão Web publicada em [portal-orbita-rho.vercel.app](https://portal-orbita-rho.vercel.app), commit `9d67d04b8fb246a9209c62531aa79ce8764cbb90`. Conferência visual/funcional no navegador do celular **realizada e confirmada pelo responsável pelo projeto (usuário)** com as contas de demonstração, não pelo agente. Os diagnósticos e registros de execução abaixo preservam o estado histórico de cada etapa; o aceite final está registrado ao fim deste plano.
+
 Base remota conferida em 2026-11-22: `origin/development` em `8876c1a`, merge do PR [#21](https://github.com/Forge-Tech-Orbita/portal-orbita/pull/21). PR integrado em 2026-11-21; nenhuma ação de merge pendente para autenticação/perfil. `origin/production` está em `5160faa`, ancestral de `development`, com diferença de 103 commits. A promoção exige revisar o conjunto da entrega, não apenas notas.
 
 Levantamento realizado na branch existente `feature/integrar-autenticacao-e-perfil`, sem trocar/atualizar branches locais. Seu conteúdo rastreado coincide com `origin/development`. Implementação futura deve partir de `development` atualizado, em nova branch `feature/integrar-notas-do-aluno`, com PR próprio para `development`.
@@ -33,8 +35,8 @@ O levantamento inicial foi somente documental. A S01 foi autorizada em 2026-11-2
 | D1 | Usar os documentos, consulta e validação descritos abaixo, sem migrar notas antigas | S01 | Aprovado em 2026-11-22; S01 autorizada |
 | D2 | Omitir CRA/históricos e métricas fixas sem fonte; manter somente resumo do semestre consultado | S01 | Diretriz do pedido; solução proposta abaixo |
 | D3 | Aprovar os dados fictícios e autorizar separadamente inspeção/cadastro remoto sem sobrescrita e publicação apenas das regras revisadas | S02 | Aprovado após S01; nove documentos e somente regras do Firestore |
-| D4 | Confirmar destino Vercel e método de build | S03 | Hobby existente `ricardopmartinsgtpvh-1353`, projeto pretendido `portal-orbita`; primeira publicação assumida como produção. Sem criação/vínculo ou deploy nesta preparação |
-| D5 | Preparar promoção do conjunto `development` → `production` após revisão completa | S04 | PR autorizado em 2026-11-23; merge e deploy não autorizados. Regenerar build do commit integrado em `production` |
+| D4 | Confirmar destino Vercel e método de build | S03 | Concluída: projeto `portal-orbita` criado no Hobby `ricardopmartinsgtpvh-1353`; publicação Production autorizada, somente pacote estático conferido e sem integração Git |
+| D5 | Preparar promoção do conjunto `development` → `production` após revisão completa | S04 | Concluída: PR #25 integrado pelo responsável; build regenerado do commit `9d67d04` e publicado sob autorização separada; aceite visual/funcional confirmado pelo usuário |
 
 ## Contrato de documentos proposto
 Manter a coleção existente `students/{uid}/grades/{gradeId}`. Um documento por disciplina/oferta no semestre e curso; ID determinístico `<semestreLetivo>_<cursoId>_<code>`, com componentes validados, sem barras. Não reutilizar/migrar IDs antigos.
@@ -223,9 +225,9 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 | --- | --- | --- | --- | --- |
 | Levantamento | Concluído | Branch existente de autenticação; sem troca | PR/branches, código, contrato proposto e Web | D1/D3 aprovadas; D4/D5 pendentes |
 | S01 | Implementada e commitada; validação técnica remota na S02 | `feature/integrar-notas-do-aluno` | Parser, consulta, estados, isolamento, apresentação e regras locais | 242 testes Flutter, 9 de regras, análise/formato e builds Android/Web aprovados |
-| S02 | Concluída tecnicamente; visual pendente | `feature/integrar-notas-do-aluno` | Nove documentos e regras do commit `1dd6d2d`; consultas reais com autenticação das três contas | 9 testes de regras; 3 logins; 15 leituras/consultas HTTP 200; 24 negativas HTTP 403; parser real aprovado |
-| S03 | Preparação local aprovada para commit/push/PR | `chore/preparar-preview-web` | Identidade Web, URLs com #, build release e pacote estático | Destino Hobby definido; sem deploy; visual pendente |
-| S04 | Preparação de PR autorizada | `development` → `production` | Revisar conjunto completo, não somente notas | Aguardar S03, revisão/aprovação e conferência visual; sem merge automático |
+| S02 | Técnica concluída; conferência Web confirmada pelo usuário | `feature/integrar-notas-do-aluno` | Nove documentos e regras do commit `1dd6d2d`; consultas reais com autenticação das três contas | Evidências técnicas preservadas; conferência visual/funcional no navegador do celular realizada pelo responsável, não pelo agente |
+| S03 | Concluída e integrada pelo PR #24 | `chore/preparar-preview-web` | Identidade Web, URLs com #, build release e pacote estático | Preparação integrada; publicação final e aceite Web registrados na S04 |
+| S04 | Publicação e aceite Web concluídos | `development` → `production` | PR #25 integrado; build limpo de `9d67d04` publicado no Hobby | HTTPS, raiz e 37 assets conferidos tecnicamente; funcionamento no celular confirmado pelo usuário |
 
 ### Execução do levantamento — 2026-11-22
 - **Verificado:** status inicialmente limpo; fetch de referências remotas, sem alterar branches locais; PR #21 `MERGED`; `production` ancestral 103 commits atrás; conteúdo de HEAD igual a `origin/development`; nenhum PR aberto retornado pela consulta.
@@ -289,3 +291,12 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 - **Skills:** removidos somente os 90 espaços finais nos 18 arquivos apontados. Comparação com `--ignore-space-at-eol` confirma conteúdo preservado, inclusive no script Swift; nenhuma skill instalada, exemplo executado ou integração alterada.
 - **Verificações locais:** formato (125 arquivos), análise e **242 testes Flutter** aprovados. `git diff --check origin/production --` passa para a árvore de trabalho completa, incluindo a correção; isso ainda não comprova o diff remoto do #25, que só muda após integração em `development`.
 - **Pendências de integração:** revisar/aprovar o PR de correção para `development` e integrá-lo antes do #25, sem push direto nas branches protegidas. A retirada do rascunho não comprova a resolução no remoto antes dessa integração nem dispensa ao menos uma aprovação e conversas resolvidas. Sem novo build, Android ou deploy; build final continua obrigatório após integração em `production`. Conferência visual mobile continua a cargo do responsável.
+
+### Publicação e aceite Web — 2026-11-23
+- **Integração:** PR #26 integrado em `development`, seguido do [PR #25](https://github.com/Forge-Tech-Orbita/portal-orbita/pull/25) em `production`. As pendências históricas de integração, faixa DEBUG e espaços finais foram resolvidas antes da publicação.
+- **URL de produção:** https://portal-orbita-rho.vercel.app — projeto `portal-orbita`, escopo Hobby `ricardopmartinsgtpvh-1353`, deployment `dpl_4RrKkD6WFFEdekESvedA3cBcsRUc` em estado Ready.
+- **Commit publicado:** `9d67d04b8fb246a9209c62531aa79ce8764cbb90` (`9d67d04`), merge do PR #25. Novo build `flutter build web --release --no-pub --base-href /` gerado de árvore limpa desse commit, com Flutter 3.47.7/Dart 3.13.5; nenhum ajuste local incorporado ao artefato.
+- **Verificação técnica pelo agente na publicação:** formato, análise e 242 testes Flutter aprovados; somente pacote estático Build Output API v3 enviado. HTTPS com certificado validado, raiz e URL com fragmento HTTP 200, HTTP → HTTPS com 308 e os 37 arquivos públicos com hashes idênticos ao pacote conferido. Sem contratação de plano, ativação de serviços pagos, deploy automático Git ou alteração de regras/dados Firebase.
+- **Conferência visual/funcional — realizada pelo usuário:** o responsável pelo projeto confirmou o funcionamento da versão publicada no navegador do celular com as contas de demonstração, concluindo a conferência final do fluxo de login, notas e logout. Esta é uma confirmação manual informada pelo usuário; **não foi executada nem observada pelo agente** e não é inferida dos testes automatizados ou das verificações HTTP.
+- **Limite do aceite:** apresentação Web com dados fictícios e módulos demonstrativos existentes. Não estender a confirmação a Android/iOS ou a cenários específicos de acessibilidade, rede e navegadores que não foram individualmente relatados.
+- **Este registro:** atualização documental apenas; sem novo build/deploy, execução do app ou alteração do Firebase.

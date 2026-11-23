@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/mock/notifications_mock.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/widgets/orbita_bottom_nav.dart';
-import '../../../core/widgets/info_banner.dart';
 import '../../auth/data/academic_session.dart';
 import '../../grades/data/grades_repository.dart';
 import '../../courses/presentation/courses_screen.dart';
@@ -52,30 +51,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
+        child: IndexedStack(
+          index: selectedIndex,
           children: [
-            const InfoBanner(
-              title: 'Ambiente de apresentação',
-              message: 'Identidade, curso e notas integrados. Horário, Cursos e demais módulos são demonstrativos.',
+            HomeScreen(nextClass: _nextClass(), notifications: _notifications),
+            const ScheduleScreen(),
+            GradesScreen(
+              repository: widget.gradesRepository,
+              profile: AcademicSessionScope.maybeOf(context)?.profile,
             ),
-            Expanded(
-              child: IndexedStack(
-                index: selectedIndex,
-                children: [
-                  HomeScreen(
-                    nextClass: _nextClass(),
-                    notifications: _notifications,
-                  ),
-                  const ScheduleScreen(),
-                  GradesScreen(
-                    repository: widget.gradesRepository,
-                    profile: AcademicSessionScope.maybeOf(context)?.profile,
-                  ),
-                  const CoursesScreen(),
-                  const MoreScreen(),
-                ],
-              ),
-            ),
+            const CoursesScreen(),
+            const MoreScreen(),
           ],
         ),
       ),

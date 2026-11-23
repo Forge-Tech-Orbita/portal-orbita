@@ -30,37 +30,36 @@ void main() {
     }
   });
 
-  testWidgets(
-    'início mostra identidade e demonstração sem métricas sem fonte',
-    (tester) async {
-      await loginAs(tester);
+  testWidgets('início mostra identidade sem banner e sem métricas sem fonte', (
+    tester,
+  ) async {
+    await loginAs(tester);
 
-      expect(find.text('Aluno Demonstração'), findsWidgets);
-      expect(
-        tester
-            .widget<StudentIdCard>(find.byType(StudentIdCard))
-            .student
-            .registration,
-        '202600001',
-      );
-      expect(find.byType(MetricTile), findsNothing);
-      expect(find.textContaining('demonstrativos'), findsOneWidget);
-      expect(find.byType(NextClassCard), findsOneWidget);
-      expect(find.text('Próxima aula · calculada pela grade'), findsOneWidget);
-      expect(find.byType(QuickActionTile), findsNWidgets(4));
+    expect(find.text('Aluno Demonstração'), findsWidgets);
+    expect(
+      tester
+          .widget<StudentIdCard>(find.byType(StudentIdCard))
+          .student
+          .registration,
+      '202600001',
+    );
+    expect(find.byType(MetricTile), findsNothing);
+    expect(find.text('Ambiente de apresentação'), findsNothing);
+    expect(find.byType(NextClassCard), findsOneWidget);
+    expect(find.text('Próxima aula · calculada pela grade'), findsOneWidget);
+    expect(find.byType(QuickActionTile), findsNWidgets(4));
 
-      await tester.ensureVisible(find.byType(NoticeTile).last);
-      await tester.pumpAndSettle();
-      expect(
-        tester
-            .widgetList<NoticeTile>(find.byType(NoticeTile))
-            .map((tile) => tile.notice),
-        recentNotices,
-      );
-      expect(find.text('Matrícula 2027.1'), findsOneWidget);
-      expect(find.text('Semana de Tecnologia Órbita'), findsOneWidget);
-    },
-  );
+    await tester.ensureVisible(find.byType(NoticeTile).last);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widgetList<NoticeTile>(find.byType(NoticeTile))
+          .map((tile) => tile.notice),
+      recentNotices,
+    );
+    expect(find.text('Matrícula 2027.1'), findsOneWidget);
+    expect(find.text('Semana de Tecnologia Órbita'), findsOneWidget);
+  });
 
   testWidgets('sino mostra não lidas e sincroniza ao marcar como lidas', (
     tester,

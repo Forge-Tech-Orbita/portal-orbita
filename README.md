@@ -2,6 +2,26 @@
 
 Portal acadêmico desenvolvido em Flutter/Dart para reunir informações e serviços do estudante em uma única aplicação, com estrutura para Android, iOS e Web.
 
+## Demonstração publicada
+
+**Acesse:** https://portal-orbita-rho.vercel.app
+
+A demonstração usa dados fictícios. Solicite à equipe as contas de acesso do aluno;
+não há cadastro público e as senhas de acesso não são divulgadas aqui.
+
+O fluxo integrado inclui:
+
+- Autenticação do aluno com instituição, matrícula e senha via Firebase Authentication.
+- Perfil acadêmico no Firestore e escolha única do curso, quando ainda não vinculado.
+- Consulta de notas do próprio aluno por semestre e curso, sem substituir falhas ou ausência de notas por dados demonstrativos.
+- Logout com limpeza da sessão e dos dados do aluno em memória.
+
+A versão publicada corresponde ao commit `9d67d04`.
+O responsável pelo projeto confirmou o funcionamento no navegador do celular com
+as contas de demonstração; essa conferência visual/funcional foi realizada por ele,
+não pelo agente. Os resultados técnicos e o aceite estão no
+[plano da apresentação](.plan/geral/notas-apresentacao-mobile/index.md).
+
 ## Funcionalidades
 
 Interface baseada no protótipo "Portal Órbita — Protótipo de interface", com quatro perfis.
@@ -17,6 +37,7 @@ Temas do aplicativo, escolhidos no Perfil: Vintage (padrão), Básico com cor de
 
 O aluno usa Firebase Authentication com instituição, matrícula numérica e senha.
 Somente contas previamente provisionadas com perfil válido em `students/{uid}` podem entrar.
+Use a instituição, matrícula e senha fornecidas pela equipe, sem publicar credenciais.
 O curso é escolhido uma única vez, caso ainda não esteja definido.
 Instituição e matrícula permanecem independentes do UID.
 
@@ -30,7 +51,7 @@ preservando a leitura individual legada e os demais serviços.
 | Aluno | Login inicial | Instituição + matrícula + senha da conta provisionada |
 | Professor | Botão “Demonstração: Professor” | Protótipo sem autenticação |
 | Coordenação | Botão “Demonstração: Coordenação” | Protótipo sem autenticação |
-| Administrador | Rota `/admin` (na Web: `/#/admin`) | E-mail `adm.nome@orbita.edu` e qualquer código de 6 dígitos |
+| Administrador | Rota `/admin` (na Web: `/#/admin`) | Protótipo com login e verificação em duas etapas simulados |
 
 Não há cadastro público nem acesso do aluno por biometria simulada.
 O portal administrativo e sua verificação em duas etapas continuam demonstrativos;
@@ -48,9 +69,9 @@ sem fallback demonstrativo. O [plano de notas](.plan/geral/notas-apresentacao-mo
 define o contrato e registra o provisionamento fictício: nove documentos, três por conta,
 criados sem sobrescrita na S02. CRA e métricas históricas sem fonte foram omitidos.
 As três contas passaram em login real e consultas REST com tokens de aluno, com conferência
-dos documentos pelo parser do app e negativas de acesso. A validação visual no navegador
-do celular permanece pendente e não bloqueia a preparação do preview; os registros técnicos
-e visuais estão separados no plano.
+dos documentos pelo parser do app e negativas de acesso. A conferência visual/funcional
+da versão publicada no navegador do celular foi confirmada pelo responsável pelo projeto;
+os registros técnicos do agente e o aceite manual do usuário estão separados no plano.
 
 Os demais módulos acadêmicos permanecem demonstrativos, identificados na casca do aluno.
 Pagamentos, chamados, reservas, materiais, comunicados, edição de dados
@@ -83,20 +104,29 @@ git diff --check
 
 Para compilar a versão Web, use `flutter build web --no-pub`.
 
-### Preparação do preview Web
+### Build Web e publicação manual
 
 ```bash
 flutter build web --release --no-pub --base-href /
 ```
 
 A saída estática fica em `build/web`; as URLs continuam com `#`, sem mudança
-para path routing. O [plano da S03](.plan/geral/notas-apresentacao-mobile/index.md)
-registra o pacote Build Output API v3 de conferência e o destino aprovado:
-Hobby existente, projeto `portal-orbita`, primeira publicação de produção.
-Após integrar a S03 em `development` e promover por PR para `production`,
-regenerar e validar o build do commit final de `production`; não publicar o pacote anterior.
-Nenhum deploy foi realizado ou autorizado nesta preparação. Não enviar a raiz do
-repositório ou arquivos privados: publicar somente o pacote final validado, sob autorização separada.
+para path routing. A publicação na Vercel é **manual**, no projeto `portal-orbita`
+do plano Hobby, sem integração Git ou deploy automático.
+
+Para cada nova publicação, integrar as alterações por PR em `development` e promover
+por PR para `production`. Gerar e validar um novo build em árvore limpa do commit
+final de `production`, empacotar somente os arquivos públicos em
+`.vercel/output/static` com configuração Build Output API v3 e conferir os hashes.
+Somente após autorização própria de deploy, publicar esse pacote com
+`vercel deploy --prebuilt --prod --project portal-orbita --scope ricardopmartinsgtpvh-1353`,
+executado na raiz do pacote estático conferido, não na raiz do repositório.
+Não enviar a raiz do repositório, fontes ou arquivos privados, nem reutilizar
+um pacote de outro commit.
+
+A primeira publicação usou o commit `9d67d04`, com HTTPS, raiz e 37 arquivos
+estáticos conferidos. O [plano da apresentação](.plan/geral/notas-apresentacao-mobile/index.md)
+registra a URL, o SHA completo e a validação no celular.
 
 Para testar as regras sem acesso ao projeto remoto:
 

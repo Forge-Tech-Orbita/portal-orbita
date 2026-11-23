@@ -52,6 +52,7 @@ void main() {
       await tester.tap(find.text(label));
       await tester.pumpAndSettle();
       expect(find.byType(screenType), findsOneWidget);
+      expect(find.text('Ambiente de apresentação'), findsNothing);
       expect(
         tester
             .widget<BottomNavigationBar>(find.byType(BottomNavigationBar))

@@ -491,21 +491,22 @@ void main() {
   });
 
   for (final size in testViewports) {
-    testWidgets('notas na casca com aviso demonstrativo e texto 2× em $size', (
-      tester,
-    ) async {
-      useViewport(tester, size, textScale: 2);
-      await loginAs(tester);
-      await tester.tap(find.text('Notas'));
-      await tester.pumpAndSettle();
-      await expandGrade(tester, 'Engenharia de Requisitos');
-      await tester.ensureVisible(
-        find.text('Frequência: 92% · Situação: Cursando'),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Ambiente de apresentação'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+    testWidgets(
+      'notas na casca sem banner de apresentação e texto 2× em $size',
+      (tester) async {
+        useViewport(tester, size, textScale: 2);
+        await loginAs(tester);
+        await tester.tap(find.text('Notas'));
+        await tester.pumpAndSettle();
+        await expandGrade(tester, 'Engenharia de Requisitos');
+        await tester.ensureVisible(
+          find.text('Frequência: 92% · Situação: Cursando'),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Ambiente de apresentação'), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
     testWidgets('última nota expandida sem overflow em $size', (tester) async {
       useViewport(tester, size, textScale: 2);
       await pumpGrades(tester);

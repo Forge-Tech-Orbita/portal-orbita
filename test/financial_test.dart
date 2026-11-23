@@ -1,106 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portal_orbita/app.dart';
 import 'package:portal_orbita/core/widgets/decorative_barcode.dart';
 import 'package:portal_orbita/features/financial/data/financial_mock.dart';
 import 'package:portal_orbita/features/financial/presentation/financial_screen.dart';
+import 'package:portal_orbita/features/financial/presentation/payment_screen.dart';
+import 'package:portal_orbita/features/financial/presentation/widgets/decorative_qr_code.dart';
+
+import 'helpers.dart';
 
 Future<void> openFinancial(WidgetTester tester) async {
-  await tester.pumpWidget(const MainApp());
-  await tester.ensureVisible(find.text('ENTRAR NO PORTAL'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('ENTRAR NO PORTAL'));
-  await tester.pump();
-  await tester.pump(const Duration(milliseconds: 900));
-  await tester.pumpAndSettle();
-  final shortcut = find.widgetWithText(OutlinedButton, 'Financeiro');
-  await tester.ensureVisible(shortcut);
-  await tester.pumpAndSettle();
-  await tester.tap(shortcut);
-  await tester.pumpAndSettle();
+  await loginAs(tester);
+  await openFromMore(tester, 'Financeiro');
+}
+
+/// Captura o texto enviado à área de transferência.
+String? Function() mockClipboard(WidgetTester tester) {
+  String? copied;
+  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+    SystemChannels.platform,
+    (call) async {
+      if (call.method == 'Clipboard.setData') {
+        copied = (call.arguments as Map)['text'] as String;
+      }
+      return null;
+    },
+  );
+  addTearDown(
+    () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      null,
+    ),
+  );
+  return () => copied;
 }
 
 void main() {
-  test('fixtures preservam valores, vencimento e ordem do histórico', () {
-    expect(
-      (
-        demoInvoice.label,
-        demoInvoice.amount,
-        demoInvoice.dueDate,
-        demoInvoice.discount,
-      ),
-      ('MENSALIDADE · SETEMBRO', r'R$ 1.240,00', '10/09/2026', r'− R$ 62,00'),
-    );
-    expect(
-      demoPayments.map((payment) => (payment.month, payment.amount)).toList(),
-      [
-        ('Agosto/2026', r'R$ 1.178,00'),
-        ('Julho/2026', r'R$ 1.178,00'),
-        ('Junho/2026', r'R$ 1.178,00'),
-        ('Maio/2026', r'R$ 1.178,00'),
-      ],
-    );
+  test('fixtures mantêm a fatura de novembro e três pagamentos', () {
+    expect(demoInvoice.label, 'MENSALIDADE · NOVEMBRO');
+    expect(demoInvoice.dueDate, '10/12/2026');
+    expect(demoInvoice.netAmount, r'R$ 1.178,00');
+    expect(demoInvoice.barcode, isNotEmpty);
+    expect(demoInvoice.pixCode, startsWith('000201'));
+    expect(demoPayments.map((payment) => payment.month), [
+      'Outubro/2026',
+      'Setembro/2026',
+      'Agosto/2026',
+    ]);
   });
 
-  testWidgets(
-    'fatura exibe valores originais e quatro pagamentos demonstrativos',
-    (tester) async {
-      await openFinancial(tester);
-      for (final text in [
-        'Dados demonstrativos · sem integração financeira',
-        'Fatura em aberto',
-        'Vencimento em 10/09/2026',
-        'MENSALIDADE · SETEMBRO',
-        r'R$ 1.240,00',
-        '10/09/2026',
-        'Desconto pontualidade',
-        r'− R$ 62,00',
-        'Código decorativo · sem valor bancário',
-      ]) {
-        expect(find.text(text), findsOneWidget);
-      }
-      await tester.ensureVisible(find.text('Maio/2026'));
-      await tester.pumpAndSettle();
-      expect(find.text('Histórico de pagamentos'), findsOneWidget);
-      expect(find.text(r'Pago · R$ 1.178,00'), findsNWidgets(4));
-      final months = tester
-          .widgetList<Text>(find.byType(Text))
-          .map((text) => text.data)
-          .where(
-            (text) => demoPayments.any((payment) => payment.month == text),
-          );
-      expect(months, ['Agosto/2026', 'Julho/2026', 'Junho/2026', 'Maio/2026']);
-      expect(find.byType(BackButton), findsOneWidget);
-      expect(find.byType(BottomNavigationBar), findsNothing);
-    },
-  );
+  testWidgets('fatura mostra valores, total e histórico', (tester) async {
+    await openFinancial(tester);
 
-  testWidgets(
-    'Gerar 2ª via informa ausência de integração sem alterar pagamentos',
-    (tester) async {
-      await openFinancial(tester);
-      final button = find.widgetWithText(FilledButton, 'Gerar 2ª via');
-      await tester.ensureVisible(button);
-      await tester.pumpAndSettle();
-      await tester.tap(button);
-      await tester.pumpAndSettle();
+    expect(find.text('Fatura em aberto'), findsOneWidget);
+    expect(find.text('Vence em 10/12/2026 · faltam 21 dias'), findsOneWidget);
+    for (final text in [
+      r'R$ 1.240,00',
+      r'− R$ 62,00',
+      'Total até o vencimento',
+      r'R$ 1.178,00',
+    ]) {
+      expect(find.text(text), findsOneWidget);
+    }
+    expect(find.text(r'Pago · R$ 1.178,00'), findsNWidgets(3));
+  });
 
-      expect(
-        find.text('Recurso demonstrativo, sem integração'),
-        findsOneWidget,
-      );
-      expect(find.byType(FinancialScreen), findsOneWidget);
-      expect(find.text('Fatura em aberto'), findsOneWidget);
-      expect(find.text(r'R$ 1.240,00'), findsOneWidget);
-      expect(find.text(r'Pago · R$ 1.178,00'), findsNWidgets(4));
-    },
-  );
+  testWidgets('Pagar com Pix mostra QR decorativo e copia o código', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final copied = mockClipboard(tester);
+    await openFinancial(tester);
+    await tapVisible(tester, find.text('Pagar com Pix'));
+
+    expect(find.byType(PaymentScreen), findsOneWidget);
+    expect(find.text('Simulação'), findsOneWidget);
+    expect(find.byType(DecorativeQrCode), findsOneWidget);
+    expect(find.bySemanticsLabel('QR Code Pix fictício'), findsOneWidget);
+    await tapVisible(tester, find.text('Copiar código Pix'));
+    expect(copied(), demoInvoice.pixCode);
+    expect(find.text('Código Pix copiado!'), findsOneWidget);
+    semantics.dispose();
+  });
+
+  testWidgets('Boleto (2ª via) mostra a linha digitável e copia o código', (
+    tester,
+  ) async {
+    final copied = mockClipboard(tester);
+    await openFinancial(tester);
+    await tapVisible(tester, find.text('Boleto (2ª via)'));
+
+    expect(
+      tester
+          .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Boleto'))
+          .selected,
+      isTrue,
+    );
+    expect(find.byType(DecorativeQrCode), findsNothing);
+    expect(find.text(demoInvoice.barcode), findsOneWidget);
+    await tapVisible(tester, find.text('Copiar código de barras'));
+    expect(copied(), demoInvoice.barcode);
+    expect(find.text('Código de barras copiado!'), findsOneWidget);
+
+    await tapVisible(tester, find.text('Baixar PDF da 2ª via'));
+    expect(find.textContaining('após integração'), findsOneWidget);
+  });
+
+  testWidgets('trocar Pix e Boleto alterna QR e código de barras', (
+    tester,
+  ) async {
+    await pumpScreen(tester, const PaymentScreen());
+    expect(find.byType(DecorativeQrCode), findsOneWidget);
+    expect(find.byType(DecorativeBarcode), findsNothing);
+
+    await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Boleto'));
+    expect(find.byType(DecorativeQrCode), findsNothing);
+    expect(find.byType(DecorativeBarcode), findsOneWidget);
+  });
 
   testWidgets('barras financeiras são decorativas e repetíveis', (
     tester,
   ) async {
-    await openFinancial(tester);
-    final barcode = find.byType(DecorativeBarcode);
+    await pumpScreen(
+      tester,
+      const PaymentScreen(initialMethod: PaymentMethod.boleto),
+    );
+    final barcode = find.byType(DecorativeBarcode).first;
     expect(tester.widget<DecorativeBarcode>(barcode).count, 46);
     final bars = find.descendant(
       of: barcode,
@@ -121,52 +146,24 @@ void main() {
     expect(tester.widgetList<SizedBox>(bars).map((bar) => bar.height), heights);
   });
 
-  for (final size in [
-    const Size(360, 800),
-    const Size(390, 844),
-    const Size(360, 640),
-  ]) {
-    testWidgets('fatura e histórico alcançáveis sem overflow em $size', (
+  for (final size in testViewports) {
+    testWidgets('fatura e pagamento alcançáveis sem overflow em $size', (
       tester,
     ) async {
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = size;
-      addTearDown(tester.view.resetDevicePixelRatio);
-      addTearDown(tester.view.resetPhysicalSize);
-      await openFinancial(tester);
-      await tester.ensureVisible(find.text('Gerar 2ª via'));
+      useViewport(tester, size, textScale: 2);
+      await pumpScreen(tester, const FinancialScreen());
+      await tester.ensureVisible(find.text('Agosto/2026'));
       await tester.pumpAndSettle();
-      expect(find.text('Gerar 2ª via').hitTestable(), findsOneWidget);
-      final lastPayment = find.text(r'Pago · R$ 1.178,00').last;
-      await tester.ensureVisible(lastPayment);
+      await pumpScreen(tester, const PaymentScreen());
+      await tester.ensureVisible(find.text('Baixar PDF da 2ª via'));
       await tester.pumpAndSettle();
-      expect(lastPayment.hitTestable(), findsOneWidget);
+      await pumpScreen(
+        tester,
+        const PaymentScreen(initialMethod: PaymentMethod.boleto),
+      );
+      await tester.ensureVisible(find.text('Baixar PDF da 2ª via'));
+      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
   }
-
-  testWidgets(
-    'texto ampliado mantém valores e pagamentos acessíveis por rolagem',
-    (tester) async {
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(360, 640);
-      tester.platformDispatcher.textScaleFactorTestValue = 2;
-      addTearDown(tester.view.resetDevicePixelRatio);
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      await openFinancial(tester);
-
-      for (final target in [
-        find.text(r'R$ 1.240,00'),
-        find.text(r'− R$ 62,00'),
-        find.text('Gerar 2ª via'),
-        find.text(r'Pago · R$ 1.178,00').last,
-      ]) {
-        await tester.ensureVisible(target);
-        await tester.pumpAndSettle();
-        expect(target.hitTestable(), findsOneWidget);
-      }
-      expect(tester.takeException(), isNull);
-    },
-  );
 }

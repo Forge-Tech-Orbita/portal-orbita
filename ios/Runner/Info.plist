@@ -24,6 +24,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>O Portal Órbita usa a câmera para tirar sua foto de perfil.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>O Portal Órbita acessa suas fotos para definir a foto de perfil.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

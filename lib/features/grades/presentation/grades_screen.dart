@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/orbita_theme.dart';
+import '../../../core/widgets/page_heading.dart';
+import '../../../core/widgets/status_tag.dart';
+import '../../../core/models/student_profile.dart';
 import '../data/grade.dart';
-import '../data/grades_mock.dart';
-import 'widgets/gpa_ring_progress.dart';
+import '../data/grades_repository.dart';
+import '../data/grades_summary.dart';
 
 enum _GradeFilter {
-  all('Todas', null),
-  inProgress('Cursando', GradeStatus.inProgress),
-  completed('Concluídas', GradeStatus.completed);
+  all('Todas'),
+  inProgress('Cursando'),
+  completed('Concluídas');
 
-  const _GradeFilter(this.label, this.status);
+  const _GradeFilter(this.label);
 
   final String label;
-  final GradeStatus? status;
+
+  bool includes(GradeStatus status) => switch (this) {
+    all => true,
+    inProgress => status == GradeStatus.inProgress,
+    completed => status.isCompleted,
+  };
 }
 
 class GradesScreen extends StatefulWidget {
-  const GradesScreen({super.key});
+  const GradesScreen({
+    super.key,
+    required this.repository,
+    required this.profile,
+  });
+
+  final GradesRepository repository;
+  final StudentProfile? profile;
 
   @override
   State<GradesScreen> createState() => _GradesScreenState();
@@ -25,66 +39,170 @@ class GradesScreen extends StatefulWidget {
 
 class _GradesScreenState extends State<GradesScreen> {
   _GradeFilter _filter = _GradeFilter.all;
+  List<Grade> _grades = [];
+  bool _loading = false;
+  String? _error;
+  int _generation = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(GradesScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.repository != widget.repository ||
+        oldWidget.profile?.uid != widget.profile?.uid ||
+        oldWidget.profile?.semester != widget.profile?.semester ||
+        oldWidget.profile?.courseId != widget.profile?.courseId) {
+      _filter = _GradeFilter.all;
+      _load();
+    }
+  }
+
+  Future<void> _load() async {
+    final generation = ++_generation;
+    final profile = widget.profile;
+    setState(() {
+      _grades = [];
+      _error = null;
+      _loading = profile?.courseId != null;
+    });
+    if (profile == null || profile.courseId == null) return;
+    try {
+      final grades = await widget.repository.loadGrades(profile);
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _grades = grades;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _loading = false;
+        _error = error is FormatException
+            ? 'Os dados das notas estão indisponíveis. Tente novamente.'
+            : 'Não foi possível carregar as notas. Confira a conexão e tente novamente.';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final grades = demoGrades.where(
-      (grade) => _filter.status == null || grade.status == _filter.status,
+    final (:average, :approved, :inProgress, :pending) = summarizeGrades(
+      _grades,
     );
+    final grades = _grades.where((grade) => _filter.includes(grade.status));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('DESEMPENHO ACADÊMICO', style: textTheme.labelMedium),
-          Text('Notas & frequência', style: textTheme.headlineSmall),
-          const SizedBox(height: 16),
-          Text('Resumo demonstrativo', style: textTheme.labelSmall),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              // shortcut: CRA e legenda fixos do protótipo, calcular com histórico acadêmico completo.
-              const GpaRingProgress(value: 8.7),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  children: [
-                    for (final (label, value) in const [
-                      ('Aprovadas', '18'),
-                      ('Cursando', '5'),
-                      ('Pendentes', '0'),
-                    ])
-                      Row(
-                        children: [
-                          Expanded(child: Text(label)),
-                          Text(value),
-                        ],
-                      ),
-                  ],
+          PageHeading(
+            overline: 'Desempenho acadêmico',
+            title: 'Notas & frequência',
+            subtitle:
+                'Semestre ${widget.profile?.semester ?? 'não disponível'} · dados fictícios de apresentação no Firestore',
+          ),
+          if (widget.profile?.courseId == null)
+            const Text(
+              'Entre com um perfil válido e curso definido para consultar notas.',
+            )
+          else
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: _loading ? null : _load,
+                icon: const Icon(Icons.refresh),
+                label: Text(
+                  _error == null ? 'Atualizar notas' : 'Tentar novamente',
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              spacing: 8,
+            ),
+          if (_loading)
+            const Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Carregando notas',
+              ),
+            ),
+          if (_error != null) Text(_error!),
+          if (!_loading &&
+              _error == null &&
+              widget.profile?.courseId != null &&
+              _grades.isEmpty)
+            const Text('Nenhuma nota cadastrada para este semestre.'),
+          if (_grades.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Column(
+              spacing: 6,
               children: [
-                for (final filter in _GradeFilter.values)
-                  ChoiceChip(
-                    label: Text(filter.label),
-                    selected: filter == _filter,
-                    onSelected: (_) => setState(() => _filter = filter),
+                for (final (label, count) in [
+                  ('Aprovadas no semestre', approved),
+                  ('Cursando', inProgress),
+                  ('Pendentes', pending),
+                ])
+                  Row(
+                    children: [
+                      Expanded(child: Text(label)),
+                      Text('$count', style: textTheme.titleSmall),
+                    ],
                   ),
               ],
             ),
-          ),
-          const SizedBox(height: 16),
-          for (final grade in grades)
-            _GradeCard(key: ValueKey((_filter, grade.code)), grade: grade),
+            if (average != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Média do semestre: ${formatGrade(average)}',
+                style: textTheme.bodySmall,
+              ),
+            ],
+            const SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: 8,
+                children: [
+                  for (final filter in _GradeFilter.values)
+                    ChoiceChip(
+                      label: Text(
+                        filter == _GradeFilter.inProgress
+                            ? '${filter.label} ($inProgress)'
+                            : filter.label,
+                      ),
+                      selected: filter == _filter,
+                      onSelected: (_) => setState(() => _filter = filter),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (grades.isEmpty)
+              Text(switch (_filter) {
+                _GradeFilter.all => 'Nenhuma disciplina neste semestre.',
+                _GradeFilter.inProgress =>
+                  'Nenhuma disciplina cursando neste semestre.',
+                _GradeFilter.completed =>
+                  'Nenhuma disciplina concluída neste semestre.',
+              }, style: textTheme.bodyMedium),
+            for (final grade in grades)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _GradeCard(
+                  key: ValueKey((
+                    widget.profile?.uid,
+                    widget.profile?.semester,
+                    widget.profile?.courseId,
+                    _filter,
+                    grade.code,
+                  )),
+                  grade: grade,
+                ),
+              ),
+          ],
         ],
       ),
     );
@@ -98,70 +216,174 @@ class _GradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final average = grade.average;
-    final color = average == null
-        ? OrbitaTheme.terracotta
-        : (average >= 7 ? OrbitaTheme.green : OrbitaTheme.amber);
+    final gradeTag = switch (average) {
+      null => const StatusTag(label: 'Pendente', tone: TagTone.neutral),
+      < 7 => StatusTag(
+        label: '${formatGrade(average)} · abaixo de 7',
+        tone: TagTone.warning,
+      ),
+      _ => StatusTag(label: formatGrade(average), tone: TagTone.success),
+    };
+    final first = grade.firstStage.total;
+    final second = grade.secondStage.total;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      color: OrbitaTheme.surface,
-      child: ExpansionTile(
-        title: Text(grade.subject),
-        subtitle: Text(grade.code),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(8),
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(grade.subject, style: textTheme.bodyLarge),
+              Text(grade.code, style: textTheme.bodySmall),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: [
+                  StatusTag(
+                    label: grade.status.label,
+                    tone: switch (grade.status) {
+                      GradeStatus.approved => TagTone.success,
+                      GradeStatus.failed => TagTone.danger,
+                      GradeStatus.completed => TagTone.neutral,
+                      GradeStatus.inProgress => TagTone.info,
+                    },
+                  ),
+                  gradeTag,
+                ],
+              ),
+            ],
           ),
-          child: Text(
-            average?.toStringAsFixed(1) ?? 'Cursando',
-            style: const TextStyle(color: OrbitaTheme.text),
-          ),
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              children: [
-                _AssessmentRow(label: 'AV1', value: grade.av1),
-                const SizedBox(height: 8),
-                _AssessmentRow(label: 'AV2', value: grade.av2),
-                const SizedBox(height: 12),
-                Text(
-                  'Frequência: ${grade.frequency}% · Situação: ${grade.status.label}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      for (final (label, value) in [
+                        ('AV1', first == null ? '—' : formatGrade(first)),
+                        ('AV2', second == null ? '—' : formatGrade(second)),
+                        ('Média', average == null ? '—' : formatGrade(average)),
+                        ('Freq.', '${grade.frequency}%'),
+                      ])
+                        Expanded(
+                          child: Semantics(
+                            label: '$label: $value',
+                            excludeSemantics: true,
+                            child: Column(
+                              children: [
+                                Text(label, style: textTheme.bodySmall),
+                                Text(value, style: textTheme.titleSmall),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  _StageDetails(number: 1, stage: grade.firstStage),
+                  const SizedBox(height: 16),
+                  _StageDetails(number: 2, stage: grade.secondStage),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Nota final: ${average == null ? 'Pendente' : '${average.toStringAsFixed(1)} de 10'}',
+                    style: textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Frequência: ${grade.frequency}% · Situação: ${grade.status.label}',
+                    style: textTheme.bodySmall,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _AssessmentRow extends StatelessWidget {
-  const _AssessmentRow({required this.label, required this.value});
+class _StageDetails extends StatelessWidget {
+  const _StageDetails({required this.number, required this.stage});
 
-  final String label;
-  final double? value;
+  final int number;
+  final GradeStage stage;
 
   @override
   Widget build(BuildContext context) {
-    final formatted = value?.toStringAsFixed(1) ?? '—';
+    final textTheme = Theme.of(context).textTheme;
+    final total = stage.total;
+    final assessments = [
+      (label: 'AV$number', value: stage.exam, maximum: stage.examMax),
+      (label: 'TED', value: stage.ted, maximum: GradeStage.tedMax),
+      if (stage.includesIntegrated)
+        (
+          label: 'Avaliação Integrada',
+          value: stage.integratedAssessment,
+          maximum: GradeStage.integratedMax,
+        ),
+    ];
+    final pending = assessments
+        .where((assessment) => assessment.value == null)
+        .map((assessment) => assessment.label)
+        .join(', ');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 8,
+      children: [
+        Text('$numberª etapa', style: textTheme.titleSmall),
+        for (final assessment in assessments)
+          _AssessmentRow(
+            label: assessment.label,
+            value: assessment.value,
+            maximum: assessment.maximum,
+          ),
+        Text(
+          total == null
+              ? 'Subtotal pendente. Falta lançar: $pending.'
+              : 'Subtotal: ${total.toStringAsFixed(1)} de 10',
+          style: textTheme.labelLarge,
+        ),
+      ],
+    );
+  }
+}
+
+class _AssessmentRow extends StatelessWidget {
+  const _AssessmentRow({
+    required this.label,
+    required this.value,
+    required this.maximum,
+  });
+
+  final String label;
+  final double? value;
+  final double maximum;
+
+  @override
+  Widget build(BuildContext context) {
+    final value = this.value;
+    final formatted = value == null
+        ? 'Não informada'
+        : '${value.toStringAsFixed(1)} de ${maximum.toStringAsFixed(0)}';
 
     return Semantics(
-      label: '$label: ${value == null ? 'Não informada' : '$formatted de 10'}',
+      label: '$label: $formatted',
       excludeSemantics: true,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 4,
         children: [
-          Text(label),
-          const SizedBox(width: 10),
-          Expanded(child: LinearProgressIndicator(value: (value ?? 0) / 10)),
-          const SizedBox(width: 10),
-          Text(formatted),
+          Text('$label: $formatted'),
+          if (value != null) LinearProgressIndicator(value: value / maximum),
         ],
       ),
     );

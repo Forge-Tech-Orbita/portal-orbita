@@ -1,6 +1,67 @@
 # Portal Órbita
 
-Aplicação Flutter migrada estruturalmente a partir do protótipo web legado mantido em `portal-orbita-antigo/` (`index.html`, `style.css` e `script.js`).
+Portal acadêmico desenvolvido em Flutter/Dart para reunir informações e serviços do estudante em uma única aplicação, com estrutura para Android, iOS e Web.
+
+## Funcionalidades
+
+Interface baseada no protótipo "Portal Órbita — Protótipo de interface", com quatro perfis.
+
+- **Aluno:** início com carteirinha, próxima aula demonstrativa e notificações; horário semanal; notas com AV1/AV2, TED e avaliação integrada consultadas no Firestore; disciplinas; financeiro com pagamento simulado por Pix ou boleto; biblioteca com busca e acervo (reserva e fila); materiais das disciplinas; mural com confirmação de presença; suporte com novo chamado e confirmação; perfil com edição de dados, foto e escolha do tema do aplicativo.
+- **Professor:** início, turmas, materiais (novo PDF ou link), frequência somente leitura e comunicados.
+- **Coordenação:** painel com indicadores agregados, turmas do curso, materiais e publicação de eventos e comunicados.
+- **Portal Administrativo (separado):** login próprio com verificação em duas etapas, painel, usuários, chamados, permissões com segunda aprovação e auditoria.
+
+Temas do aplicativo, escolhidos no Perfil: Vintage (padrão), Básico com cor de destaque selecionável, Forge Tech (escuro) e UniSapiens.
+
+## Contas de demonstração
+
+O aluno usa Firebase Authentication com instituição, matrícula numérica e senha.
+Somente contas previamente provisionadas com perfil válido em `students/{uid}` podem entrar.
+O curso é escolhido uma única vez, caso ainda não esteja definido.
+Instituição e matrícula permanecem independentes do UID.
+
+O [roteiro de provisionamento](.plan/geral/autenticacao-perfil/provisionamento.md)
+descreve três contas fictícias e a publicação das regras de autenticação/perfil.
+As regras de consulta de notas do commit `1dd6d2d` foram publicadas na S02,
+preservando a leitura individual legada e os demais serviços.
+
+| Perfil | Onde entrar | Identificação |
+| --- | --- | --- |
+| Aluno | Login inicial | Instituição + matrícula + senha da conta provisionada |
+| Professor | Botão “Demonstração: Professor” | Protótipo sem autenticação |
+| Coordenação | Botão “Demonstração: Coordenação” | Protótipo sem autenticação |
+| Administrador | Rota `/admin` (na Web: `/#/admin`) | E-mail `adm.nome@orbita.edu` e qualquer código de 6 dígitos |
+
+Não há cadastro público nem acesso do aluno por biometria simulada.
+O portal administrativo e sua verificação em duas etapas continuam demonstrativos;
+não são autenticação ou autorização reais.
+
+## Status do projeto
+
+Firebase é inicializado em Android e Web. O acesso do aluno usa autenticação real,
+perfil no Firestore e vínculo inicial de curso. Logout remove a sessão e os dados
+do aluno em memória. As demais plataformas não têm configuração Firebase.
+
+Notas são consultadas somente para o UID autenticado, semestre e curso do perfil,
+em `students/{uid}/grades`, com carregamento, atualização, erro e ausência de notas
+sem fallback demonstrativo. O [plano de notas](.plan/geral/notas-apresentacao-mobile/index.md)
+define o contrato e registra o provisionamento fictício: nove documentos, três por conta,
+criados sem sobrescrita na S02. CRA e métricas históricas sem fonte foram omitidos.
+As três contas passaram em login real e consultas REST com tokens de aluno, com conferência
+dos documentos pelo parser do app e negativas de acesso. A validação visual no navegador
+do celular permanece pendente e não bloqueia a preparação do preview; os registros técnicos
+e visuais estão separados no plano.
+
+Os demais módulos acadêmicos permanecem demonstrativos, identificados na casca do aluno.
+Pagamentos, chamados, reservas, materiais, comunicados, edição de dados
+pessoais, foto, tema escolhido e preferências continuam locais, sem persistência.
+Professor, coordenação e portal administrativo são protótipos separados. Abrir PDF
+ou link de material e anexar arquivos informam que dependem da integração.
+
+## Pré-requisitos
+
+- Flutter SDK com Dart compatível com `pubspec.yaml` (`^3.13.5`).
+- Dispositivo, emulador ou navegador configurado para executar o app.
 
 ## Como executar
 
@@ -9,42 +70,38 @@ flutter pub get
 flutter run
 ```
 
+Para executar no Chrome, use `flutter run -d chrome`.
+
 ## Verificações e testes
 
 ```bash
-flutter analyze
-flutter test
-flutter build web
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze --no-pub
+flutter test --no-pub
+git diff --check
 ```
 
-## Estrutura de telas migradas (P01–P14)
+Para compilar a versão Web, use `flutter build web --no-pub`.
 
-- **Autenticação:**
-  - `LoginScreen` (`/`): formulário demonstrativo com atraso simulado de 900 ms e atalho de biometria simulada.
-- **Casca principal (`MainNavigationScreen` em `/main` com `IndexedStack` e `OrbitaBottomNav`):**
-  1. `HomeScreen`: saudação por faixa de horário, carteirinha estudantil (`StudentIdCard`), métricas acadêmicas, próxima aula, atalhos rápidos e resumos do mural (`NoticeTile`).
-  2. `ScheduleScreen`: grade semanal por dia (`SEG` a `SÁB`), com seleção preservada entre abas e fallback de domingo para sábado.
-  3. `GradesScreen`: resumo de CRA com anel determinístico (`GpaRingProgress`), filtros (`Todas`, `Cursando`, `Concluídas`) e cards expansíveis com AV1, AV2, frequência e situação.
-  4. `CoursesScreen`: lista de disciplinas do semestre `2026.2` com professor, créditos, progresso e sala.
-  5. `MoreScreen`: grade de acesso às cinco telas secundárias e encerramento de sessão.
-- **Rotas secundárias (`Scaffold` e `AppBar` próprios, sem barra inferior):**
-  - `FinancialScreen` (`/financial`): fatura em aberto, código de barras decorativo (`DecorativeBarcode`), botão demonstrativo de 2ª via e histórico de pagamentos.
-  - `LibraryScreen` (`/library`): campo de busca e categorias demonstrativas e lista de empréstimos com destaque de prazo.
-  - `NoticesScreen` (`/notices`): mural completo compartilhando a mesma fixture de avisos da Home.
-  - `SupportScreen` (`/support`): card da secretaria com abertura demonstrativa de chamado e perguntas frequentes (FAQ).
-  - `ProfileScreen` (`/profile`): carteirinha compacta compartilhada, dados cadastrais mascarados, switches locais de preferências demonstrativas e encerramento de sessão limpando a pilha.
+### Preparação do preview Web
 
-## Recursos simulados e limitações desta etapa
+```bash
+flutter build web --release --no-pub --base-href /
+```
 
-- **Sem backend ou persistência:** todos os dados (estudante, aulas, notas, disciplinas, faturas, empréstimos e comunicados) vêm de fixtures locais imutáveis.
-- **Login e biometria:** validam apenas o preenchimento dos campos e aguardam 900 ms localmente; não há autenticação remota nem leitura biométrica do dispositivo.
-- **Métricas, CRA e próxima aula:** valores (`CRA 8.7`, `94%`, `142 créditos`, legenda `18/5/0` e `"em 47 min"`) são fixtures estáticas do protótipo, sem recálculo acadêmico ou timer regressivo.
-- **Financeiro e Suporte:** os botões *"Gerar 2ª via"* e *"Abrir novo chamado"* exibem apenas feedback via `SnackBar` (`"Recurso demonstrativo, sem integração"`). O código de barras é determinístico e sem valor bancário.
-- **Biblioteca:** o campo de busca e os chips de categoria são demonstrativos e não filtram nem consultam acervo real.
-- **Preferências do Perfil:** os switches (*Notificações push*, *Modo escuro* e *Biometria facial*) alteram apenas o estado visual na instância da tela, sem persistência, permissões nativas ou troca do tema claro da aplicação.
+A saída estática fica em `build/web`; as URLs continuam com `#`, sem mudança
+para path routing. O [plano da S03](.plan/geral/notas-apresentacao-mobile/index.md)
+registra o pacote Build Output API v3 de conferência e o destino aprovado:
+Hobby existente, projeto `portal-orbita`, primeira publicação de produção.
+Após integrar a S03 em `development` e promover por PR para `production`,
+regenerar e validar o build do commit final de `production`; não publicar o pacote anterior.
+Nenhum deploy foi realizado ou autorizado nesta preparação. Não enviar a raiz do
+repositório ou arquivos privados: publicar somente o pacote final validado, sob autorização separada.
 
-## Próximas etapas previstas
+Para testar as regras sem acesso ao projeto remoto:
 
-1. **Fidelidade visual (`style.css`):** tipografia externa, texturas, sombras finas, gradientes, responsividade refinada e animações decorativas.
-2. **Comportamento complementar (`script.js`):** relógio/saudação contínua e refinamentos adicionais de interação.
-3. **Evolução além do protótipo:** integração com APIs, autenticação real, regras acadêmicas dinâmicas, busca de acervo e persistência de preferências.
+```bash
+firebase emulators:exec --project demo-portal-orbita --config firebase.emulators.json --only auth,firestore "node --test test/firestore_rules_test.cjs"
+```
+
+Requisitos: Firebase CLI, Node com `node:test`/`fetch`, Java 21+ e emuladores locais.

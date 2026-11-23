@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/models/learning_material.dart';
 import '../../../core/widgets/material_tile.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../data/student_materials_mock.dart';
@@ -12,12 +13,15 @@ class MaterialsScreen extends StatefulWidget {
 }
 
 class _MaterialsScreenState extends State<MaterialsScreen> {
-  String? _filter;
+  String? _discipline;
+  MaterialKind? _kind;
 
   @override
   Widget build(BuildContext context) {
     final materials = demoStudentMaterials.where(
-      (material) => _filter == null || material.audiences.contains(_filter),
+      (material) =>
+          (_discipline == null || material.audiences.contains(_discipline)) &&
+          (_kind == null || material.kind == _kind),
     );
 
     return Scaffold(
@@ -34,20 +38,42 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
                 subtitle: 'Postados pelos professores das suas disciplinas e pela coordenação',
               ),
               const SizedBox(height: 10),
+              const Text('Disciplina'),
               Wrap(
+                key: const ValueKey('material-discipline-filter'),
                 spacing: 8,
                 runSpacing: 4,
                 children: [
                   ChoiceChip(
                     label: const Text('Todos'),
-                    selected: _filter == null,
-                    onSelected: (_) => setState(() => _filter = null),
+                    selected: _discipline == null,
+                    onSelected: (_) => setState(() => _discipline = null),
                   ),
                   for (final filter in studentMaterialFilters)
                     ChoiceChip(
                       label: Text(filter),
-                      selected: _filter == filter,
-                      onSelected: (_) => setState(() => _filter = filter),
+                      selected: _discipline == filter,
+                      onSelected: (_) => setState(() => _discipline = filter),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text('Tipo de material'),
+              Wrap(
+                key: const ValueKey('material-kind-filter'),
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Todos'),
+                    selected: _kind == null,
+                    onSelected: (_) => setState(() => _kind = null),
+                  ),
+                  for (final kind in MaterialKind.values)
+                    ChoiceChip(
+                      label: Text(kind.label),
+                      selected: _kind == kind,
+                      onSelected: (_) => setState(() => _kind = kind),
                     ),
                 ],
               ),

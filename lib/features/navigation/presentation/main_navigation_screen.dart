@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../core/mock/notifications_mock.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/widgets/orbita_bottom_nav.dart';
+import '../../../core/widgets/info_banner.dart';
+import '../../auth/data/academic_session.dart';
+import '../../grades/data/grades_repository.dart';
 import '../../courses/presentation/courses_screen.dart';
 import '../../grades/presentation/grades_screen.dart';
 import '../../home/presentation/home_screen.dart';
@@ -13,7 +16,9 @@ import '../../schedule/data/schedule_mock.dart';
 import '../../schedule/presentation/schedule_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  const MainNavigationScreen({super.key, required this.gradesRepository});
+
+  final GradesRepository gradesRepository;
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
@@ -47,14 +52,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: IndexedStack(
-          index: selectedIndex,
+        child: Column(
           children: [
-            HomeScreen(nextClass: _nextClass(), notifications: _notifications),
-            const ScheduleScreen(),
-            const GradesScreen(),
-            const CoursesScreen(),
-            const MoreScreen(),
+            const InfoBanner(
+              title: 'Ambiente de apresentação',
+              message: 'Identidade, curso e notas integrados. Horário, Cursos e demais módulos são demonstrativos.',
+            ),
+            Expanded(
+              child: IndexedStack(
+                index: selectedIndex,
+                children: [
+                  HomeScreen(
+                    nextClass: _nextClass(),
+                    notifications: _notifications,
+                  ),
+                  const ScheduleScreen(),
+                  GradesScreen(
+                    repository: widget.gradesRepository,
+                    profile: AcademicSessionScope.maybeOf(context)?.profile,
+                  ),
+                  const CoursesScreen(),
+                  const MoreScreen(),
+                ],
+              ),
+            ),
           ],
         ),
       ),

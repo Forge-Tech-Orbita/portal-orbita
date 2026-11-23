@@ -1,8 +1,4 @@
-import 'grade.dart';
-
-/// CRA e aprovações históricas importados do sistema acadêmico.
-const historicalGpa = 8.7;
-const historicalApproved = 18;
+import 'package:portal_orbita/features/grades/data/grade.dart';
 
 const demoGrades = [
   Grade(

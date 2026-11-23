@@ -6,7 +6,7 @@ Portal acadêmico desenvolvido em Flutter/Dart para reunir informações e servi
 
 Interface baseada no protótipo "Portal Órbita — Protótipo de interface", com quatro perfis.
 
-- **Aluno:** início com carteirinha, indicadores, próxima aula calculada pela grade e notificações; horário semanal; notas com AV1/AV2, TED e avaliação integrada; disciplinas; financeiro com pagamento simulado por Pix ou boleto; biblioteca com busca e acervo (reserva e fila); materiais das disciplinas; mural com confirmação de presença; suporte com novo chamado e confirmação; perfil com edição de dados, foto e escolha do tema do aplicativo.
+- **Aluno:** início com carteirinha, próxima aula demonstrativa e notificações; horário semanal; notas com AV1/AV2, TED e avaliação integrada consultadas no Firestore; disciplinas; financeiro com pagamento simulado por Pix ou boleto; biblioteca com busca e acervo (reserva e fila); materiais das disciplinas; mural com confirmação de presença; suporte com novo chamado e confirmação; perfil com edição de dados, foto e escolha do tema do aplicativo.
 - **Professor:** início, turmas, materiais (novo PDF ou link), frequência somente leitura e comunicados.
 - **Coordenação:** painel com indicadores agregados, turmas do curso, materiais e publicação de eventos e comunicados.
 - **Portal Administrativo (separado):** login próprio com verificação em duas etapas, painel, usuários, chamados, permissões com segunda aprovação e auditoria.
@@ -21,8 +21,9 @@ O curso é escolhido uma única vez, caso ainda não esteja definido.
 Instituição e matrícula permanecem independentes do UID.
 
 O [roteiro de provisionamento](.plan/geral/autenticacao-perfil/provisionamento.md)
-descreve três contas fictícias, os documentos e a proposta local de regras.
-As regras precisam de revisão e publicação autorizada antes de validar o fluxo no projeto remoto.
+descreve três contas fictícias e a publicação das regras de autenticação/perfil.
+As novas regras locais de consulta de notas ainda precisam de revisão e publicação autorizada;
+não foram publicadas nesta entrega.
 
 | Perfil | Onde entrar | Identificação |
 | --- | --- | --- |
@@ -41,8 +42,14 @@ Firebase é inicializado em Android e Web. O acesso do aluno usa autenticação 
 perfil no Firestore e vínculo inicial de curso. Logout remove a sessão e os dados
 do aluno em memória. As demais plataformas não têm configuração Firebase.
 
-Notas e demais dados acadêmicos ainda são demonstrativos: não há consulta de notas
-ao Firestore. Pagamentos, chamados, reservas, materiais, comunicados, edição de dados
+Notas são consultadas somente para o UID autenticado, semestre e curso do perfil,
+em `students/{uid}/grades`, com carregamento, atualização, erro e ausência de notas
+sem fallback demonstrativo. O [plano de notas](.plan/geral/notas-apresentacao-mobile/index.md)
+define o contrato e o cadastro fictício futuro: ainda não houve provisionamento nem
+publicação das novas regras de consulta. CRA e métricas históricas sem fonte foram omitidos.
+
+Os demais módulos acadêmicos permanecem demonstrativos, identificados na casca do aluno.
+Pagamentos, chamados, reservas, materiais, comunicados, edição de dados
 pessoais, foto, tema escolhido e preferências continuam locais, sem persistência.
 Professor, coordenação e portal administrativo são protótipos separados. Abrir PDF
 ou link de material e anexar arquivos informam que dependem da integração.

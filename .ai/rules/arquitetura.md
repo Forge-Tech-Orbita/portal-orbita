@@ -11,6 +11,7 @@ paths: ["lib/**", "pubspec.yaml", "pubspec.lock", "android/**", "ios/**", "web/*
 | `lib/main.dart`, `lib/app.dart` | Inicialização Firebase em Android/Web, `MainApp`, sessão, tema e rotas |
 | `lib/firebase_options.dart`, `firebase.json`, `android/app/google-services.json` | Configuração gerada pelo FlutterFire CLI para Android/Web; não edite manualmente |
 | `lib/features/auth/data/`, `lib/core/models/student_profile.dart` | Autenticação Firebase, perfil por UID e invalidação de respostas antigas |
+| `lib/features/grades/data/`, `lib/features/grades/presentation/` | Parser validado em runtime, consulta de notas por UID/semestre/curso e estados sem fallback |
 | `lib/core/constants/institution_catalog.dart` | Instituições/cursos fictícios e conversão central de matrícula para e-mail técnico |
 | `lib/core/constants/app_routes.dart` | Constantes `AppRoutes` |
 | `lib/core/theme/orbita_theme.dart` | Cores do tema vintage e montagem do `ThemeData` |
@@ -34,10 +35,10 @@ paths: ["lib/**", "pubspec.yaml", "pubspec.lock", "android/**", "ios/**", "web/*
 
 ## Dados e limites demonstrativos
 
-- Firebase Auth e Firestore são usados somente para acesso do aluno e perfil `students/{uid}` em Android/Web; iOS não está configurado. Instituição/matrícula são independentes do UID; curso só pode ser escolhido quando nulo. As regras locais em `firestore.rules` exigem revisão e publicação autorizada para uso remoto. Notas e demais dados acadêmicos continuam fixtures; não crie consultas ou escritas por antecipação. Novos serviços, pacotes, SDK/lockfile e camadas exigem aprovação.
-- Preserve login/biometria simulados de 900 ms, métricas fixas, barras decorativas e feedback via `SnackBar`. A busca da Biblioteca filtra empréstimos e acervo localmente. Switches de Perfil não persistem. A troca de tema é feita pelo seletor de tema do Perfil, mantida apenas em memória (volta ao vintage ao reiniciar).
+- Firebase Auth e Firestore são usados para acesso do aluno, perfil `students/{uid}` e consulta de notas em `students/{uid}/grades` em Android/Web; iOS não está configurado. Instituição/matrícula são independentes do UID; curso só pode ser escolhido quando nulo. A consulta de notas usa servidor, semestre e curso do perfil, com validação de documentos, erro/vazio distintos e descarte de respostas antigas. Fixtures de notas são exclusivas de testes. As novas regras locais de `list` exigem revisão e publicação autorizada antes da validação remota; o `get` legado é preservado. Demais módulos continuam demonstrativos, identificados na casca do aluno. Novos serviços, pacotes, SDK/lockfile e camadas exigem aprovação.
+- Preserve o acesso demonstrativo de professor/coordenação separado do aluno, barras decorativas e feedback via `SnackBar`. Não reintroduza CRA, frequência global ou créditos sem fonte na apresentação do aluno. A busca da Biblioteca filtra empréstimos e acervo localmente. Switches de Perfil não persistem. A troca de tema é feita pelo seletor de tema do Perfil, mantida apenas em memória (volta ao vintage ao reiniciar).
 - Valores financeiros são strings para exibição, não cálculo ou cobrança real.
-- `Grade.average` só calcula com AV2 informada; status acadêmico vem da fixture, não da média. `ScheduleDay.forDate` mapeia domingo para sábado. Não altere essas decisões silenciosamente.
+- `Grade.average` só calcula com AV2 informada; status acadêmico vem do documento (ou fixture de teste), não da média. `summarizeGrades` usa somente médias completas e não representa CRA. `ScheduleDay.forDate` mapeia domingo para sábado. Não altere essas decisões silenciosamente.
 
 ## Plataformas
 

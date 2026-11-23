@@ -10,11 +10,14 @@ const base = `http://${firestoreHost}/v1/projects/${project}/databases/(default)
 const accounts = {};
 
 function fields(data) {
-  return Object.fromEntries(Object.entries(data).map(([key, value]) => [key,
+  const encode = value =>
     value === null ? {nullValue: null} :
     typeof value === 'boolean' ? {booleanValue: value} :
-    typeof value === 'number' ? {integerValue: String(value)} : {stringValue: value},
-  ]));
+    typeof value === 'number' ? (Number.isInteger(value)
+      ? {integerValue: String(value)} : {doubleValue: value}) :
+    typeof value === 'object' ? {mapValue: {fields: fields(value)}} :
+    {stringValue: value};
+  return Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encode(value)]));
 }
 
 async function request(path, token, method = 'GET', data, query = '') {
@@ -34,6 +37,10 @@ before(async () => {
     ['b', 'inst-demo', '202600002'],
     ['c', 'inst-horizonte', '202600001'],
     ['orphan', 'inst-demo', '202600003'],
+    ['grades-a', 'inst-demo', '202600011'],
+    ['grades-b', 'inst-demo', '202600012'],
+    ['grades-c', 'inst-horizonte', '202600011'],
+    ['invalid', 'inst-demo', '202600013'],
   ]) {
     const response = await fetch(`http://${authHost}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=emulator`, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -48,8 +55,10 @@ before(async () => {
     accounts[key] = {uid, token};
     if (key !== 'orphan') {
       const result = await request(`students/${uid}`, 'owner', 'PATCH', {
-        nome: `Aluno ${key}`, matricula: registration,
-        instituicaoId: institution, cursoId: null, semestreLetivo: '2026-2', periodo: 4,
+        nome: `Aluno ${key}`, matricula: key === 'invalid' ? '999' : registration,
+        instituicaoId: institution,
+        cursoId: key === 'grades-b' ? 'adm' : key.startsWith('grades-') || key === 'invalid' ? 'si' : null,
+        semestreLetivo: '2026-2', periodo: 4,
       });
       assert.equal(result.status, 200);
     }
@@ -67,6 +76,97 @@ before(async () => {
   assert.equal((await request(
     `students/${accounts.a.uid}/grades/existing`, 'owner', 'PATCH', {subject: 'Teste'},
   )).status, 200);
+  for (const key of ['grades-a', 'grades-b', 'grades-c', 'orphan', 'invalid']) {
+    const course = key === 'grades-b' ? 'adm' : 'si';
+    for (const [semester, courseId] of [
+      ['2026-2', course], ['2025-2', course],
+      ['2026-2', course === 'si' ? 'adm' : 'si'],
+    ]) {
+      assert.equal((await request(
+        `students/${accounts[key].uid}/grades/${semester}_${courseId}_TEST-1`,
+        'owner', 'PATCH', {
+          semestreLetivo: semester, cursoId: courseId,
+          subject: `Disciplina ${key}`, code: 'TEST-1',
+          firstStage: {exam: 6, ted: 2.6},
+          secondStage: {exam: null, ted: null, integratedAssessment: null},
+          frequency: 94, status: 'inProgress',
+        },
+      )).status, 200);
+    }
+  }
+});
+
+function queryGrades(uid, token, filters = {
+  semestreLetivo: '2026-2', cursoId: 'si',
+}, collectionGroup = false) {
+  const fieldFilters = Object.entries(filters).map(([field, value]) => ({
+    fieldFilter: {
+      field: {fieldPath: field}, op: 'EQUAL', value: {stringValue: value},
+    },
+  }));
+  return fetch(`${base}${collectionGroup ? '' : `/students/${uid}`}:runQuery`, {
+    method: 'POST',
+    headers: {
+      ...(token ? {Authorization: `Bearer ${token}`} : {}),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({structuredQuery: {
+      from: [{collectionId: 'grades', ...(collectionGroup ? {allDescendants: true} : {})}],
+      ...(fieldFilters.length ? {where: {compositeFilter: {op: 'AND', filters: fieldFilters}}} : {}),
+    }}),
+  });
+}
+
+test('consultar somente notas do UID, semestre e curso do perfil válido', async () => {
+  for (const key of ['grades-a', 'grades-b', 'grades-c']) {
+    const {uid, token} = accounts[key];
+    const course = key === 'grades-b' ? 'adm' : 'si';
+    const response = await queryGrades(uid, token, {semestreLetivo: '2026-2', cursoId: course});
+    assert.equal(response.status, 200);
+    const rows = await response.json();
+    const documents = rows.filter(row => row.document).map(row => row.document);
+    assert.equal(documents.length, 1);
+    assert.equal(documents[0].fields.subject.stringValue, `Disciplina ${key}`);
+    assert.equal(documents[0].fields.firstStage.mapValue.fields.ted.doubleValue, 2.6);
+    assert.equal(documents[0].fields.secondStage.mapValue.fields.exam.nullValue, null);
+  }
+});
+
+test('negar consulta ampla, filtros incompletos, outro semestre/curso e collection group', async () => {
+  const {uid, token} = accounts['grades-a'];
+  for (const filters of [
+    {}, {semestreLetivo: '2026-2'}, {cursoId: 'si'},
+    {semestreLetivo: '2025-2', cursoId: 'si'},
+    {semestreLetivo: '2026-2', cursoId: 'adm'},
+  ]) {
+    assert.equal((await queryGrades(uid, token, filters)).status, 403);
+  }
+  assert.equal((await request(`students/${uid}/grades`, token)).status, 403);
+  assert.equal((await queryGrades(uid, token, undefined, true)).status, 403);
+});
+
+test('negar consultas sem login, de terceiros, sem perfil/curso e identidade incompatível', async () => {
+  const {uid} = accounts['grades-a'];
+  for (const token of [undefined, accounts['grades-b'].token, accounts['grades-c'].token]) {
+    assert.equal((await queryGrades(uid, token)).status, 403);
+  }
+  for (const key of ['orphan', 'invalid', 'c']) {
+    const account = accounts[key];
+    assert.equal((await queryGrades(account.uid, account.token)).status, 403);
+  }
+});
+
+test('consulta não concede escrita de notas e preserva get legado', async () => {
+  const {uid, token} = accounts['grades-a'];
+  const path = `students/${uid}/grades/2026-2_si_TEST-1`;
+  assert.equal((await request(path, token)).status, 200);
+  assert.equal((await request(path, token, 'PATCH', {frequency: 100})).status, 403);
+  assert.equal((await request(path, token, 'DELETE')).status, 403);
+  assert.equal((await request(`students/${uid}/grades/new`, token, 'PATCH', {
+    semestreLetivo: '2026-2', cursoId: 'si',
+  })).status, 403);
+  assert.equal((await request(`students/${accounts.orphan.uid}/grades/2026-2_si_TEST-1`,
+    accounts.orphan.token)).status, 200);
 });
 
 test('perfil somente do titular; mesma matrícula em outra instituição não concede acesso', async () => {

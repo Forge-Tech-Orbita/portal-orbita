@@ -76,7 +76,7 @@ remoteConfig.fetchAndActivate { (status, error) in
     } else {
         print("Config not fetched")
     }
-    
+
     // Access a value
     let message = remoteConfig.configValue(forKey: "welcome_message").stringValue
 }

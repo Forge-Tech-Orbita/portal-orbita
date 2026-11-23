@@ -84,6 +84,7 @@ class _MainAppState extends State<MainApp> {
           builder: (context, _) => MaterialApp(
             key: ValueKey(_session.navigationEpoch),
             title: 'Portal Órbita',
+            debugShowCheckedModeBanner: false,
             theme: _themeController.themeData,
             initialRoute:
                 _session.profile?.courseId != null && !_session.loading

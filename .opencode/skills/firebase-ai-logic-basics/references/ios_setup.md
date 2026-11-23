@@ -66,16 +66,16 @@ final class AIViewModel {
         backend: .googleAI(),
         useLimitedUseAppCheckTokens: true
     ).generativeModel(modelName: "<latest_supported_model>")
-    
+
     var responseText: String = ""
     var isFetching: Bool = false
     var errorMessage: String?
-    
+
     func generate(prompt: String) async {
         isFetching = true
         errorMessage = nil
         defer { isFetching = false }
-        
+
         do {
             let response = try await model.generateContent(prompt)
             self.responseText = response.text ?? "No response"
@@ -88,16 +88,16 @@ final class AIViewModel {
 struct AIView: View {
     @State private var viewModel = AIViewModel()
     @State private var prompt = "Write a story about a magic backpack."
-    
+
     var body: some View {
         VStack {
             TextField("Enter prompt", text: $prompt)
-            
+
             Button("Generate") {
                 Task { await viewModel.generate(prompt: prompt) }
             }
             .disabled(viewModel.isFetching)
-            
+
             if viewModel.isFetching {
                 ProgressView()
             } else if let error = viewModel.errorMessage {

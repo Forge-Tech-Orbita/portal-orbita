@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portal_orbita/core/mock/academic_demo.dart';
 import 'package:portal_orbita/core/widgets/material_tile.dart';
 import 'package:portal_orbita/features/materials/data/student_materials_mock.dart';
 import 'package:portal_orbita/features/materials/presentation/materials_screen.dart';
@@ -15,7 +16,10 @@ void main() {
   testWidgets('materiais listam PDFs e links e filtram por disciplina', (
     tester,
   ) async {
-    await pumpScreen(tester, const MaterialsScreen());
+    await pumpScreen(
+      tester,
+      MaterialsList(catalog: materialsFor(AcademicDemo.informationSystems)),
+    );
 
     expect(
       find.byType(MaterialTile),
@@ -33,7 +37,10 @@ void main() {
   testWidgets('filtros de disciplina e tipo mantêm seleções independentes', (
     tester,
   ) async {
-    await pumpScreen(tester, const MaterialsScreen());
+    await pumpScreen(
+      tester,
+      MaterialsList(catalog: materialsFor(AcademicDemo.informationSystems)),
+    );
 
     await tapVisible(tester, filterChip('discipline', 'IA'));
     await tapVisible(tester, filterChip('kind', 'PDF'));
@@ -64,15 +71,33 @@ void main() {
   });
 
   testWidgets('abrir material informa que é demonstrativo', (tester) async {
-    await pumpScreen(tester, const MaterialsScreen());
+    await pumpScreen(
+      tester,
+      MaterialsList(catalog: materialsFor(AcademicDemo.informationSystems)),
+    );
     await tapVisible(tester, find.text('Abrir link'));
     expect(find.textContaining('abre após a integração'), findsOneWidget);
   });
 
   for (final size in testViewports) {
+    testWidgets('materiais de ADM alcançáveis com texto 2× em $size', (
+      tester,
+    ) async {
+      useViewport(tester, size, textScale: 2);
+      await pumpScreen(
+        tester,
+        MaterialsList(catalog: materialsFor(AcademicDemo.administration)),
+      );
+      await tapVisible(tester, find.text('Abrir PDF').last);
+      expect(find.textContaining('abre após a integração'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
     testWidgets('materiais sem overflow em $size', (tester) async {
       useViewport(tester, size, textScale: 2);
-      await pumpScreen(tester, const MaterialsScreen());
+      await pumpScreen(
+        tester,
+        MaterialsList(catalog: materialsFor(AcademicDemo.informationSystems)),
+      );
       await tapVisible(tester, filterChip('discipline', 'Arquitetura'));
       await tapVisible(tester, filterChip('kind', 'Link'));
       await tapVisible(tester, find.text('Abrir link'));

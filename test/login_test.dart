@@ -7,10 +7,12 @@ import 'package:portal_orbita/core/constants/institution_catalog.dart';
 import 'package:portal_orbita/core/models/student_profile.dart';
 import 'package:portal_orbita/features/auth/data/academic_session.dart';
 import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
+import 'package:portal_orbita/features/home/presentation/widgets/next_class_card.dart';
 import 'package:portal_orbita/features/navigation/presentation/main_navigation_screen.dart';
 import 'package:portal_orbita/features/profile/presentation/course_selection_screen.dart';
 
 import 'fake_auth_repository.dart';
+import 'fake_grades_repository.dart';
 import 'helpers.dart';
 
 const profileWithoutCourse = StudentProfile(
@@ -32,6 +34,76 @@ Future<void> enterCredentials(
 }
 
 void main() {
+  testWidgets('Home e Horário usam a mesma grade com data fixa', (
+    tester,
+  ) async {
+    final auth = FakeAuthRepository();
+    final session = AcademicSession(auth);
+    addTearDown(auth.dispose);
+    addTearDown(session.dispose);
+    await tester.pump();
+    session.profile = const StudentProfile(
+      uid: 'adm',
+      name: 'Aluno Fictício',
+      registration: '202600002',
+      institutionId: 'inst-demo',
+      courseId: 'adm',
+      semester: '2026-2',
+      period: 4,
+    );
+    await pumpScreen(
+      tester,
+      AcademicSessionScope(
+        session: session,
+        child: MainNavigationScreen(
+          gradesRepository: FakeGradesRepository(),
+          now: DateTime(2026, 11, 19, 17),
+        ),
+      ),
+    );
+    expect(find.text('Marketing'), findsOneWidget);
+    expect(find.text('Hoje · 19:00'), findsOneWidget);
+    await tapVisible(tester, find.text('Horário'));
+    expect(find.text('Marketing'), findsOneWidget);
+    expect(
+      find.textContaining('Grade da turma ADM-4N, 2026.2.'),
+      findsOneWidget,
+    );
+    await tapVisible(tester, find.widgetWithText(ChoiceChip, 'QUA'));
+    expect(find.text('Sem aulas em Quarta'), findsOneWidget);
+  });
+
+  testWidgets('semestre sem catálogo mostra estados vazios', (tester) async {
+    final auth = await pumpTestApp(tester);
+    auth.profile = const StudentProfile(
+      uid: 'without-fixtures',
+      name: 'Aluno Fictício',
+      registration: '202600001',
+      institutionId: 'inst-demo',
+      courseId: 'adm',
+      semester: '2027-1',
+      period: 5,
+    );
+    await enterCredentials(tester);
+    await tapVisible(tester, find.text('ENTRAR NO PORTAL'));
+    expect(find.byType(NextClassCard), findsNothing);
+    await tapVisible(tester, find.text('Horário'));
+    expect(
+      find.text('Nenhuma grade demonstrativa para este perfil.'),
+      findsOneWidget,
+    );
+    await tapVisible(tester, find.text('Cursos'));
+    expect(
+      find.text('Nenhuma disciplina demonstrativa para este perfil.'),
+      findsOneWidget,
+    );
+    await tapVisible(tester, find.text('ver materiais'));
+    expect(
+      find.text('Nenhum material demonstrativo para este perfil.'),
+      findsOneWidget,
+    );
+  });
+
   test('e-mail técnico preserva zeros e isola instituições', () {
     expect(
       technicalEmail('inst-demo', '0001'),
@@ -291,8 +363,62 @@ void main() {
     'logout limpa a pilha, perfil e dados locais ao trocar de aluno',
     (tester) async {
       final auth = await pumpTestApp(tester);
+      final siProfile = auth.profile;
+
+      Future<void> checkCatalog({required bool adm}) async {
+        final subjects = adm
+            ? ['Gestão de Pessoas', 'Contabilidade Gerencial', 'Marketing']
+            : [
+                'Inteligência Artificial',
+                'Banco de Dados II',
+                'Arquitetura de Software',
+                'Engenharia de Requisitos',
+              ];
+        final nextClass = tester.widget<NextClassCard>(
+          find.byType(NextClassCard),
+        );
+        expect(nextClass.nextClass.subject, isIn(subjects));
+        await tapVisible(tester, find.text('Horário'));
+        await tapVisible(tester, find.widgetWithText(ChoiceChip, 'SEG'));
+        expect(find.text(subjects.first), findsOneWidget);
+        expect(find.textContaining(adm ? 'ADM-4N' : 'ESW-6N'), findsOneWidget);
+        await tapVisible(tester, find.text('Cursos'));
+        for (final subject in subjects) {
+          expect(find.text(subject), findsOneWidget);
+        }
+        expect(
+          find.text(adm ? 'Inteligência Artificial' : 'Marketing'),
+          findsNothing,
+        );
+        await tapVisible(tester, find.text('ver materiais'));
+        final filter = find.widgetWithText(
+          ChoiceChip,
+          adm ? 'Marketing' : 'IA',
+        );
+        expect(tester.widget<ChoiceChip>(filter).selected, isFalse);
+        expect(
+          find.widgetWithText(ChoiceChip, adm ? 'IA' : 'Marketing'),
+          findsNothing,
+        );
+        await tapVisible(tester, filter);
+        await tapVisible(tester, find.widgetWithText(ChoiceChip, 'PDF'));
+        if (adm) {
+          expect(
+            find.text('Nenhum material para este filtro.'),
+            findsOneWidget,
+          );
+          await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Link'));
+          expect(find.text('Introdução à Pesquisa de Mercado'), findsOneWidget);
+        } else {
+          expect(find.text('Notas de aula · Busca heurística'), findsOneWidget);
+        }
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+      }
+
       await enterCredentials(tester);
       await tapVisible(tester, find.text('ENTRAR NO PORTAL'));
+      await checkCatalog(adm: false);
       await openFromMore(tester, 'Meu perfil');
       expect(
         find.textContaining('Dados pessoais, foto e preferências são locais'),
@@ -322,6 +448,14 @@ void main() {
       await tapVisible(tester, find.text('ENTRAR NO PORTAL'));
       expect(find.text('Outro Aluno'), findsWidgets);
       expect(find.text('Aluno Demonstração'), findsNothing);
+      await checkCatalog(adm: true);
+
+      await openFromMore(tester, 'Meu perfil');
+      await tapVisible(tester, find.text('Encerrar sessão'));
+      auth.profile = siProfile;
+      await enterCredentials(tester);
+      await tapVisible(tester, find.text('ENTRAR NO PORTAL'));
+      await checkCatalog(adm: false);
     },
   );
 

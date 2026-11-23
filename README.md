@@ -34,7 +34,7 @@ Solicite à equipe a senha de acesso. As contas e os dados são fictícios, e n�
 
 ### Ainda simuladas
 
-- **Aluno:** próxima aula, horário, notificações, disciplinas, financeiro/Pix/boleto, biblioteca/reservas, materiais, mural e suporte. Esses módulos não consultam dados acadêmicos reais.
+- **Aluno:** próxima aula, horário, notificações, disciplinas, financeiro/Pix/boleto, biblioteca/reservas, materiais, mural e suporte. Esses módulos não consultam dados acadêmicos reais. Disciplinas, horário, próxima aula e materiais usam o catálogo demonstrativo correspondente à instituição, ao curso e ao semestre do perfil.
 - **Professor:** início, turmas, materiais, frequência somente leitura e comunicados.
 - **Coordenação:** painel com indicadores, turmas, materiais, eventos e comunicados.
 - **Portal administrativo:** login e verificação em duas etapas simulados, painel, usuários, chamados, permissões e auditoria. Não há autenticação ou autorização administrativa real.

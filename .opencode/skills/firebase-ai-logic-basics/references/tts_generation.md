@@ -257,7 +257,7 @@ import FirebaseAILogic
 final class SpeechStreamingManager {
     private let audioEngine = AVAudioEngine()
     private let playerNode = AVAudioPlayerNode()
-    
+
     // 24 kHz, 16-bit Mono PCM
     private let audioFormat = AVAudioFormat(
         commonFormat: .pcmFormatInt16,
@@ -273,23 +273,23 @@ final class SpeechStreamingManager {
 
     func streamSpeech(prompt: String) async throws {
         let ai = FirebaseAI.firebaseAI()
-        
+
         let speechConfig = SpeechConfig(
             voiceConfig: VoiceConfig(
                 prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
             )
         )
-        
+
         let genConfig = GenerationConfig(
             responseModalities: [.audio],
             speechConfig: speechConfig
         )
-        
+
         let model = ai.generativeModel(
             modelName: "gemini-3.1-flash-tts-preview",
             generationConfig: genConfig
         )
-        
+
         if !audioEngine.isRunning {
             try audioEngine.start()
         }
@@ -313,14 +313,14 @@ final class SpeechStreamingManager {
             return
         }
         buffer.frameLength = frameCount
-        
+
         data.withUnsafeBytes { rawBufferPointer in
             guard let src = rawBufferPointer.baseAddress else { return }
             if let dest = buffer.int16ChannelData?[0] {
                 UnsafeMutableRawPointer(dest).copyMemory(from: src, byteCount: data.count)
             }
         }
-        
+
         playerNode.scheduleBuffer(buffer)
     }
 

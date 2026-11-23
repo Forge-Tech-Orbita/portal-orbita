@@ -22,6 +22,12 @@ void main() {
 
     expect(find.byType(LoginScreen), findsOneWidget);
     expect(find.byType(BottomNavigationBar), findsNothing);
+    expect(
+      tester
+          .widget<MaterialApp>(find.byType(MaterialApp))
+          .debugShowCheckedModeBanner,
+      isFalse,
+    );
     final theme = Theme.of(tester.element(find.byType(LoginScreen)));
     expect(theme.brightness, Brightness.light);
     expect(theme.scaffoldBackgroundColor, OrbitaTheme.background);

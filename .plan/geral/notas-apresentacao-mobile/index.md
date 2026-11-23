@@ -7,7 +7,7 @@ Base remota conferida em 2026-11-22: `origin/development` em `8876c1a`, merge do
 
 Levantamento realizado na branch existente `feature/integrar-autenticacao-e-perfil`, sem trocar/atualizar branches locais. Seu conteúdo rastreado coincide com `origin/development`. Implementação futura deve partir de `development` atualizado, em nova branch `feature/integrar-notas-do-aluno`, com PR próprio para `development`.
 
-Nesta etapa: somente levantamento e este plano. Sem alteração do app, regras, dados remotos, staging, commit, push, merge ou publicação.
+O levantamento inicial foi somente documental. A S01 foi autorizada em 2026-11-22 e commitada depois em `1dd6d2d`, com aprovação separada. Na S02 foram autorizados somente os nove documentos planejados, publicação das regras do Firestore e validação técnica com autenticação de aluno; sem redefinir curso/senha, iniciar Android, push, merge ou publicação Vercel.
 
 ## Organização do trabalho
 - Plano compartilhado neste arquivo; decisões e evidências futuras devem ser registradas aqui.
@@ -30,9 +30,9 @@ Nesta etapa: somente levantamento e este plano. Sem alteração do app, regras, 
 ## Decisões propostas
 | ID | Decisão | Bloqueia | Status |
 | --- | --- | --- | --- |
-| D1 | Usar os documentos, consulta e validação descritos abaixo, sem migrar notas antigas | S01 | Aguardando aprovação |
+| D1 | Usar os documentos, consulta e validação descritos abaixo, sem migrar notas antigas | S01 | Aprovado em 2026-11-22; S01 autorizada |
 | D2 | Omitir CRA/históricos e métricas fixas sem fonte; manter somente resumo do semestre consultado | S01 | Diretriz do pedido; solução proposta abaixo |
-| D3 | Aprovar os dados fictícios e autorizar separadamente inspeção/cadastro remoto sem sobrescrita e publicação apenas das regras revisadas | S02 | Ainda não autorizado |
+| D3 | Aprovar os dados fictícios e autorizar separadamente inspeção/cadastro remoto sem sobrescrita e publicação apenas das regras revisadas | S02 | Aprovado após S01; nove documentos e somente regras do Firestore |
 | D4 | Confirmar projeto/equipe Vercel, acesso, exposição pública do preview e método de build | S03 | Pendente; recomendar primeiro preview estático compilado localmente |
 | D5 | Aprovar promoção do conjunto `development` → `production` após validação e revisão | S04 | Ainda não autorizado |
 
@@ -162,8 +162,8 @@ Referência: [configuração de projetos Vercel](https://vercel.com/docs/project
 | `lib/features/grades/data/grades_repository.dart` (novo) | Consulta de notas por UID/semestre/curso e ordenação |
 | `lib/features/grades/presentation/grades_screen.dart` | Carga, retry/atualização, estados, semestre, remoção de históricos e fixture default |
 | `lib/features/grades/data/grades_summary.dart` | Preservar cálculos; arquivo de referência/teste, sem mudança prevista |
-| `lib/features/grades/data/grades_mock.dart` | Remover dependência do runtime; manter fixtures só onde testes precisarem |
-| `lib/features/grades/presentation/widgets/gpa_ring_progress.dart` | Verificar consumidores e retirar se ficar sem uso após omitir CRA |
+| `test/grades_fixtures.dart` | Fixtures movidas de `lib/features/grades/data/grades_mock.dart`, exclusivas de testes |
+| `lib/features/grades/presentation/widgets/gpa_ring_progress.dart` (removido) | Sem consumidor após omitir CRA; retirar widget e constantes históricas |
 | `lib/app.dart` | Injetar repositório de notas, preservando guards e reset de sessão |
 | `lib/features/navigation/presentation/main_navigation_screen.dart` | Passar repositório; identificar módulos demonstrativos |
 | `lib/features/home/presentation/home_screen.dart` | Omitir métricas fixas sem fonte |
@@ -199,7 +199,8 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 - **Decisão necessária:** D3, com autorização explícita de cadastro e publicação somente de regras.
 - **Passos:** reler base remota/regras; inspecionar documentos existentes; cadastrar nove documentos sem sobrescrita; publicar só regras revisadas; reler; executar matriz.
 - **Validação manual:** três contas no Android e navegador do celular: login, identidade, curso já vinculado, Home sem indicadores inventados, Notas com dados distintos e semestre correto, detalhes/cálculos, perfil, logout e troca entre contas. Não redefinir curso para repetir escolha única; ela já foi validada na entrega anterior.
-- **Critério de conclusão:** leituras do cliente autorizadas, dados conferidos, sem vazamento/nota anterior após logout, layout 360 px e texto ampliado aprovados pelo responsável.
+- **Ajuste aprovado após S01:** não iniciar Android para conferência rotineira. A validação visual será feita pelo responsável no navegador do celular antes da apresentação, sem bloquear a preparação do preview.
+- **Critério técnico de conclusão:** regras publicadas correspondentes ao commit revisado, nove documentos conferidos sem sobrescrita e consultas reais com tokens Firebase de aluno, incluindo isolamento e negativas. Releitura administrativa não substitui esse teste. Layout, navegação e logout visual permanecem pendentes para a conferência completa no celular.
 
 ### S03: preparar preview Vercel
 - **Responsável:** agente e responsável pelo projeto; D4 obrigatória.
@@ -216,9 +217,9 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 ## Acompanhamento
 | Sessão | Status | Branch | Escopo resolvido | Validações / Pendências |
 | --- | --- | --- | --- | --- |
-| Levantamento | Concluído | Branch existente de autenticação; sem troca | PR/branches, código, contrato proposto e Web | D1/D3/D4/D5 pendentes |
-| S01 | Planejada | `feature/integrar-notas-do-aluno` (proposta) | — | Aprovação do contrato |
-| S02 | Planejada | Conforme S01 | — | Autorização remota e validação manual |
+| Levantamento | Concluído | Branch existente de autenticação; sem troca | PR/branches, código, contrato proposto e Web | D1/D3 aprovadas; D4/D5 pendentes |
+| S01 | Implementada e commitada; validação técnica remota na S02 | `feature/integrar-notas-do-aluno` | Parser, consulta, estados, isolamento, apresentação e regras locais | 242 testes Flutter, 9 de regras, análise/formato e builds Android/Web aprovados |
+| S02 | Concluída tecnicamente; visual pendente | `feature/integrar-notas-do-aluno` | Nove documentos e regras do commit `1dd6d2d`; consultas reais com autenticação das três contas | 9 testes de regras; 3 logins; 15 leituras/consultas HTTP 200; 24 negativas HTTP 403; parser real aprovado |
 | S03 | Planejada | `chore/preparar-preview-web` (proposta) | — | Definir método/projeto Vercel |
 | S04 | Planejada | `development` → `production` | — | Revisão e autorização separadas |
 
@@ -229,3 +230,30 @@ Não alterar `StudentProfile`, cálculos acadêmicos, `AuthRepository`, configur
 - **Limites:** nenhum teste Flutter/emulador ou build Android reexecutado neste levantamento documental. Os 209 testes Flutter/5 testes de regras da entrega anterior não validam a integração de notas futura.
 - **Servidor anterior:** execução Web local foi cancelada pelo reinício do servidor; não foi reiniciada nem publicada.
 - **Commit proposto:** `docs(grades): planejar notas integradas e apresentação mobile`.
+
+### Execução da S01 — 2026-11-22
+- **Base:** `development` atualizada por fast-forward em `8876c1a`; criada a branch autorizada `feature/integrar-notas-do-aluno`.
+- **Documentação anterior:** plano commitado em `11bdb78` e publicado no [PR #22](https://github.com/Forge-Tech-Orbita/portal-orbita/pull/22), ainda sem aprovação na conferência inicial; merge não executado por política de revisão. O plano foi trazido somente para a árvore de trabalho desta branch para registrar a execução, sem cherry-pick, staging ou commit da implementação.
+- **Implementado:** parser estrito em runtime, sem alterar fórmulas; repositório injetado de `MainApp` até a tela; consulta somente ao servidor por UID/semestre/curso; loading/erro/vazio/atualização, rejeição de lote inválido e de respostas antigas; filtros/detalhes mantidos ao alternar abas na mesma sessão.
+- **Apresentação:** removidos CRA/indicadores históricos e métricas sem fonte da Home; fixtures movidas para `test/`; aviso visível na casca distingue módulos demonstrativos. Cards usam título e etiquetas em linhas separadas para manter leitura/interação com texto 2× em 360×640.
+- **Regras locais:** acrescentado apenas `list` próprio com perfil/identidade, curso e semestre correspondentes; `get` legado preservado, inclusive sem perfil novo; nenhuma escrita de notas concedida.
+- **Validação final:** `dart format --output=none --set-exit-if-changed lib test` sem alterações (125 arquivos); `flutter analyze --no-pub` sem diagnósticos; `flutter test --no-pub` com **242 testes aprovados**; `git diff --check` aprovado. Regressões cobrem parser/limites/enum/metadados/números finitos, zero e null, fórmulas existentes, loading/erro/vazio/retry/atualização, resposta atrasada, logout/troca de conta, troca independente de semestre/curso e preservação de estado entre abas. Os componentes são testados com fake explícito; não há mocks de classes sealed ou dependências novas.
+- **Regras:** `npx -y firebase-tools@latest emulators:exec --project demo-portal-orbita --config firebase.emulators.json --only auth,firestore "node --test test/firestore_rules_test.cjs"` com **9 testes aprovados**. Sintaxe compilada pelo emulador; consulta REST com os mesmos filtros da aplicação testada em três perfis institucionais, preservando testes anteriores. Negadas consultas sem filtros completos, de outro semestre/curso/UID, collection group, sem login/perfil/curso válido e escritas de notas. `get` legado sem perfil preservado intencionalmente; não deve ser confundido com autorização de `list`.
+- **Builds finais:** `flutter build apk --debug --no-pub` aprovado em `build/app/outputs/flutter-apk/app-debug.apk`; `flutter build web --no-pub` aprovado em `build/web`. Toolchain Android/Web disponível. Sem instalação/execução no dispositivo nesta sessão; builds e widget tests não comprovam validação visual ou leitura remota do SDK Flutter.
+- **Limites de validação:** a chamada SDK usa `Source.server` e foi revisada no código; sem teste de integração FlutterFire no projeto remoto nesta etapa. Dados fictícios permanecem somente em testes/emuladores. Detalhes dos avisos não bloqueantes preexistentes ficam no acompanhamento local, sem mudanças de SDK/pacotes para silenciá-los.
+- **Pendências:** revisão das regras locais, publicação/provisionamento e validação remota pertencem à S02; conferência manual no Android e navegador do celular ainda necessária. Vercel não preparada/publicada.
+- **Commit proposto, não autorizado nesta etapa:** `feat(grades): integrar notas do aluno ao Firestore`.
+
+### Execução da S02
+- **Git:** commit aprovado `1dd6d2d` (`feat(grades): integrar notas do aluno ao Firestore`), restrito à implementação, testes e documentação da S01; sem push/merge.
+- **Inspeção antes de escrever:** três contas habilitadas com provedor de senha e sem claims personalizados; perfis mantêm instituição/matrícula, cursos `si`/`adm`/`si`, semestre `2026-2` e período 4. As três coleções `grades` estavam vazias, sem colisões ou disciplinas duplicadas.
+- **Provisionamento:** manifesto fixo dos nove documentos passou pelo parser real `Grade.fromMap` e conferência das médias/pendências. Criação em um único commit REST atômico, com `currentDocument.exists: false` em cada escrita; commit remoto em `2026-11-23T02:10:24.773043Z`. Nenhum documento existente foi substituído; perfis, cursos e senhas não foram alterados.
+- **Releitura administrativa:** exatamente três notas por conta; todos os campos dos nove documentos correspondem ao manifesto aprovado. Essa releitura é somente evidência de dados, não de autorização do cliente.
+- **Regras:** antes da escrita e novamente imediatamente antes da publicação, regras remotas iguais às 38 linhas do commit `f548409`, sem divergência inesperada. Arquivo local igual ao commit `1dd6d2d`; 9 testes de emuladores aprovados novamente. Publicação por `npx -y firebase-tools@latest deploy --project portal-orbita --config firebase.emulators.json --only firestore:rules --non-interactive`, saída 0. Releitura pela API Rules confirmou as 45 linhas do commit, normalizando apenas finais de linha; `get` legado preservado, sem alteração de configuração/serviços restantes.
+- **Autenticação de aluno:** emissão keyless via IAM foi negada (`IAM_PERMISSION_DENIED`); nenhuma API foi habilitada, chave criada ou permissão concedida. Em seguida, o responsável digitou as senhas existentes em formulário local privado, e as **três contas autenticaram por e-mail/senha**. Tokens ID Firebase com UID, e-mail, projeto e provedor `password` conferidos; consultas executadas com esses tokens, nunca com OAuth administrativo. Senhas e tokens somente em memória/stdin privado; sem valores em logs, arquivos, argumentos ou chat.
+- **Consultas reais permitidas:** por conta, `get` do próprio perfil (HTTP 200), consulta `students/{uid}/grades` filtrada por `semestreLetivo == "2026-2"` e `cursoId` do perfil (HTTP 200, exatamente três documentos), e `get` das três notas (HTTP 200). Total: **15 leituras/consultas permitidas**, além dos três logins. A consulta usa os mesmos caminhos e filtros do repositório do app; resposta real validada com `Grade.fromMap`, confirmando nove documentos, seis médias completas e três pendentes conforme o plano. Não foi necessário criar índice.
+- **Negativas reais:** para cada token de aluno, consulta e `get` de outra conta, consulta com apenas semestre, com apenas curso, outro semestre, outro curso, listagem ampla e a mesma consulta sem autenticação retornaram **HTTP 403**: oito tentativas por conta, **24 negativas**. Nenhuma escrita remota foi tentada com aluno; negação de escrita está coberta pelos emuladores e pelo conteúdo publicado.
+- **Preservação final:** releitura MCP confirmou `updateTime` dos três perfis idêntico ao observado antes da operação, com cursos e semestre intactos. Somente os nove documentos de notas foram criados; não houve alteração de senha, claims, vínculo de curso ou documento anterior.
+- **Validação visual:** pendente, a cargo do responsável no navegador do celular antes da apresentação. Não iniciar Android nesta etapa; isso não bloqueia a preparação futura do preview Vercel. Não alegar validação visual a partir das consultas REST.
+- **Preparação:** artefatos Android debug e Flutter Web da S01 disponíveis; app não alterado nesta operação remota. Sem publicação Vercel, redefinição de curso, alteração de senha, push ou merge.
+- **Commit documental proposto:** `docs(grades): registrar provisionamento e validação técnica`.

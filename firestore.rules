@@ -25,8 +25,15 @@ service cloud.firestore {
         )
         && get(/databases/$(database)/documents/institutions/$(resource.data.instituicaoId)/courses/$(request.resource.data.cursoId)).data.ativo == true;
       match /grades/{gradeId} {
-        // Preservar o get existente das contas A/B; list e escrita continuam negados.
+        // Preservar o get existente das contas A/B, inclusive sem perfil novo.
         allow get: if owner(uid);
+        allow list: if owner(uid)
+          && validIdentity(get(/databases/$(database)/documents/students/$(uid)).data)
+          && get(/databases/$(database)/documents/students/$(uid)).data.cursoId != null
+          && resource.data.semestreLetivo ==
+            get(/databases/$(database)/documents/students/$(uid)).data.semestreLetivo
+          && resource.data.cursoId ==
+            get(/databases/$(database)/documents/students/$(uid)).data.cursoId;
       }
     }
     match /institutions/{institutionId}/courses/{courseId} {

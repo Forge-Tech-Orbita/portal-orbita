@@ -5,7 +5,6 @@ import '../../../core/mock/notices_mock.dart';
 import '../../../core/mock/student_mock.dart';
 import '../../auth/data/academic_session.dart';
 import '../../../core/models/app_notification.dart';
-import '../../../core/widgets/metric_tile.dart';
 import '../../../core/widgets/notice_tile.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/student_id_card.dart';
@@ -70,21 +69,6 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           StudentIdCard(student: student),
-          const SizedBox(height: 12),
-          const Row(
-            spacing: 8,
-            children: [
-              Expanded(
-                child: MetricTile(value: '8.7', label: 'CRA geral'),
-              ),
-              Expanded(
-                child: MetricTile(value: '91%', label: 'Frequência'),
-              ),
-              Expanded(
-                child: MetricTile(value: '142', label: 'Créditos'),
-              ),
-            ],
-          ),
           if (nextClass != null) ...[
             const SizedBox(height: 12),
             NextClassCard(nextClass: nextClass),

@@ -5,14 +5,21 @@ import 'package:portal_orbita/core/theme/orbita_theme.dart';
 import 'package:portal_orbita/core/models/student_profile.dart';
 
 import 'fake_auth_repository.dart';
+import 'fake_grades_repository.dart';
 
 Future<FakeAuthRepository> pumpTestApp(
   WidgetTester tester, {
   FakeAuthRepository? repository,
+  FakeGradesRepository? gradesRepository,
 }) async {
   final auth = repository ?? FakeAuthRepository();
   addTearDown(auth.dispose);
-  await tester.pumpWidget(MainApp(authRepository: auth));
+  await tester.pumpWidget(
+    MainApp(
+      authRepository: auth,
+      gradesRepository: gradesRepository ?? FakeGradesRepository(),
+    ),
+  );
   await tester.pumpAndSettle();
   return auth;
 }

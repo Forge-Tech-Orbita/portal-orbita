@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portal_orbita/core/models/student_profile.dart';
+import 'package:portal_orbita/features/auth/data/academic_session.dart';
 import 'package:portal_orbita/features/grades/data/grade.dart';
-import 'package:portal_orbita/features/grades/data/grades_mock.dart';
 import 'package:portal_orbita/features/grades/data/grades_summary.dart';
 import 'package:portal_orbita/features/grades/presentation/grades_screen.dart';
-import 'package:portal_orbita/features/grades/presentation/widgets/gpa_ring_progress.dart';
 
 import 'helpers.dart';
+import 'fake_grades_repository.dart';
+import 'grades_fixtures.dart';
 
 const _pendingGrade = Grade(
   subject: 'Cálculo Numérico',
@@ -29,13 +33,246 @@ const _completedGrade = Grade(
 Future<void> pumpGrades(
   WidgetTester tester, [
   List<Grade> grades = demoGrades,
-]) => pumpScreen(tester, Scaffold(body: GradesScreen(grades: grades)));
+]) async {
+  await pumpScreen(
+    tester,
+    Scaffold(
+      body: GradesScreen(
+        repository: FakeGradesRepository()..grades = grades,
+        profile: gradesProfile,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
 
 Future<void> expandGrade(WidgetTester tester, String subject) async {
   await tapVisible(tester, find.text(subject));
 }
 
 void main() {
+  testWidgets(
+    'carregamento, vazio, erro, retry e atualização não usam fixtures',
+    (tester) async {
+      final pending = Completer<List<Grade>>();
+      final repository = FakeGradesRepository()..pending = pending.future;
+      await pumpScreen(
+        tester,
+        Scaffold(
+          body: GradesScreen(repository: repository, profile: gradesProfile),
+        ),
+      );
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Arquitetura de Software'), findsNothing);
+      pending.complete([]);
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Nenhuma nota cadastrada para este semestre.'),
+        findsOneWidget,
+      );
+      expect(find.text('Aprovadas no semestre'), findsNothing);
+
+      repository.pending = null;
+      repository.error = StateError('permission-denied: informação privada');
+      await tapVisible(tester, find.text('Atualizar notas'));
+      expect(
+        find.textContaining('Não foi possível carregar as notas'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('informação privada'), findsNothing);
+      expect(
+        find.text('Nenhuma nota cadastrada para este semestre.'),
+        findsNothing,
+      );
+
+      repository.error = const FormatException('documento privado');
+      await tapVisible(tester, find.text('Tentar novamente'));
+      expect(
+        find.textContaining('Os dados das notas estão indisponíveis'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('documento privado'), findsNothing);
+
+      repository.error = null;
+      repository.grades = [_pendingGrade];
+      await tapVisible(tester, find.text('Tentar novamente'));
+      expect(find.text('Cálculo Numérico'), findsOneWidget);
+      expect(find.text('Arquitetura de Software'), findsNothing);
+      final refresh = Completer<List<Grade>>();
+      repository.pending = refresh.future;
+      await tester.tap(find.text('Atualizar notas'));
+      await tester.pump();
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Cálculo Numérico'), findsNothing);
+      refresh.complete([_completedGrade]);
+      await tester.pumpAndSettle();
+      expect(find.text('Algoritmos'), findsOneWidget);
+      expect(repository.calls, hasLength(5));
+    },
+  );
+
+  testWidgets('ausência de perfil/curso não consulta notas', (tester) async {
+    final repository = FakeGradesRepository();
+    for (final profile in <StudentProfile?>[
+      null,
+      const StudentProfile(
+        uid: 'student-a',
+        name: 'Aluno',
+        registration: '202600001',
+        institutionId: 'inst-demo',
+        courseId: null,
+        semester: '2026-2',
+        period: 4,
+      ),
+    ]) {
+      await pumpScreen(
+        tester,
+        Scaffold(
+          body: GradesScreen(repository: repository, profile: profile),
+        ),
+      );
+      expect(repository.calls, isEmpty);
+      expect(find.textContaining('Entre com um perfil válido'), findsOneWidget);
+      expect(find.text('Arquitetura de Software'), findsNothing);
+    }
+  });
+
+  testWidgets('mudança de semestre/curso descarta resposta atrasada', (
+    tester,
+  ) async {
+    final old = Completer<List<Grade>>();
+    final repository = FakeGradesRepository()..pending = old.future;
+    await pumpScreen(
+      tester,
+      Scaffold(
+        body: GradesScreen(repository: repository, profile: gradesProfile),
+      ),
+    );
+    repository.pending = null;
+    repository.grades = [_completedGrade];
+    const next = StudentProfile(
+      uid: 'student-a',
+      name: 'Aluno',
+      registration: '202600001',
+      institutionId: 'inst-demo',
+      courseId: 'adm',
+      semester: '2027-1',
+      period: 5,
+    );
+    await pumpScreen(
+      tester,
+      Scaffold(
+        body: GradesScreen(repository: repository, profile: next),
+      ),
+    );
+    await tester.pumpAndSettle();
+    old.complete([_pendingGrade]);
+    await tester.pumpAndSettle();
+    expect(repository.calls.last.semester, '2027-1');
+    expect(repository.calls.last.courseId, 'adm');
+    expect(find.text('Algoritmos'), findsOneWidget);
+    expect(find.text('Cálculo Numérico'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('novo semestre limpa expansão e novo curso limpa filtro', (
+    tester,
+  ) async {
+    final repository = FakeGradesRepository()..grades = [demoGrades.first];
+    Future<void> show(StudentProfile profile) async {
+      await pumpScreen(
+        tester,
+        Scaffold(
+          body: GradesScreen(repository: repository, profile: profile),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await show(gradesProfile);
+    await expandGrade(tester, demoGrades.first.subject);
+    expect(find.text('1ª etapa'), findsOneWidget);
+    const nextSemester = StudentProfile(
+      uid: 'student-a',
+      name: 'Aluno',
+      registration: '202600001',
+      institutionId: 'inst-demo',
+      courseId: 'si',
+      semester: '2027-1',
+      period: 5,
+    );
+    await show(nextSemester);
+    expect(find.text('1ª etapa'), findsNothing);
+    await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Concluídas'));
+    expect(
+      find.text('Nenhuma disciplina concluída neste semestre.'),
+      findsOneWidget,
+    );
+    const nextCourse = StudentProfile(
+      uid: 'student-a',
+      name: 'Aluno',
+      registration: '202600001',
+      institutionId: 'inst-demo',
+      courseId: 'adm',
+      semester: '2027-1',
+      period: 5,
+    );
+    await show(nextCourse);
+    expect(
+      tester
+          .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Todas'))
+          .selected,
+      isTrue,
+    );
+    expect(find.text(demoGrades.first.subject), findsOneWidget);
+    expect(
+      repository.calls.map((profile) => (profile.semester, profile.courseId)),
+      [('2026-2', 'si'), ('2027-1', 'si'), ('2027-1', 'adm')],
+    );
+  });
+
+  testWidgets(
+    'logout e outra conta isolam notas e respostas da árvore descartada',
+    (tester) async {
+      final old = Completer<List<Grade>>();
+      final repository = FakeGradesRepository()..pending = old.future;
+      final auth = await pumpTestApp(tester, gradesRepository: repository);
+      await auth.signIn('inst-demo', auth.profile.registration, 'test-only');
+      await tester.pump();
+      await tester.pump();
+      final context = tester.element(
+        find.byType(GradesScreen, skipOffstage: false),
+      );
+      final session = AcademicSessionScope.maybeOf(context)!;
+      await session.signOut();
+      await tester.pumpAndSettle();
+      repository.pending = null;
+      repository.grades = [_completedGrade];
+      auth.profile = const StudentProfile(
+        uid: 'student-b',
+        name: 'Outra pessoa',
+        registration: '202600002',
+        institutionId: 'inst-demo',
+        courseId: 'adm',
+        semester: '2026-2',
+        period: 4,
+      );
+      await session.signIn('inst-demo', auth.profile.registration, 'test-only');
+      await tester.pumpAndSettle();
+      old.complete([_pendingGrade]);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Notas'));
+      await tester.pumpAndSettle();
+      expect(repository.calls.map((profile) => profile.uid), [
+        'student-a',
+        'student-b',
+      ]);
+      expect(find.text('Algoritmos'), findsOneWidget);
+      expect(find.text('Cálculo Numérico'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   test('resumo conta aprovadas, cursando e pendentes', () {
     expect(summarizeGrades(const []), (
       average: null,
@@ -117,16 +354,28 @@ void main() {
     expect(stage.total, isNull);
   });
 
-  testWidgets('cabeçalho mostra CRA histórico e contagens', (tester) async {
+  testWidgets('cabeçalho mostra semestre e contagens sem histórico inventado', (
+    tester,
+  ) async {
     await pumpGrades(tester);
 
     expect(find.text('Notas & frequência'), findsOneWidget);
+    expect(find.textContaining('Semestre 2026-2'), findsOneWidget);
+    expect(find.textContaining('CRA'), findsNothing);
+    expect(find.text('Aprovadas (histórico)'), findsNothing);
+    expect(find.text('Aprovadas no semestre'), findsOneWidget);
     expect(
-      tester.widget<GpaRingProgress>(find.byType(GpaRingProgress)).value,
-      historicalGpa,
+      find.descendant(
+        of: find
+            .ancestor(
+              of: find.text('Aprovadas no semestre'),
+              matching: find.byType(Row),
+            )
+            .first,
+        matching: find.text('0'),
+      ),
+      findsOneWidget,
     );
-    expect(find.text('Aprovadas (histórico)'), findsOneWidget);
-    expect(find.text('$historicalApproved'), findsOneWidget);
     expect(find.text('Pendentes'), findsOneWidget);
     expect(find.widgetWithText(ChoiceChip, 'Cursando (4)'), findsOneWidget);
     expect(find.text('6,75 · abaixo de 7'), findsOneWidget);
@@ -242,6 +491,21 @@ void main() {
   });
 
   for (final size in testViewports) {
+    testWidgets('notas na casca com aviso demonstrativo e texto 2× em $size', (
+      tester,
+    ) async {
+      useViewport(tester, size, textScale: 2);
+      await loginAs(tester);
+      await tester.tap(find.text('Notas'));
+      await tester.pumpAndSettle();
+      await expandGrade(tester, 'Engenharia de Requisitos');
+      await tester.ensureVisible(
+        find.text('Frequência: 92% · Situação: Cursando'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Ambiente de apresentação'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
     testWidgets('última nota expandida sem overflow em $size', (tester) async {
       useViewport(tester, size, textScale: 2);
       await pumpGrades(tester);

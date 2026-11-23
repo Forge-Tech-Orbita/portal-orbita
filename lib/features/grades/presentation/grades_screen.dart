@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/status_tag.dart';
+import '../../../core/models/student_profile.dart';
 import '../data/grade.dart';
-import '../data/grades_mock.dart';
+import '../data/grades_repository.dart';
 import '../data/grades_summary.dart';
-import 'widgets/gpa_ring_progress.dart';
 
 enum _GradeFilter {
   all('Todas'),
@@ -24,9 +24,14 @@ enum _GradeFilter {
 }
 
 class GradesScreen extends StatefulWidget {
-  const GradesScreen({super.key, this.grades = demoGrades});
+  const GradesScreen({
+    super.key,
+    required this.repository,
+    required this.profile,
+  });
 
-  final List<Grade> grades;
+  final GradesRepository repository;
+  final StudentProfile? profile;
 
   @override
   State<GradesScreen> createState() => _GradesScreenState();
@@ -34,96 +39,170 @@ class GradesScreen extends StatefulWidget {
 
 class _GradesScreenState extends State<GradesScreen> {
   _GradeFilter _filter = _GradeFilter.all;
+  List<Grade> _grades = [];
+  bool _loading = false;
+  String? _error;
+  int _generation = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(GradesScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.repository != widget.repository ||
+        oldWidget.profile?.uid != widget.profile?.uid ||
+        oldWidget.profile?.semester != widget.profile?.semester ||
+        oldWidget.profile?.courseId != widget.profile?.courseId) {
+      _filter = _GradeFilter.all;
+      _load();
+    }
+  }
+
+  Future<void> _load() async {
+    final generation = ++_generation;
+    final profile = widget.profile;
+    setState(() {
+      _grades = [];
+      _error = null;
+      _loading = profile?.courseId != null;
+    });
+    if (profile == null || profile.courseId == null) return;
+    try {
+      final grades = await widget.repository.loadGrades(profile);
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _grades = grades;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted || generation != _generation) return;
+      setState(() {
+        _loading = false;
+        _error = error is FormatException
+            ? 'Os dados das notas estão indisponíveis. Tente novamente.'
+            : 'Não foi possível carregar as notas. Confira a conexão e tente novamente.';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final (:average, :approved, :inProgress, :pending) = summarizeGrades(
-      widget.grades,
+      _grades,
     );
-    final grades = widget.grades.where(
-      (grade) => _filter.includes(grade.status),
-    );
+    final grades = _grades.where((grade) => _filter.includes(grade.status));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PageHeading(
+          PageHeading(
             overline: 'Desempenho acadêmico',
             title: 'Notas & frequência',
             subtitle:
-                'Notas importadas do sistema acadêmico · resumo calculado',
+                'Semestre ${widget.profile?.semester ?? 'não disponível'} · dados fictícios de apresentação no Firestore',
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const GpaRingProgress(value: historicalGpa),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  spacing: 6,
-                  children: [
-                    for (final (label, count) in [
-                      ('Aprovadas (histórico)', historicalApproved + approved),
-                      ('Cursando', inProgress),
-                      ('Pendentes', pending),
-                    ])
-                      Row(
-                        children: [
-                          Expanded(child: Text(label)),
-                          Text('$count', style: textTheme.titleSmall),
-                        ],
-                      ),
-                  ],
+          if (widget.profile?.courseId == null)
+            const Text(
+              'Entre com um perfil válido e curso definido para consultar notas.',
+            )
+          else
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: _loading ? null : _load,
+                icon: const Icon(Icons.refresh),
+                label: Text(
+                  _error == null ? 'Atualizar notas' : 'Tentar novamente',
                 ),
               ),
-            ],
-          ),
-          if (average != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              'Média do semestre: ${formatGrade(average)}',
-              style: textTheme.bodySmall,
             ),
-          ],
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              spacing: 8,
+          if (_loading)
+            const Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Carregando notas',
+              ),
+            ),
+          if (_error != null) Text(_error!),
+          if (!_loading &&
+              _error == null &&
+              widget.profile?.courseId != null &&
+              _grades.isEmpty)
+            const Text('Nenhuma nota cadastrada para este semestre.'),
+          if (_grades.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Column(
+              spacing: 6,
               children: [
-                for (final filter in _GradeFilter.values)
-                  ChoiceChip(
-                    label: Text(
-                      filter == _GradeFilter.inProgress
-                          ? '${filter.label} ($inProgress)'
-                          : filter.label,
-                    ),
-                    selected: filter == _filter,
-                    onSelected: (_) => setState(() => _filter = filter),
+                for (final (label, count) in [
+                  ('Aprovadas no semestre', approved),
+                  ('Cursando', inProgress),
+                  ('Pendentes', pending),
+                ])
+                  Row(
+                    children: [
+                      Expanded(child: Text(label)),
+                      Text('$count', style: textTheme.titleSmall),
+                    ],
                   ),
               ],
             ),
-          ),
-          const SizedBox(height: 12),
-          if (grades.isEmpty)
-            Text(switch (_filter) {
-              _GradeFilter.all => 'Nenhuma disciplina neste semestre.',
-              _GradeFilter.inProgress =>
-                'Nenhuma disciplina cursando neste semestre.',
-              _GradeFilter.completed =>
-                'Nenhuma disciplina concluída neste semestre.',
-            }, style: textTheme.bodyMedium),
-          for (final grade in grades)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: _GradeCard(
-                key: ValueKey((_filter, grade.code)),
-                grade: grade,
+            if (average != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Média do semestre: ${formatGrade(average)}',
+                style: textTheme.bodySmall,
+              ),
+            ],
+            const SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: 8,
+                children: [
+                  for (final filter in _GradeFilter.values)
+                    ChoiceChip(
+                      label: Text(
+                        filter == _GradeFilter.inProgress
+                            ? '${filter.label} ($inProgress)'
+                            : filter.label,
+                      ),
+                      selected: filter == _filter,
+                      onSelected: (_) => setState(() => _filter = filter),
+                    ),
+                ],
               ),
             ),
+            const SizedBox(height: 12),
+            if (grades.isEmpty)
+              Text(switch (_filter) {
+                _GradeFilter.all => 'Nenhuma disciplina neste semestre.',
+                _GradeFilter.inProgress =>
+                  'Nenhuma disciplina cursando neste semestre.',
+                _GradeFilter.completed =>
+                  'Nenhuma disciplina concluída neste semestre.',
+              }, style: textTheme.bodyMedium),
+            for (final grade in grades)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _GradeCard(
+                  key: ValueKey((
+                    widget.profile?.uid,
+                    widget.profile?.semester,
+                    widget.profile?.courseId,
+                    _filter,
+                    grade.code,
+                  )),
+                  grade: grade,
+                ),
+              ),
+          ],
         ],
       ),
     );
@@ -156,36 +235,27 @@ class _GradeCard extends StatelessWidget {
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 14),
-          title: Row(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(grade.subject, style: textTheme.bodyLarge),
-                    Text(grade.code, style: textTheme.bodySmall),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  alignment: WrapAlignment.end,
-                  children: [
-                    StatusTag(
-                      label: grade.status.label,
-                      tone: switch (grade.status) {
-                        GradeStatus.approved => TagTone.success,
-                        GradeStatus.failed => TagTone.danger,
-                        GradeStatus.completed => TagTone.neutral,
-                        GradeStatus.inProgress => TagTone.info,
-                      },
-                    ),
-                    gradeTag,
-                  ],
-                ),
+              Text(grade.subject, style: textTheme.bodyLarge),
+              Text(grade.code, style: textTheme.bodySmall),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: [
+                  StatusTag(
+                    label: grade.status.label,
+                    tone: switch (grade.status) {
+                      GradeStatus.approved => TagTone.success,
+                      GradeStatus.failed => TagTone.danger,
+                      GradeStatus.completed => TagTone.neutral,
+                      GradeStatus.inProgress => TagTone.info,
+                    },
+                  ),
+                  gradeTag,
+                ],
               ),
             ],
           ),

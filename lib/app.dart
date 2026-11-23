@@ -9,6 +9,7 @@ import 'features/admin/presentation/admin_shell.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/data/academic_session.dart';
 import 'features/auth/data/auth_repository.dart';
+import 'features/grades/data/grades_repository.dart';
 import 'features/profile/presentation/course_selection_screen.dart';
 import 'features/coordination/data/coordination_mock.dart';
 import 'features/coordination/presentation/coordination_shell.dart';
@@ -30,15 +31,18 @@ import 'features/support/presentation/support_screen.dart';
 import 'features/support/presentation/ticket_sent_screen.dart';
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key, this.authRepository});
+  const MainApp({super.key, this.authRepository, this.gradesRepository});
 
   final AuthRepository? authRepository;
+  final GradesRepository? gradesRepository;
 
   @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
+  late final _gradesRepository =
+      widget.gradesRepository ?? FirebaseGradesRepository();
   var _themeController = OrbitaThemeController();
   late final _session = AcademicSession(
     widget.authRepository ?? FirebaseAuthRepository(),
@@ -122,7 +126,9 @@ class _MainAppState extends State<MainApp> {
     }
     final screen = switch (settings.name) {
       AppRoutes.login => _entry(),
-      AppRoutes.main => const MainNavigationScreen(),
+      AppRoutes.main => MainNavigationScreen(
+        gradesRepository: _gradesRepository,
+      ),
       AppRoutes.financial => const FinancialScreen(),
       AppRoutes.payment => PaymentScreen(
         initialMethod: arguments is PaymentMethod
@@ -183,6 +189,6 @@ class _MainAppState extends State<MainApp> {
     if (_session.profile!.courseId == null) {
       return const CourseSelectionScreen();
     }
-    return const MainNavigationScreen();
+    return MainNavigationScreen(gradesRepository: _gradesRepository);
   }
 }

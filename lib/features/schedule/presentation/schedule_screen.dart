@@ -25,7 +25,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final textTheme = Theme.of(context).textTheme;
     final lessons = demoSchedule[_currentDay]!;
     final todayLabel =
-        '${ScheduleDay.forDate(_today).lowercase}, '
+        '${weekdayName(_today)}, '
         '${_today.day.toString().padLeft(2, '0')}/'
         '${_today.month.toString().padLeft(2, '0')}';
 

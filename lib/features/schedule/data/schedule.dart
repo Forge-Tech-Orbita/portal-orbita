@@ -19,6 +19,18 @@ enum ScheduleDay {
       date.weekday == DateTime.sunday ? saturday : values[date.weekday - 1];
 }
 
+const _weekdayNames = [
+  'segunda',
+  'terça',
+  'quarta',
+  'quinta',
+  'sexta',
+  'sábado',
+  'domingo',
+];
+
+String weekdayName(DateTime date) => _weekdayNames[date.weekday - 1];
+
 class ScheduledClass {
   const ScheduledClass({
     required this.time,

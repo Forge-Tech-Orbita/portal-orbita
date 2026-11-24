@@ -11,8 +11,9 @@
 
 Ambiente acadêmico simulado desenvolvido em Flutter/Dart, com acesso do aluno,
 perfil e notas integrados ao Firebase e demais funcionalidades demonstrativas.
-O projeto tem estrutura para Android, iOS e Web; Firebase está configurado somente
-em Android e Web.
+O projeto tem estrutura para Android, iOS e Web; Firebase está configurado em
+Android, iOS e Web. No iOS, o teste foi feito em iPhone físico, com instalação local
+assinada para desenvolvimento; não há publicação na App Store/TestFlight.
 
 ## Demonstração publicada
 

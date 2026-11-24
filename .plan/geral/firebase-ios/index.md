@@ -27,9 +27,10 @@ Habilitar no aplicativo nativo iOS o Firebase já usado em Android/Web (login do
 | `flutter build ios --debug --no-codesign` | Concluído |
 | `flutter build ios --release --no-codesign` | Concluído; `CFBundleIdentifier` correto |
 | `flutter build web --no-pub` | Concluído |
-| Teste no iPhone físico (debug e release) | **Pendente — Edu** |
+| iPhone físico, debug (`flutter run`) | Edu relatou que o fluxo funcionou; sem registro caso a caso |
+| iPhone físico, release assinado (`flutter run --release`) | Edu relatou que o fluxo funcionou; sem registro caso a caso |
 
 ## Pendências e limites
-- Aceite em iPhone físico (login, perfil, notas, isolamento, logout) ainda não realizado; só ele comprova o suporte iOS.
+- O aceite no iPhone físico foi relatado pelo Edu de forma geral (instalação, abertura e uso nos dois modos). Casos individuais — troca de conta, senha incorreta, falta de rede, segundo plano, seletor de foto, texto ampliado e VoiceOver — não foram registrados um a um e ficam sem evidência detalhada.
 - Personal Team: o perfil de provisionamento expira em 7 dias; não há distribuição pela App Store/TestFlight.
 - Fora de escopo: Analytics, Crashlytics, Messaging, App Check, login Apple/Google, regras Firestore e dados existentes.

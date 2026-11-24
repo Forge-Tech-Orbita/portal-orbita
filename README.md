@@ -1,6 +1,13 @@
 <img width="2000" height="632" alt="forgetech-logo-escuro" src="https://github.com/user-attachments/assets/13ad749f-7d4b-475e-800d-94c38a002041" />
 
+
+<div align="center">
+
 # Portal Órbita
+
+<img width="280" alt="Logo do Portal Órbita" src="https://github.com/user-attachments/assets/a204e67d-4962-4b38-941f-2609f40befaa" />
+
+</div>
 
 Ambiente acadêmico simulado desenvolvido em Flutter/Dart, com acesso do aluno,
 perfil e notas integrados ao Firebase e demais funcionalidades demonstrativas.

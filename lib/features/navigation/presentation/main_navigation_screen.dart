@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/mock/academic_demo.dart';
 import '../../../core/mock/notifications_mock.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/widgets/orbita_bottom_nav.dart';
 import '../../auth/data/academic_session.dart';
 import '../../grades/data/grades_repository.dart';
+import '../../courses/data/courses_mock.dart';
 import '../../courses/presentation/courses_screen.dart';
 import '../../grades/presentation/grades_screen.dart';
 import '../../home/presentation/home_screen.dart';
@@ -15,7 +17,13 @@ import '../../schedule/data/schedule_mock.dart';
 import '../../schedule/presentation/schedule_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key, required this.gradesRepository});
+  const MainNavigationScreen({
+    super.key,
+    required this.gradesRepository,
+    this.now,
+  });
+
+  final DateTime? now;
 
   final GradesRepository gradesRepository;
 
@@ -30,8 +38,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     demoNotifications,
   );
 
-  HomeNextClass? _nextClass() {
-    final next = nextClassFrom(demoSchedule, DateTime.now());
+  HomeNextClass? _nextClass(DemoSchedule? schedule, DateTime now) {
+    if (schedule == null) return null;
+    final next = nextClassFrom(schedule.lessons, now);
     if (next == null) return null;
     return (
       subject: next.lesson.subject,
@@ -49,18 +58,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = AcademicSessionScope.maybeOf(context)?.profile;
+    final demo = academicDemoFor(profile);
+    final schedule = scheduleFor(demo);
+    final now = widget.now ?? DateTime.now();
     return Scaffold(
       body: SafeArea(
         child: IndexedStack(
           index: selectedIndex,
           children: [
-            HomeScreen(nextClass: _nextClass(), notifications: _notifications),
-            const ScheduleScreen(),
-            GradesScreen(
-              repository: widget.gradesRepository,
-              profile: AcademicSessionScope.maybeOf(context)?.profile,
+            HomeScreen(
+              nextClass: _nextClass(schedule, now),
+              notifications: _notifications,
             ),
-            const CoursesScreen(),
+            ScheduleScreen(
+              schedule: schedule,
+              semester: profile?.semester,
+              now: now,
+            ),
+            GradesScreen(repository: widget.gradesRepository, profile: profile),
+            CoursesScreen(
+              courses: coursesFor(demo),
+              semester: profile?.semester,
+            ),
             const MoreScreen(),
           ],
         ),

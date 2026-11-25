@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portal_orbita/core/mock/academic_demo.dart';
 import 'package:portal_orbita/features/schedule/data/schedule.dart';
 import 'package:portal_orbita/features/schedule/data/schedule_mock.dart';
 import 'package:portal_orbita/features/schedule/presentation/schedule_screen.dart';
@@ -49,8 +50,25 @@ void main() {
     expect(nextClassFrom({}, thursday), isNull);
   });
 
+  test('próxima aula de ADM vem da grade de ADM', () {
+    final schedule = scheduleFor(AcademicDemo.administration)!;
+    final next = nextClassFrom(schedule.lessons, DateTime(2026, 11, 19, 17));
+    expect(next?.lesson.subject, 'Marketing');
+    expect(next?.when, 'Hoje · 19:00');
+    expect(schedule.lessons[ScheduleDay.wednesday], isEmpty);
+  });
+
   testWidgets('abre no dia de hoje e troca de dia pelos chips', (tester) async {
-    await pumpScreen(tester, Scaffold(body: ScheduleScreen(now: thursday)));
+    await pumpScreen(
+      tester,
+      Scaffold(
+        body: ScheduleScreen(
+          schedule: scheduleFor(AcademicDemo.informationSystems),
+          semester: demoSemester,
+          now: thursday,
+        ),
+      ),
+    );
 
     expect(find.text('Suas aulas'), findsOneWidget);
     expect(
@@ -78,7 +96,16 @@ void main() {
     tester,
   ) async {
     final sunday = DateTime(2026, 11, 29, 10, 0);
-    await pumpScreen(tester, Scaffold(body: ScheduleScreen(now: sunday)));
+    await pumpScreen(
+      tester,
+      Scaffold(
+        body: ScheduleScreen(
+          schedule: scheduleFor(AcademicDemo.informationSystems),
+          semester: demoSemester,
+          now: sunday,
+        ),
+      ),
+    );
 
     expect(
       find.textContaining('Abre no dia de hoje (domingo, 29/11)'),
@@ -94,7 +121,16 @@ void main() {
 
   testWidgets('dia comum exibe o nome do dia na legenda', (tester) async {
     final wednesday = DateTime(2026, 11, 25, 10, 0);
-    await pumpScreen(tester, Scaffold(body: ScheduleScreen(now: wednesday)));
+    await pumpScreen(
+      tester,
+      Scaffold(
+        body: ScheduleScreen(
+          schedule: scheduleFor(AcademicDemo.informationSystems),
+          semester: demoSemester,
+          now: wednesday,
+        ),
+      ),
+    );
 
     expect(
       find.textContaining('Abre no dia de hoje (quarta, 25/11)'),
@@ -113,7 +149,16 @@ void main() {
       tester,
     ) async {
       useViewport(tester, size, textScale: 1.5);
-      await pumpScreen(tester, Scaffold(body: ScheduleScreen(now: thursday)));
+      await pumpScreen(
+        tester,
+        Scaffold(
+          body: ScheduleScreen(
+            schedule: scheduleFor(AcademicDemo.informationSystems),
+            semester: demoSemester,
+            now: thursday,
+          ),
+        ),
+      );
       await tester.ensureVisible(find.text('Prof.ª C. Bezerra'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

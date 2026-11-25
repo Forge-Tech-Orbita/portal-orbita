@@ -1,24 +1,42 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/mock/academic_demo.dart';
 import '../../../core/models/learning_material.dart';
 import '../../../core/widgets/material_tile.dart';
 import '../../../core/widgets/page_heading.dart';
+import '../../auth/data/academic_session.dart';
 import '../data/student_materials_mock.dart';
 
-class MaterialsScreen extends StatefulWidget {
+class MaterialsScreen extends StatelessWidget {
   const MaterialsScreen({super.key});
 
   @override
-  State<MaterialsScreen> createState() => _MaterialsScreenState();
+  Widget build(BuildContext context) {
+    final profile = AcademicSessionScope.maybeOf(context)?.profile;
+    final demo = academicDemoFor(profile);
+    return MaterialsList(
+      key: ValueKey((profile?.uid, demo)),
+      catalog: materialsFor(demo),
+    );
+  }
 }
 
-class _MaterialsScreenState extends State<MaterialsScreen> {
+class MaterialsList extends StatefulWidget {
+  const MaterialsList({super.key, required this.catalog});
+
+  final StudentMaterials catalog;
+
+  @override
+  State<MaterialsList> createState() => _MaterialsListState();
+}
+
+class _MaterialsListState extends State<MaterialsList> {
   String? _discipline;
   MaterialKind? _kind;
 
   @override
   Widget build(BuildContext context) {
-    final materials = demoStudentMaterials.where(
+    final materials = widget.catalog.items.where(
       (material) =>
           (_discipline == null || material.audiences.contains(_discipline)) &&
           (_kind == null || material.kind == _kind),
@@ -49,7 +67,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
                     selected: _discipline == null,
                     onSelected: (_) => setState(() => _discipline = null),
                   ),
-                  for (final filter in studentMaterialFilters)
+                  for (final filter in widget.catalog.filters)
                     ChoiceChip(
                       label: Text(filter),
                       selected: _discipline == filter,
@@ -79,10 +97,12 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
               ),
               const SizedBox(height: 10),
               if (materials.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Text(
-                    'Nenhum material para este filtro.',
+                    widget.catalog.items.isEmpty
+                        ? 'Nenhum material demonstrativo para este perfil.'
+                        : 'Nenhum material para este filtro.',
                     textAlign: TextAlign.center,
                   ),
                 ),

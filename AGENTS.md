@@ -10,7 +10,7 @@
 
 ## Projeto e fontes principais
 
-Aplicação Flutter/Dart com Firebase em Android/Web para autenticação do aluno e perfil em `students/{uid}`. O fluxo exige contas provisionadas e regras publicadas compatíveis; os dados acadêmicos e os outros perfis continuam demonstrativos. `lib/main.dart` inicia `MainApp` em `lib/app.dart`. Consulte o roteiro em `.plan/geral/autenticacao-perfil/provisionamento.md` antes de validar o acesso remoto.
+Aplicação Flutter/Dart com Firebase em Android/iOS/Web para autenticação do aluno e perfil em `students/{uid}`. O fluxo exige contas provisionadas e regras publicadas compatíveis; os dados acadêmicos e os outros perfis continuam demonstrativos. `lib/main.dart` inicia `MainApp` em `lib/app.dart`. Consulte o roteiro em `.plan/geral/autenticacao-perfil/provisionamento.md` antes de validar o acesso remoto.
 
 | Assunto | Fonte |
 | --- | --- |

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'orbita_colors.dart';
 import 'orbita_theme.dart';
@@ -18,14 +19,48 @@ enum OrbitaThemeOption {
 
 /// Guarda o tema escolhido e avisa o app quando ele muda.
 ///
-/// shortcut: a escolha fica só em memória; ao reiniciar o app, volta ao
-/// vintage. Persistir exigiria um pacote de armazenamento local aprovado.
+/// Com [preferences] e [userId], a escolha é lida na criação e gravada a cada
+/// troca, separada por usuário, e sobrevive ao reinício do app. Sem um dos
+/// dois (sem sessão, ou em testes), fica só em memória.
 class OrbitaThemeController extends ChangeNotifier {
-  OrbitaThemeController({
-    this._option = OrbitaThemeOption.vintage,
-    this._basicColor = BasicThemeColor.blue,
-  });
+  OrbitaThemeController({SharedPreferences? preferences, String? userId})
+    : _preferences = userId == null ? null : preferences,
+      _optionKey = optionKeyFor(userId),
+      _basicColorKey = basicColorKeyFor(userId),
+      _option = _readOption(preferences, optionKeyFor(userId)),
+      _basicColor = _readBasicColor(preferences, basicColorKeyFor(userId));
 
+  static String optionKeyFor(String? userId) => 'orbita.theme.$userId.option';
+
+  static String basicColorKeyFor(String? userId) =>
+      'orbita.theme.$userId.basicColor';
+
+  // Valor ausente ou desconhecido (ex.: tema removido) cai no padrão.
+  static OrbitaThemeOption _readOption(
+    SharedPreferences? preferences,
+    String key,
+  ) {
+    final name = preferences?.getString(key);
+    for (final option in OrbitaThemeOption.values) {
+      if (option.name == name) return option;
+    }
+    return OrbitaThemeOption.vintage;
+  }
+
+  static BasicThemeColor _readBasicColor(
+    SharedPreferences? preferences,
+    String key,
+  ) {
+    final name = preferences?.getString(key);
+    for (final color in BasicThemeColor.values) {
+      if (color.name == name) return color;
+    }
+    return BasicThemeColor.blue;
+  }
+
+  final SharedPreferences? _preferences;
+  final String _optionKey;
+  final String _basicColorKey;
   OrbitaThemeOption _option;
   BasicThemeColor _basicColor;
 
@@ -51,6 +86,7 @@ class OrbitaThemeController extends ChangeNotifier {
   void select(OrbitaThemeOption option) {
     if (option == _option) return;
     _option = option;
+    _save();
     notifyListeners();
   }
 
@@ -59,7 +95,14 @@ class OrbitaThemeController extends ChangeNotifier {
     if (color == _basicColor && _option == OrbitaThemeOption.basic) return;
     _basicColor = color;
     _option = OrbitaThemeOption.basic;
+    _save();
     notifyListeners();
+  }
+
+  // Gravação sem await: a UI já foi atualizada e o valor fica em cache local.
+  void _save() {
+    _preferences?.setString(_optionKey, _option.name);
+    _preferences?.setString(_basicColorKey, _basicColor.name);
   }
 }
 

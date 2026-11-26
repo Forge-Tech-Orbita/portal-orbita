@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/constants/app_routes.dart';
 import 'core/models/app_notification.dart';
@@ -31,8 +32,15 @@ import 'features/support/presentation/support_screen.dart';
 import 'features/support/presentation/ticket_sent_screen.dart';
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key, this.authRepository, this.gradesRepository});
+  const MainApp({
+    super.key,
+    this.authRepository,
+    this.gradesRepository,
+    this.preferences,
+  });
 
+  /// Armazenamento local do tema; sem ele, a escolha não é persistida.
+  final SharedPreferences? preferences;
   final AuthRepository? authRepository;
   final GradesRepository? gradesRepository;
 
@@ -60,7 +68,12 @@ class _MainAppState extends State<MainApp> {
     if (uid == _themeUid) return;
     _themeUid = uid;
     final previous = _themeController;
-    setState(() => _themeController = OrbitaThemeController());
+    setState(
+      () => _themeController = OrbitaThemeController(
+        preferences: widget.preferences,
+        userId: uid,
+      ),
+    );
     previous.dispose();
   }
 

@@ -55,6 +55,6 @@ git diff --check
 ## Documentação e hook
 
 - Para documentação apenas, confira caminhos, links, referências dos consumidores, frontmatter/JSON aplicáveis e `git diff --check`. Confira arquivos não rastreados separadamente; não rode gates Flutter nem reformate o app sem necessidade.
-- Preserve `@AGENTS.md` em `CLAUDE.md`, fora de crases/cercas, com alvo existente e sem cópia das regras. Uma frase curta junto da importação é aceita.
+- Ao alterar instruções gerais, mantenha `CLAUDE.md` como cópia integral de `AGENTS.md` e confira que o conteúdo é idêntico. Não duplique as regras temáticas de `.ai/rules/` nos dois arquivos.
 - Ao alterar `.claude/hooks/check.sh`, execute `bash -n .claude/hooks/check.sh` e `bash .claude/hooks/check-self-test.sh` em Bash. Os testes isolados não substituem a suíte Flutter.
 - O hook cobre formato/análise de alterações relevantes no status; não substitui testes, build ou validação funcional nem autoriza operações Git.

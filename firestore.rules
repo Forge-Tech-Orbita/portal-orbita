@@ -24,6 +24,17 @@ service cloud.firestore {
             && request.resource.data.cursoId == 'si')
         )
         && get(/databases/$(database)/documents/institutions/$(resource.data.instituicaoId)/courses/$(request.resource.data.cursoId)).data.ativo == true;
+      allow update: if owner(uid) && validIdentity(resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['telefone', 'emailPessoal', 'cep', 'endereco'])
+        && request.resource.data.get('telefone', '') is string
+        && request.resource.data.get('emailPessoal', '') is string
+        && request.resource.data.get('cep', '') is string
+        && request.resource.data.get('endereco', '') is string
+        && request.resource.data.get('telefone', '').size() <= 20
+        && request.resource.data.get('emailPessoal', '').size() <= 254
+        && request.resource.data.get('cep', '').size() <= 9
+        && request.resource.data.get('endereco', '').size() <= 200;
       match /grades/{gradeId} {
         // Preservar o get existente das contas A/B, inclusive sem perfil novo.
         allow get: if owner(uid);

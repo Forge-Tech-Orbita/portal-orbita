@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:portal_orbita/core/mock/student_mock.dart';
+import 'package:portal_orbita/core/models/student_profile.dart';
 import 'package:portal_orbita/core/widgets/student_id_card.dart';
 import 'package:portal_orbita/features/auth/presentation/login_screen.dart';
 import 'package:portal_orbita/features/navigation/presentation/main_navigation_screen.dart';
@@ -11,6 +12,7 @@ import 'package:portal_orbita/features/profile/presentation/edit_profile_screen.
 import 'package:portal_orbita/features/profile/presentation/profile_screen.dart';
 import 'package:portal_orbita/features/support/presentation/support_screen.dart';
 
+import 'fake_auth_repository.dart';
 import 'helpers.dart';
 
 final transparentPixel = base64Decode(
@@ -139,6 +141,92 @@ void main() {
     await openEdit(tester);
     expect(find.text('(21) 91234-5678'), findsOneWidget);
     expect(find.text('marina@exemplo.com'), findsOneWidget);
+  });
+
+  test('perfil lê contato opcional e rejeita tipos inválidos', () {
+    const base = {
+      'nome': 'Aluno',
+      'matricula': '202600001',
+      'instituicaoId': 'inst-demo',
+      'cursoId': null,
+      'semestreLetivo': '2026-2',
+      'periodo': 4,
+    };
+    final empty = StudentProfile.fromMap('u1', base);
+    expect(empty.phone, isEmpty);
+    expect(empty.address, isEmpty);
+    final filled = StudentProfile.fromMap('u1', {
+      ...base,
+      'telefone': '(11) 91234-5678',
+      'emailPessoal': 'a@b.com',
+      'cep': '01310-100',
+      'endereco': 'Rua A, 1',
+    });
+    expect(filled.student.phone, '(11) 91234-5678');
+    expect(filled.student.personalEmail, 'a@b.com');
+    expect(filled.student.postalCode, '01310-100');
+    expect(filled.student.address, 'Rua A, 1');
+    expect(
+      () => StudentProfile.fromMap('u1', {...base, 'telefone': 1}),
+      throwsFormatException,
+    );
+  });
+
+  testWidgets('dados de contato são persistidos e relidos pelo perfil', (
+    tester,
+  ) async {
+    final auth = await pumpTestApp(tester);
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      auth.profile.registration,
+    );
+    await tester.enterText(find.byType(TextFormField).last, 'test-only');
+    await tapVisible(tester, find.text('ENTRAR NO PORTAL'));
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+    await openFromMore(tester, 'Meu perfil');
+    expect(find.text('Não informado'), findsWidgets);
+
+    await openEdit(tester);
+    await tester.enterText(fieldFor('Telefone'), '21912345678');
+    await tester.enterText(fieldFor('E-mail pessoal'), 'a@exemplo.com');
+    await tester.enterText(fieldFor('CEP'), '01310100');
+    await tester.enterText(fieldFor('Endereço'), 'Rua A, 1');
+    await save(tester);
+
+    expect(auth.saveContactCalls, 1);
+    expect(auth.profile.phone, '(21) 91234-5678');
+    expect(auth.profile.personalEmail, 'a@exemplo.com');
+    expect(auth.profile.postalCode, '01310-100');
+    expect(auth.profile.address, 'Rua A, 1');
+    expect(find.text('(21) 9••••-5678'), findsOneWidget);
+    expect(find.text('Dados pessoais atualizados.'), findsOneWidget);
+  });
+
+  testWidgets('falha ao persistir mantém a edição aberta com aviso', (
+    tester,
+  ) async {
+    final auth = FakeAuthRepository()..failSaveContact = true;
+    await pumpTestApp(tester, repository: auth);
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      auth.profile.registration,
+    );
+    await tester.enterText(find.byType(TextFormField).last, 'test-only');
+    await tapVisible(tester, find.text('ENTRAR NO PORTAL'));
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+    await openFromMore(tester, 'Meu perfil');
+    await openEdit(tester);
+    await tester.enterText(fieldFor('Telefone'), '21912345678');
+    await save(tester);
+
+    expect(find.byType(EditProfileScreen), findsOneWidget);
+    expect(
+      find.text('Não foi possível salvar os dados. Tente novamente.'),
+      findsOneWidget,
+    );
+    expect(auth.profile.phone, isEmpty);
   });
 
   testWidgets('cancelar a edição mantém os dados', (tester) async {

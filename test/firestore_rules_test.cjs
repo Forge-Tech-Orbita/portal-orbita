@@ -200,6 +200,24 @@ test('curso pertence à instituição, deve estar ativo e só pode ser escolhido
   assert.equal((await request('institutions/inst-horizonte/courses/si', c.token)).status, 200);
 });
 
+test('titular grava apenas contato válido; terceiros e outros campos são negados', async () => {
+  const {a, b} = accounts;
+  const fieldsList = ['telefone', 'emailPessoal', 'cep', 'endereco'];
+  const query = '?' + fieldsList.map(f => `updateMask.fieldPaths=${f}`).join('&');
+  const contact = {telefone: '(11) 91234-5678', emailPessoal: 'a@exemplo.com', cep: '01310-100', endereco: 'Rua A, 1'};
+  assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH', contact, query)).status, 200);
+  assert.equal((await request(`students/${a.uid}`, b.token, 'PATCH', contact, query)).status, 403);
+  assert.equal((await request(`students/${a.uid}`, undefined, 'PATCH', contact, query)).status, 403);
+  assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH',
+    {...contact, endereco: 'x'.repeat(201)}, query)).status, 403);
+  assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH',
+    {telefone: 11999999999}, '?updateMask.fieldPaths=telefone')).status, 403);
+  assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH',
+    {cursoId: 'si', ...contact}, query + '&updateMask.fieldPaths=cursoId')).status, 403);
+  assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH',
+    {matricula: '1'}, '?updateMask.fieldPaths=matricula')).status, 403);
+});
+
 test('preservar get de notas; negar list, escrita e acesso de terceiros', async () => {
   const {a, b, orphan} = accounts;
   const path = `students/${a.uid}/grades/existing`;

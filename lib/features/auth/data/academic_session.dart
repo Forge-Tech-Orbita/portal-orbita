@@ -129,6 +129,36 @@ class AcademicSession extends ChangeNotifier {
     }
   }
 
+  /// Grava os dados de contato e atualiza o perfil em memória; lança em falha.
+  Future<void> saveContact({
+    required String phone,
+    required String personalEmail,
+    required String postalCode,
+    required String address,
+  }) async {
+    final account = _account;
+    if (account == null || profile == null) {
+      throw StateError('Sem sessão ativa.');
+    }
+    final generation = _generation;
+    await repository.saveContact(
+      account.uid,
+      phone: phone,
+      personalEmail: personalEmail,
+      postalCode: postalCode,
+      address: address,
+    );
+    final current = profile;
+    if (_disposed || generation != _generation || current == null) return;
+    profile = current.withContact(
+      phone: phone,
+      personalEmail: personalEmail,
+      postalCode: postalCode,
+      address: address,
+    );
+    notifyListeners();
+  }
+
   Future<void> signOut() async {
     if (_disposed) return;
     _generation++;

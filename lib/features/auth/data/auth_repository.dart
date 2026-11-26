@@ -18,6 +18,13 @@ abstract class AuthRepository {
   Future<StudentProfile> loadProfile(AuthAccount account);
   Future<Set<String>> loadActiveCourseIds(String institutionId);
   Future<void> chooseCourse(String uid, String courseId);
+  Future<void> saveContact(
+    String uid, {
+    required String phone,
+    required String personalEmail,
+    required String postalCode,
+    required String address,
+  });
 }
 
 class FirebaseAuthRepository implements AuthRepository {
@@ -93,5 +100,19 @@ class FirebaseAuthRepository implements AuthRepository {
       throw StateError('Curso já definido ou inválido.');
     }
     transaction.update(reference, {'cursoId': courseId});
+  });
+
+  @override
+  Future<void> saveContact(
+    String uid, {
+    required String phone,
+    required String personalEmail,
+    required String postalCode,
+    required String address,
+  }) => _store.doc('students/$uid').update({
+    'telefone': phone,
+    'emailPessoal': personalEmail,
+    'cep': postalCode,
+    'endereco': address,
   });
 }

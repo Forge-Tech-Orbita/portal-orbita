@@ -10,6 +10,10 @@ class StudentProfile {
     required this.courseId,
     required this.semester,
     required this.period,
+    this.phone = '',
+    this.personalEmail = '',
+    this.postalCode = '',
+    this.address = '',
   });
 
   factory StudentProfile.fromMap(String uid, Map<String, dynamic> data) {
@@ -19,6 +23,13 @@ class StudentProfile {
     final courseId = data['cursoId'];
     final semester = data['semestreLetivo'];
     final period = data['periodo'];
+    final contact = [
+      for (final key in ['telefone', 'emailPessoal', 'cep', 'endereco'])
+        data[key] ?? '',
+    ];
+    if (contact.any((value) => value is! String)) {
+      throw const FormatException('Dados de contato inválidos.');
+    }
     if (uid.isEmpty ||
         name is! String ||
         name.trim().isEmpty ||
@@ -46,6 +57,10 @@ class StudentProfile {
       courseId: courseId as String?,
       semester: semester,
       period: period,
+      phone: contact[0] as String,
+      personalEmail: contact[1] as String,
+      postalCode: contact[2] as String,
+      address: contact[3] as String,
     );
   }
 
@@ -56,6 +71,29 @@ class StudentProfile {
   final String? courseId;
   final String semester;
   final int period;
+  final String phone;
+  final String personalEmail;
+  final String postalCode;
+  final String address;
+
+  StudentProfile withContact({
+    required String phone,
+    required String personalEmail,
+    required String postalCode,
+    required String address,
+  }) => StudentProfile(
+    uid: uid,
+    name: name,
+    registration: registration,
+    institutionId: institutionId,
+    courseId: courseId,
+    semester: semester,
+    period: period,
+    phone: phone,
+    personalEmail: personalEmail,
+    postalCode: postalCode,
+    address: address,
+  );
 
   Student get student => Student(
     name: name,
@@ -75,9 +113,9 @@ class StudentProfile {
     maskedCpf: 'Não informado',
     email: 'Não informado',
     maskedPhone: 'Não informado',
-    phone: '',
-    personalEmail: '',
-    postalCode: '',
-    address: '',
+    phone: phone,
+    personalEmail: personalEmail,
+    postalCode: postalCode,
+    address: address,
   );
 }

@@ -7,14 +7,14 @@ Consulte ao alterar adaptadores, skills ou o hook. As regras de execução ficam
 | Finalidade | Local |
 | --- | --- |
 | Instruções gerais / Codex | `AGENTS.md` |
-| Entrada Claude | `CLAUDE.md`, com importação `@AGENTS.md` |
+| Entrada Claude | `CLAUDE.md`, cópia integral de `AGENTS.md` |
 | Entrada Copilot | `.github/copilot-instructions.md` |
 | Entrada Antigravity | `.agents/rules/portal-orbita.md` |
 | Skills | `.agents/skills/<nome>/SKILL.md`; catálogo em `AGENTS.md` |
 | Configuração do hook Claude | `.claude/settings.json` |
 | Hook e autoteste | `.claude/hooks/check.sh`, `.claude/hooks/check-self-test.sh` |
 
-Atualize referências e consumidores quando mover esses arquivos. Preserve a importação Claude e evite copiar regras para os adaptadores.
+Atualize referências e consumidores quando mover esses arquivos. `AGENTS.md` é a fonte das instruções gerais; mantenha `CLAUDE.md` idêntico para que o Claude não dependa da importação. As regras temáticas continuam apenas em `.ai/rules/`.
 
 ## Hook
 

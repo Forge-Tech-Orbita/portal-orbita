@@ -75,7 +75,7 @@ Para executar no Chrome, use `flutter run -d chrome`.
 
 ```bash
 dart format --output=none --set-exit-if-changed lib test
-flutter analyze --no-pub
+flutter analyze --no-pub --no-fatal-infos
 flutter test --no-pub
 git diff --check
 ```

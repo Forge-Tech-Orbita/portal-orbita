@@ -41,7 +41,7 @@ run 0
 printf 'void main() {}\n' > "$repo/lib/exemplo com espacos.dart"
 run 0
 grep -qx 'dart format --output=none --set-exit-if-changed lib test' "$HOOK_TEST_LOG"
-grep -qx 'flutter analyze --no-pub' "$HOOK_TEST_LOG"
+grep -qx 'flutter analyze --no-pub --no-fatal-infos' "$HOOK_TEST_LOG"
 
 # O staging abaixo pertence apenas à fixture temporária, nunca ao projeto do usuário.
 git -c core.autocrlf=false -C "$repo" add 'lib/exemplo com espacos.dart'

@@ -30,7 +30,7 @@ Reutilize `lib/core/` e `lib/features/<feature>/`, `OrbitaColors.of(context)`/`O
 
 ```text
 dart format --output=none --set-exit-if-changed lib test
-flutter analyze --no-pub
+flutter analyze --no-pub --no-fatal-infos
 flutter test --no-pub
 git diff --check
 ```

@@ -213,7 +213,7 @@ test('titular grava apenas contato válido; terceiros e outros campos são negad
   assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH',
     {telefone: 11999999999}, '?updateMask.fieldPaths=telefone')).status, 403);
   assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH',
-    {cursoId: 'si', ...contact}, query + '&updateMask.fieldPaths=cursoId')).status, 403);
+    {nome: 'alterado', ...contact, telefone: '(11) 90000-0000'}, query + '&updateMask.fieldPaths=nome')).status, 403);
   assert.equal((await request(`students/${a.uid}`, a.token, 'PATCH',
     {matricula: '1'}, '?updateMask.fieldPaths=matricula')).status, 403);
 });

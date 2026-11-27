@@ -50,6 +50,62 @@ void main() {
     expect(nextClassFrom({}, thursday), isNull);
   });
 
+  test('próxima aula inclui ocorrência após 7 dias quando há aula em um só dia da semana', () {
+    const singleWednesdayLesson = ScheduledClass(
+      time: '08:00',
+      subject: 'Laboratório de Redes',
+      room: 'Lab 01',
+      professor: 'Prof. Teste',
+      color: Colors.blue,
+    );
+    final singleDaySchedule = <ScheduleDay, List<ScheduledClass>>{
+      ScheduleDay.monday: [],
+      ScheduleDay.tuesday: [],
+      ScheduleDay.wednesday: [singleWednesdayLesson],
+      ScheduleDay.thursday: [],
+      ScheduleDay.friday: [],
+      ScheduleDay.saturday: [],
+    };
+
+    // 1. Consulta após a última aula do dia (quarta 25/11 às 11:00) retorna aula de 7 dias depois
+    final afterClass = nextClassFrom(
+      singleDaySchedule,
+      DateTime(2026, 11, 25, 11, 0),
+    );
+    expect(afterClass, isNotNull);
+    expect(afterClass!.lesson.subject, 'Laboratório de Redes');
+    expect(afterClass.when, 'Qua · 08:00');
+    expect(afterClass.startsIn, isNull);
+
+    // 2. Consulta antes da aula, no mesmo dia, retorna a aula de hoje
+    final beforeClass = nextClassFrom(
+      singleDaySchedule,
+      DateTime(2026, 11, 25, 7, 0),
+    );
+    expect(beforeClass, isNotNull);
+    expect(beforeClass!.lesson.subject, 'Laboratório de Redes');
+    expect(beforeClass.when, 'Hoje · 08:00');
+    expect(beforeClass.startsIn, 'em 1h00');
+
+    // 3. Consulta em outro dia da semana continua retornando a próxima ocorrência
+    final otherDay = nextClassFrom(
+      singleDaySchedule,
+      DateTime(2026, 11, 24, 10, 0),
+    );
+    expect(otherDay, isNotNull);
+    expect(otherDay!.lesson.subject, 'Laboratório de Redes');
+    expect(otherDay.when, 'Qua · 08:00');
+    expect(otherDay.startsIn, isNull);
+  });
+
+  test('nextClassFrom preserva retorno null para grade vazia', () {
+    expect(nextClassFrom({}, thursday), isNull);
+    expect(
+      nextClassFrom({for (final day in ScheduleDay.values) day: []}, thursday),
+      isNull,
+    );
+  });
+
   test('próxima aula de ADM vem da grade de ADM', () {
     final schedule = scheduleFor(AcademicDemo.administration)!;
     final next = nextClassFrom(schedule.lessons, DateTime(2026, 11, 19, 17));

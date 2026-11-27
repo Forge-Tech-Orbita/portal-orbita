@@ -60,7 +60,7 @@ NextClass? nextClassFrom(
   DateTime now,
 ) {
   final nowMinutes = now.hour * 60 + now.minute;
-  for (var offset = 0; offset < 7; offset++) {
+  for (var offset = 0; offset <= 7; offset++) {
     final date = now.add(Duration(days: offset));
     if (date.weekday == DateTime.sunday) continue;
     final lessons = [...?schedule[ScheduleDay.forDate(date)]]

@@ -1,9 +1,19 @@
+<img width="2000" height="632" alt="forgetech-logo-escuro" src="https://github.com/user-attachments/assets/13ad749f-7d4b-475e-800d-94c38a002041" />
+
+
+<div align="center">
+
 # Portal Órbita
+
+<img width="280" alt="Logo do Portal Órbita" src="https://github.com/user-attachments/assets/a204e67d-4962-4b38-941f-2609f40befaa" />
+
+</div>
 
 Ambiente acadêmico simulado desenvolvido em Flutter/Dart, com acesso do aluno,
 perfil e notas integrados ao Firebase e demais funcionalidades demonstrativas.
-O projeto tem estrutura para Android, iOS e Web; Firebase está configurado somente
-em Android e Web.
+O projeto tem estrutura para Android, iOS e Web; Firebase está configurado em
+Android, iOS e Web. No iOS, o teste foi feito em iPhone físico, com instalação local
+assinada para desenvolvimento; não há publicação na App Store/TestFlight.
 
 ## Demonstração publicada
 
@@ -34,7 +44,7 @@ Solicite à equipe a senha de acesso. As contas e os dados são fictícios, e n�
 
 ### Ainda simuladas
 
-- **Aluno:** próxima aula, horário, notificações, disciplinas, financeiro/Pix/boleto, biblioteca/reservas, materiais, mural e suporte. Esses módulos não consultam dados acadêmicos reais.
+- **Aluno:** próxima aula, horário, notificações, disciplinas, financeiro/Pix/boleto, biblioteca/reservas, materiais, mural e suporte. Esses módulos não consultam dados acadêmicos reais. Disciplinas, horário, próxima aula e materiais usam o catálogo demonstrativo correspondente à instituição, ao curso e ao semestre do perfil.
 - **Professor:** início, turmas, materiais, frequência somente leitura e comunicados.
 - **Coordenação:** painel com indicadores, turmas, materiais, eventos e comunicados.
 - **Portal administrativo:** login e verificação em duas etapas simulados, painel, usuários, chamados, permissões e auditoria. Não há autenticação ou autorização administrativa real.

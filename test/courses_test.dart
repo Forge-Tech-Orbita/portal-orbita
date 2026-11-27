@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portal_orbita/core/mock/academic_demo.dart';
 import 'package:portal_orbita/features/courses/data/courses_mock.dart';
 import 'package:portal_orbita/features/courses/presentation/courses_screen.dart';
 import 'package:portal_orbita/features/materials/presentation/materials_screen.dart';
@@ -47,9 +48,26 @@ void main() {
   });
 
   for (final size in testViewports) {
+    testWidgets('disciplinas de ADM alcançáveis com texto 2× em $size', (
+      tester,
+    ) async {
+      useViewport(tester, size, textScale: 2);
+      await pumpScreen(
+        tester,
+        Scaffold(
+          body: CoursesScreen(courses: coursesFor(AcademicDemo.administration)),
+        ),
+      );
+      await tester.ensureVisible(find.text('Sala 103'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
     testWidgets('último card alcançável sem overflow em $size', (tester) async {
       useViewport(tester, size, textScale: 1.5);
-      await pumpScreen(tester, const Scaffold(body: CoursesScreen()));
+      await pumpScreen(
+        tester,
+        const Scaffold(body: CoursesScreen(courses: demoCourses)),
+      );
       await tester.ensureVisible(find.text('Sala 212'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

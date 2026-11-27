@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyASjK774XqlME2RbBH1DKpw0CKD_rOs_us</string>
+	<key>GCM_SENDER_ID</key>
+	<string>591651377504</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.forgetech.plataformaorbita</string>
+	<key>PROJECT_ID</key>
+	<string>portal-orbita</string>
+	<key>STORAGE_BUCKET</key>
+	<string>portal-orbita.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:591651377504:ios:e5c80cea2b50a82b914e05</string>
+</dict>
+</plist>

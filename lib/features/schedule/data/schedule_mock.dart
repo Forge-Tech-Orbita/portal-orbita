@@ -1,8 +1,57 @@
+import '../../../core/mock/academic_demo.dart';
 import '../../../core/theme/orbita_theme.dart';
 import 'schedule.dart';
 
 const scheduleGroup = 'ESW-6N';
-const scheduleTerm = '2026.2';
+typedef DemoSchedule = ({
+  String group,
+  Map<ScheduleDay, List<ScheduledClass>> lessons,
+});
+
+DemoSchedule? scheduleFor(AcademicDemo? demo) => switch (demo) {
+  AcademicDemo.informationSystems => (
+    group: scheduleGroup,
+    lessons: demoSchedule,
+  ),
+  AcademicDemo.administration => (
+    group: 'ADM-4N',
+    lessons: _administrationSchedule,
+  ),
+  null => null,
+};
+
+const _administrationSchedule = <ScheduleDay, List<ScheduledClass>>{
+  ScheduleDay.monday: [
+    ScheduledClass(
+      time: '19:00',
+      subject: peopleManagementSubject,
+      room: peopleManagementRoom,
+      professor: peopleManagementProfessor,
+      color: OrbitaTheme.primary,
+    ),
+  ],
+  ScheduleDay.tuesday: [
+    ScheduledClass(
+      time: '19:00',
+      subject: managementAccountingSubject,
+      room: managementAccountingRoom,
+      professor: managementAccountingProfessor,
+      color: OrbitaTheme.amber,
+    ),
+  ],
+  ScheduleDay.wednesday: [],
+  ScheduleDay.thursday: [
+    ScheduledClass(
+      time: '19:00',
+      subject: marketingSubject,
+      room: marketingRoom,
+      professor: marketingProfessor,
+      color: OrbitaTheme.terracotta,
+    ),
+  ],
+  ScheduleDay.friday: [],
+  ScheduleDay.saturday: [],
+};
 
 const _artificialIntelligence = ScheduledClass(
   time: '19:00',

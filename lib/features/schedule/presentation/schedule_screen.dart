@@ -6,7 +6,15 @@ import '../data/schedule.dart';
 import '../data/schedule_mock.dart';
 
 class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key, this.now});
+  const ScheduleScreen({
+    super.key,
+    required this.schedule,
+    this.semester,
+    this.now,
+  });
+
+  final DemoSchedule? schedule;
+  final String? semester;
 
   /// Data de referência, substituível em testes.
   final DateTime? now;
@@ -23,7 +31,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget build(BuildContext context) {
     final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final lessons = demoSchedule[_currentDay]!;
+    final schedule = widget.schedule;
+    final semester = widget.semester?.replaceFirst('-', '.');
+    final lessons = schedule?.lessons[_currentDay] ?? const [];
     final todayLabel =
         '${weekdayName(_today)}, '
         '${_today.day.toString().padLeft(2, '0')}/'
@@ -53,8 +63,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Abre no dia de hoje ($todayLabel). '
-            'Grade da turma $scheduleGroup, $scheduleTerm.',
+            schedule == null || semester == null
+                ? 'Abre no dia de hoje ($todayLabel).'
+                : 'Abre no dia de hoje ($todayLabel). '
+                      'Grade da turma ${schedule.group}, $semester.',
             style: textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
@@ -66,7 +78,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   const Icon(Icons.calendar_today_outlined, size: 34),
                   const SizedBox(height: 12),
                   Text(
-                    'Sem aulas em ${_currentDay.label}',
+                    schedule == null
+                        ? 'Nenhuma grade demonstrativa para este perfil.'
+                        : 'Sem aulas em ${_currentDay.label}',
                     textAlign: TextAlign.center,
                   ),
                 ],

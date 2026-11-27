@@ -4,15 +4,19 @@ import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/orbita_colors.dart';
 import '../../../core/widgets/page_heading.dart';
 import '../../../core/widgets/status_tag.dart';
-import '../data/courses_mock.dart';
+import '../data/course.dart';
 
 class CoursesScreen extends StatelessWidget {
-  const CoursesScreen({super.key});
+  const CoursesScreen({super.key, required this.courses, this.semester});
+
+  final List<Course> courses;
+  final String? semester;
 
   @override
   Widget build(BuildContext context) {
     final colors = OrbitaColors.of(context);
     final textTheme = Theme.of(context).textTheme;
+    final term = semester?.replaceFirst('-', '.');
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -20,16 +24,22 @@ class CoursesScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PageHeading(
-            overline: 'Semestre 2026.2 · atual',
+            overline: term == null || courses.isEmpty
+                ? 'Disciplinas demonstrativas'
+                : 'Semestre $term · atual',
             title: 'Minhas disciplinas',
-            trailing: TextButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.materials),
-              child: const Text('ver materiais'),
+            trailing: Flexible(
+              child: TextButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.materials),
+                child: const Text('ver materiais', textAlign: TextAlign.center),
+              ),
             ),
           ),
           const SizedBox(height: 12),
-          for (final course in demoCourses)
+          if (courses.isEmpty)
+            const Text('Nenhuma disciplina demonstrativa para este perfil.'),
+          for (final course in courses)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Card(

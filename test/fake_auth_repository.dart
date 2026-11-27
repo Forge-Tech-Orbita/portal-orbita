@@ -23,6 +23,8 @@ class FakeAuthRepository implements AuthRepository {
   Completer<void>? pendingSignIn;
   bool failProfile = false;
   bool failSignOut = false;
+  bool failSaveContact = false;
+  int saveContactCalls = 0;
   int signInCalls = 0;
   int signOutCalls = 0;
 
@@ -93,6 +95,24 @@ class FakeAuthRepository implements AuthRepository {
       courseId: courseId,
       semester: profile.semester,
       period: profile.period,
+    );
+  }
+
+  @override
+  Future<void> saveContact(
+    String uid, {
+    required String phone,
+    required String personalEmail,
+    required String postalCode,
+    required String address,
+  }) async {
+    saveContactCalls++;
+    if (failSaveContact || uid != profile.uid) throw StateError('Offline');
+    profile = profile.withContact(
+      phone: phone,
+      personalEmail: personalEmail,
+      postalCode: postalCode,
+      address: address,
     );
   }
 

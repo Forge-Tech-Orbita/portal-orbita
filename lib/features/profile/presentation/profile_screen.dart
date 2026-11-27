@@ -26,7 +26,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   var _pushNotifications = true;
   late var _biometrics = !widget.isWeb;
-  // shortcut: dados e foto ficam só no estado da tela, sem persistência.
+  // shortcut: a foto fica só no estado da tela, sem persistência.
   PersonalData? _localData;
   String? _dataUid;
 
@@ -50,8 +50,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _edit() async {
-    final student =
-        AcademicSessionScope.maybeOf(context)?.profile?.student ?? demoStudent;
+    final session = AcademicSessionScope.maybeOf(context);
+    final student = session?.profile?.student ?? demoStudent;
     final data = await Navigator.of(context).push<PersonalData>(
       MaterialPageRoute(
         settings: const RouteSettings(name: AppRoutes.editProfile),
@@ -59,6 +59,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           initial: _data,
           pickPhoto: widget.pickPhoto,
           student: student,
+          onSave: session?.profile == null
+              ? null
+              : (data) => session!.saveContact(
+                  phone: data.phone,
+                  personalEmail: data.personalEmail,
+                  postalCode: data.postalCode,
+                  address: data.address,
+                ),
         ),
       ),
     );

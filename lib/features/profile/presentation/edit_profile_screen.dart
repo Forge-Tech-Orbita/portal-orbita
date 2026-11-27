@@ -82,7 +82,11 @@ class EditProfileScreen extends StatefulWidget {
     required this.initial,
     this.pickPhoto,
     this.student = demoStudent,
+    this.onSave,
   });
+
+  /// Persiste os dados; sem ela, a atualização é apenas simulada.
+  final Future<void> Function(PersonalData data)? onSave;
 
   final Student student;
 
@@ -175,18 +179,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     FocusScope.of(context).unfocus();
     setState(() => _saving = true);
-    // shortcut: atualização simulada, sem persistência; integrar cadastro em etapa própria.
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-
     final digits = _phone.text.replaceAll(RegExp(r'\D'), '');
-    Navigator.of(context).pop<PersonalData>((
+    final data = (
       phone: formatPhone(digits),
       personalEmail: _personalEmail.text.trim(),
       postalCode: formatPostalCode(_postalCode.text),
       address: _address.text.trim(),
       photo: _photo,
-    ));
+    );
+    try {
+      final onSave = widget.onSave;
+      if (onSave == null) {
+        // shortcut: sem sessão (demonstração), a atualização é simulada.
+        await Future<void>.delayed(const Duration(milliseconds: 900));
+      } else {
+        await onSave(data);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      _showMessage('Não foi possível salvar os dados. Tente novamente.');
+      return;
+    }
+    if (!mounted) return;
+    Navigator.of(context).pop<PersonalData>(data);
   }
 
   @override

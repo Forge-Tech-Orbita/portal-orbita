@@ -25,7 +25,7 @@ Execute separadamente:
 
 ```text
 dart format --output=none --set-exit-if-changed lib test
-flutter analyze --no-pub
+flutter analyze --no-pub --no-fatal-infos
 flutter test --no-pub
 git diff --check
 ```
@@ -33,6 +33,7 @@ git diff --check
 - No primeiro erro, investigue/corrija, reexecute a verificação que falhou e complete as restantes, conforme `.ai/rules/geral.md`.
 - Formate somente arquivos afetados com `dart format <caminho>`; não use formatação ampla para modificar trabalho fora do escopo.
 - Não introduza novos erros/warnings. Registre falhas e avisos preexistentes sem escondê-los ou corrigi-los fora do pedido; não altere expectativas para mascarar regressões.
+- `--no-fatal-infos` mantém todos os diagnósticos visíveis e só reprova o gate em warning ou erro. Ele existe porque o SDK atual marca `package:flutter/material.dart` como obsoleto (`deprecated_member_use`, nível `info`) em dezenas de arquivos; não é autorização para ignorar outros `info`. Não introduza novos `info`; a migração para `material_ui` é uma decisão separada da equipe.
 
 ## Testes
 

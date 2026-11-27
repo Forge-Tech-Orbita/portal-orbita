@@ -31,6 +31,6 @@ if ! dart format --output=none --set-exit-if-changed lib test >&2; then
   block 'Falha na verificação de formato. Formate somente os arquivos da tarefa e execute a checagem novamente.'
 fi
 
-if ! flutter analyze --no-pub >&2; then
+if ! flutter analyze --no-pub --no-fatal-infos >&2; then
   block 'Falha na análise. Confira os diagnósticos e as dependências já declaradas; não esconda erros nem execute upgrade automático.'
 fi

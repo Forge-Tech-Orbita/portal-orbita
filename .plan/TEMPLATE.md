@@ -22,7 +22,7 @@
 6. Resolva decisões bloqueantes antes de mudar negócio, navegação ou contratos.
 7. Siga `.ai/rules/qualidade.md`: formate somente arquivos afetados quando necessário e execute as verificações abaixo separadamente. No primeiro erro, interrompa a sequência, investigue/corrija e reexecute antes de prosseguir:
    - `dart format --output=none --set-exit-if-changed lib test`
-   - `flutter analyze --no-pub`
+   - `flutter analyze --no-pub --no-fatal-infos`
    - `flutter test --no-pub`
    - `git diff --check`
 8. Preserve a suíte real em `test/`. Atualize testes de comportamento afetado; não introduza outra stack. Para documentação apenas, use as validações documentais em `.ai/rules/qualidade.md` sem reformatação ampla do app.

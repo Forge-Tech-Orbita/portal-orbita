@@ -70,6 +70,42 @@ void main() {
     expect(find.text('J. Stewart · 8ª ed.'), findsOneWidget);
   });
 
+  testWidgets('empréstimos e acervo respondem igual à mesma consulta', (
+    tester,
+  ) async {
+    const neural = 'Redes Neurais e Deep Learning';
+    const algorithms = 'Estruturas de Dados e Algoritmos';
+    const cases = <(String, bool, bool)>[
+      ('GOODFELLOW', true, false),
+      ('cormen', false, true),
+      ('ESTRUTURAS', false, true),
+      ('neurais', true, false),
+      ('inexistente', false, false),
+    ];
+
+    for (final (query, showsNeural, showsAlgorithms) in cases) {
+      await pumpScreen(tester, const LibraryScreen());
+      await tester.enterText(find.byType(TextField), query);
+      await tester.pumpAndSettle();
+      final loansNeural = find.text(neural).evaluate().isNotEmpty;
+      final loansAlgorithms = find.text(algorithms).evaluate().isNotEmpty;
+
+      await pumpScreen(
+        tester,
+        CatalogScreen(
+          initial: CatalogQuery(query: query, category: LibraryCategory.all),
+        ),
+      );
+      final catalogNeural = find.text(neural).evaluate().isNotEmpty;
+      final catalogAlgorithms = find.text(algorithms).evaluate().isNotEmpty;
+
+      expect(loansNeural, showsNeural, reason: 'empréstimos: $query');
+      expect(catalogNeural, showsNeural, reason: 'acervo: $query');
+      expect(loansAlgorithms, showsAlgorithms, reason: 'empréstimos: $query');
+      expect(catalogAlgorithms, showsAlgorithms, reason: 'acervo: $query');
+    }
+  });
+
   testWidgets('concluir a busca abre o acervo com a consulta', (tester) async {
     await loginAs(tester);
     await openFromMore(tester, 'Biblioteca');
